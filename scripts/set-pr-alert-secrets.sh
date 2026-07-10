@@ -5,9 +5,13 @@
 
 set -euo pipefail
 
-# First rollout only. Add approved repository names here for later rollouts.
+# Approved repositories for the PR-alert rollout.
 REPOS=(
   "natalyx-developer-context-skills"
+  "natalyx-app"
+  "natalyx-intelligence"
+  "natalyx-infra"
+  "natalyx-learn-resources"
 )
 
 SMTP_HOST="smtp.gmail.com"
