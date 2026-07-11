@@ -11,6 +11,11 @@ from typing import Any
 
 
 PROJECT_URL = "https://github.com/orgs/NatalyxPlatform/projects/3"
+PROJECT_BENCHED = True
+DRIVE_PACKAGE_URL = "https://drive.google.com/drive/folders/1fWFyWPcFMEm15BbHXngBH4NzqAaIf2yR"
+DRIVE_MD_FOLDER_URL = "https://drive.google.com/drive/folders/1eKIbuD0lWabm55ZbH3pAv1x-0_Wd3aH3"
+DRIVE_PDF_FOLDER_URL = "https://drive.google.com/drive/folders/1FtZIYVD0y7OmhO7WJmJpJS-ulxesxtU1"
+DRIVE_OVERVIEW_URL = "https://drive.google.com/file/d/1It9TNlHX63A6xmdLXtN9_Nzv30Ey-8qY/view?usp=drivesdk"
 INSPECTED_AT = "2026-07-10 20:12 America/New_York"
 PR_INSPECTED_AT = "2026-07-11T00:59:11Z (2026-07-10 20:59:11 America/New_York)"
 PLAN_BRANCH = "plan/mvp-product-flow-reshape"
@@ -1545,7 +1550,7 @@ PROJECT_FIELDS = [
 PROJECT_CONVENTIONS = {
     "project": "MVP Product Flow Reshape",
     "number": 3,
-    "status": "Reuse GitHub's Todo / In Progress / Done field for execution state.",
+    "status": "Benched and closed pending Alan's review of the Drive-only package; do not use for execution until jointly reactivated.",
     "hierarchy": "Draft items cannot be true GitHub sub-issues. Work-package parents are identifiable draft epics; child PR/decision/gate items link by Work package and Dependencies fields and exact IDs. Convert only when real implementation begins.",
     "readiness": "Readiness is independent from Status. A Todo item may be blocked, awaiting reconciliation, plan-ready or ready to implement.",
     "assignment": "Alan is a proposed implementer pending his review/sign-off; Project fields describe the recommendation, not an imposed assignment.",

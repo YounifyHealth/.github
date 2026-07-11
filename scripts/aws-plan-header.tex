@@ -1,0 +1,25 @@
+% Restrained document styling based on the earlier AWS migration-plan PDF.
+\usepackage{xcolor}
+\usepackage{etoolbox}
+\definecolor{linkblue}{HTML}{0000CC}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.55em}
+\setlength{\emergencystretch}{3em}
+\sloppy
+\renewcommand{\arraystretch}{1.13}
+\AtBeginEnvironment{longtable}{\small}
+\makeatletter
+\renewcommand\section{\@startsection{section}{1}{\z@}%
+  {-3.5ex \@plus -1ex \@minus -.2ex}%
+  {2.3ex \@plus .2ex}%
+  {\normalfont\Large\sffamily\bfseries}}
+\renewcommand\subsection{\@startsection{subsection}{2}{\z@}%
+  {-3.25ex\@plus -1ex \@minus -.2ex}%
+  {1.5ex \@plus .2ex}%
+  {\normalfont\large\sffamily\bfseries}}
+\renewcommand\subsubsection{\@startsection{subsubsection}{3}{\z@}%
+  {-3.25ex\@plus -1ex \@minus -.2ex}%
+  {1.2ex \@plus .2ex}%
+  {\normalfont\normalsize\sffamily\bfseries}}
+\makeatother
+\newcommand{\plantitle}[1]{\colorbox{yellow}{\strut\sffamily\bfseries #1}}

@@ -85,7 +85,7 @@ PROJECT_QUERY = """
 query($org: String!, $number: Int!, $after: String) {
   organization(login: $org) {
     projectV2(number: $number) {
-      id title url shortDescription readme
+      id title url shortDescription readme closed
       fields(first: 100) {
         nodes {
           ... on ProjectV2FieldCommon { id name dataType }
@@ -889,6 +889,10 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--apply", action="store_true", help="Apply idempotent Project mutations")
     args = parser.parse_args()
+    if args.apply and getattr(data, "PROJECT_BENCHED", False):
+        raise SystemExit(
+            "Project 3 is benched pending Drive-plan approval. Do not apply the active sync until the programme is jointly reactivated."
+        )
     print(json.dumps(sync(args.apply), indent=2, sort_keys=True))
 
 
