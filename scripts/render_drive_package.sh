@@ -4,7 +4,8 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
-python scripts/build_drive_package.py
+PYTHON="${PYTHON:-$(command -v python3)}"
+"$PYTHON" scripts/build_drive_package.py
 
 COMMON=(
   --from=markdown+yaml_metadata_block+pipe_tables+task_lists+raw_tex

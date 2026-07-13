@@ -99,7 +99,7 @@ def bench_project(project_id: str) -> None:
             "input": {
                 "projectId": project_id,
                 "closed": True,
-                "shortDescription": "Benched pending Alan review of the Drive-only MVP Fixes plan; not an active implementation tracker.",
+                "shortDescription": "Benched after technical reconciliation; not an active implementation tracker until the amended Drive package is jointly accepted and separately reactivated.",
                 "readme": readme,
             }
         },

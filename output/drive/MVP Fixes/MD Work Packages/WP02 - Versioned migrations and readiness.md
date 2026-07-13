@@ -2,8 +2,8 @@
 title: '\plantitle{Natalyx MVP Fixes}'
 title-meta: "Natalyx MVP Fixes"
 subtitle: "Work Package 02: Versioned migrations and readiness"
-author: "L. Rhodes (plan owner) - A. Zhao (technical review requested)"
-date: "2026-07-10"
+author: "L. Rhodes (plan owner) - A. Zhao (technical feedback reconciled)"
+date: "2026-07-12"
 ---
 # Work Package 02: Versioned migrations and readiness
 
@@ -14,7 +14,7 @@ date: "2026-07-10"
 | Work package | WP02 |
 | Plan file | `WP02 - Versioned migrations and readiness.md` |
 | Proposed PRs | P02-01, P02-02, P02-03, P02-04 |
-| Inspection snapshot | 2026-07-10 20:12 America/New_York |
+| Inspection snapshot | 2026-07-12 19:30 America/New_York |
 
 ## Purpose and outcome
 
@@ -40,6 +40,7 @@ Classification is explicit: **verified** is observed code/PR/live behavior; **ve
 | E-007 | verified | app / feature/byos-node0-consolidation@84a5a84 | app/storage/schema.py:1-33,353-880 | Schema ownership is a monolithic init_db/ensure_column routine with inline CREATE TABLE/ALTER TABLE and no ordered migration/version/checksum ledger. |
 | E-008 | verified | app / origin/main@fdf2bb4 | app/main.py:295-313 | Cloud startup validates auth/storage then calls storage.init_db in-process; readiness is not separated from migration execution. |
 | E-009 | verified | app / origin/main@fdf2bb4 | app/storage/connection.py:14-57,93-123 | The app supports pooled PostgreSQL and SQLite with a SQL compatibility adapter; PostgreSQL is the cloud backend but the current suite is predominantly local. |
+| E-030 | independently reproduced defect | app / feat/byos-journey-wave-2@5b63e3a7 | app/storage/schema.py orphan cleanup; document review CAS/work-item payload | A second init_db deletes canonical case-anchored reviewer work because participant_id is empty. Separately, a stale v1 work item can approve v2 after same-row resubmission because it is not bound to an immutable submission revision. |
 
 ## Architecture and contracts
 
@@ -61,40 +62,46 @@ Classification is explicit: **verified** is observed code/PR/live behavior; **ve
 
 ### Migration ADR contract
 
-Options:
+Options Alan must assess:
 
 1. Alembic with reviewed operations/raw SQL
 2. Custom ordered Python migrations with a demonstrated reason not to use an established framework
 3. A standalone established runner such as Flyway/dbmate if its runtime/deployment burden fits
 
-**Provisional recommendation.** Favor Alembic unless the ADR proves it cannot safely serve the current raw-SQL/SQLite compatibility architecture.
+**Founder constraints and independent recommendation.** Founder constraints are final: Alan should prefer Alembic or another well-supported low-maintenance framework, while retaining authority to choose a different established runner or justify a custom runner in the ADR.
 
-- PostgreSQL is production authority; SQLite is a supported local/test projection only if the ADR retains it.
+- Zero intended data loss is the governing reliability objective.
+- PostgreSQL is production authority; SQLite may remain a convenient synthetic local-development projection without full production parity.
 - Fingerprint existing databases before baseline stamping; never blindly stamp unknown schema.
 - App and intelligence use separate revision namespaces and PostgreSQL advisory-lock keys.
 - Migration identities hold DDL; app/intelligence runtime identities do not after adoption.
 - Run migrations in a deploy-controlled one-off task before app rollout, not opportunistically from web startup.
-- Use expand in release N, bounded/backpressure-aware backfill, dual-compatible N+1, then contract only when N cannot run.
+- Stage consequential changes and keep them backward-compatible wherever reasonably possible; use expand in release N, bounded/backpressure-aware backfill, dual-compatible N+1, then contract only when N cannot run.
 - CI covers fresh, current, one-revision-behind, N-1 app on expanded schema, concurrent runner, checksum drift and interrupted backfill.
-- Irreversible changes require backup evidence, explicit approval and forward-repair plan. Schema rollback is not automatic.
+- Every consequential migration has tested recovery or rollback evidence before use.
+- Scheduled and communicated beta downtime may be up to 30 minutes when a tested recovery plan exists.
+- Irreversible changes that could affect real-user data require explicit evidence and Luke approval plus a forward-repair plan. Schema rollback is not automatic.
 
 ## Explicit PR sequence
 
-| Order | ID | Title | Repository | Dependencies | Gate | Size | Readiness |
+| Order | ID | Title | Repository | Dependencies | Gate | Local preparation | Merge readiness |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | P02-01 | Decide migration architecture and compatibility contract | app | P01-01 | A0 | Small | Blocked by decision |
-| 2 | P02-02 | Introduce versioned migration runner and readiness checks | app | P02-01 | A0 | Large | Dependencies unmet |
-| 3 | P02-03 | Baseline canonical schema and prove expand-contract repair | app | P02-02 | A1 | Large | Dependencies unmet |
-| 4 | P02-04 | Move intelligence persistence to a revisioned migration namespace | intelligence | P02-01, P02-02 | A1 | Large | Dependencies unmet |
+| 1 | P02-01 | Decide migration architecture and compatibility contract | app | P01-01 | A0 | Technical-decision preparation only; implementation waits on named dependencies | Blocked pending PR dependencies P01-01; Luke review/final founder approval |
+| 2 | P02-02 | Introduce versioned migration runner and readiness checks | app | P02-01 | A0 | Not ready; named PR, decision or programme-acceptance prerequisites remain | Blocked pending PR dependencies P02-01; technical decisions/controls D-MIG-01; Luke review/final founder approval |
+| 3 | P02-03 | Baseline canonical schema and prove expand-contract repair | app | P02-02 | A1 | Not ready; named PR, decision or programme-acceptance prerequisites remain | Blocked pending PR dependencies P02-02; technical decisions/controls D-MIG-01; Gate A0 active and verified; Luke review/final founder approval |
+| 4 | P02-04 | Move intelligence persistence to a revisioned migration namespace | intelligence | P02-01, P02-02 | A1 | Not ready; named PR, decision or programme-acceptance prerequisites remain | Blocked pending PR dependencies P02-01, P02-02; Gate A0 active and verified; Luke review/final founder approval |
 
 ### P02-01 - Decide migration architecture and compatibility contract
 
 | Field | Plan |
 | --- | --- |
 | Repository / base | `app` (`main`) |
-| Gate / size / readiness | A0 / Small / Blocked by decision |
+| Gate / size | A0 / Small |
+| Local preparation status | Technical-decision preparation only; implementation waits on named dependencies |
+| Merge readiness | Blocked pending PR dependencies P01-01; Luke review/final founder approval |
+| Technical-decision owner | D-MIG-01: Alan - immediate framework, sequencing and recovery mechanism |
 | Dependencies | P01-01 |
-| Blocking decisions/checkpoints | D-MIG-01 |
+| Blocking decisions/checkpoints | None beyond dependencies and plan approval |
 | Source / salvage | app/storage/schema.py, app/storage/connection.py |
 
 #### Objective
@@ -163,16 +170,19 @@ Hard dependencies: P01-01. Parallel opportunities: P02-03
 - [ ] Record an ADR choosing an established migration framework or justified ordered runner, including PostgreSQL authority, SQLite support, locks, expand/contract, backfills, rollback, and forward repair.
 - [ ] Every listed objective test passes locally and at the required gate where applicable.
 - [ ] Every explicit non-goal remains out of the diff and no protected worktree/branch is modified during extraction.
+- [ ] The planning record has matching dependency, local-preparation, merge-readiness, ownership, gate and disposition fields.
 - [ ] Rollout/repair evidence is attached before merge; unresolved decisions remain blocked rather than encoded as guesses.
 
 #### Ownership and review
 
 | Role | Recommendation |
 | --- | --- |
-| DRI | Alan |
-| Implementer | Alan (proposed; pending consolidated-plan sign-off) |
+| Work-package DRI | Alan |
+| Primary implementer | Alan (proposed; pending Alan review) |
+| Technical-decision owner | D-MIG-01: Alan - immediate framework, sequencing and recovery mechanism |
 | Reviewer | Luke |
 | Final approver | Luke |
+| PR-level ownership exception | None |
 | Required expertise | PostgreSQL migrations, zero-downtime deployment |
 | Higher-capability review | Mandatory before merge |
 
@@ -181,7 +191,10 @@ Hard dependencies: P01-01. Parallel opportunities: P02-03
 | Field | Plan |
 | --- | --- |
 | Repository / base | `app` (`main`) |
-| Gate / size / readiness | A0 / Large / Dependencies unmet |
+| Gate / size | A0 / Large |
+| Local preparation status | Not ready; named PR, decision or programme-acceptance prerequisites remain |
+| Merge readiness | Blocked pending PR dependencies P02-01; technical decisions/controls D-MIG-01; Luke review/final founder approval |
+| Technical-decision owner | D-MIG-01: Alan - immediate framework, sequencing and recovery mechanism |
 | Dependencies | P02-01 |
 | Blocking decisions/checkpoints | D-MIG-01 |
 | Source / salvage | Current init_db startup path |
@@ -259,16 +272,19 @@ Hard dependencies: P02-01. Parallel opportunities: None inside this package beyo
 - [ ] Implement the chosen ordered migration mechanism, checksum ledger, advisory lock, startup mode, and readiness signal without moving product tables yet.
 - [ ] Every listed objective test passes locally and at the required gate where applicable.
 - [ ] Every explicit non-goal remains out of the diff and no protected worktree/branch is modified during extraction.
+- [ ] The planning record has matching dependency, local-preparation, merge-readiness, ownership, gate and disposition fields.
 - [ ] Rollout/repair evidence is attached before merge; unresolved decisions remain blocked rather than encoded as guesses.
 
 #### Ownership and review
 
 | Role | Recommendation |
 | --- | --- |
-| DRI | Alan |
-| Implementer | Alan (proposed; pending consolidated-plan sign-off) |
+| Work-package DRI | Alan |
+| Primary implementer | Alan (proposed; pending Alan review) |
+| Technical-decision owner | D-MIG-01: Alan - immediate framework, sequencing and recovery mechanism |
 | Reviewer | Luke |
 | Final approver | Luke |
+| PR-level ownership exception | None |
 | Required expertise | PostgreSQL, migration framework, runtime operations |
 | Higher-capability review | Mandatory before merge |
 
@@ -277,9 +293,12 @@ Hard dependencies: P02-01. Parallel opportunities: None inside this package beyo
 | Field | Plan |
 | --- | --- |
 | Repository / base | `app` (`main`) |
-| Gate / size / readiness | A1 / Large / Dependencies unmet |
+| Gate / size | A1 / Large |
+| Local preparation status | Not ready; named PR, decision or programme-acceptance prerequisites remain |
+| Merge readiness | Blocked pending PR dependencies P02-02; technical decisions/controls D-MIG-01; Gate A0 active and verified; Luke review/final founder approval |
+| Technical-decision owner | D-MIG-01: Alan - immediate framework, sequencing and recovery mechanism |
 | Dependencies | P02-02 |
-| Blocking decisions/checkpoints | None beyond dependencies and plan approval |
+| Blocking decisions/checkpoints | D-MIG-01 |
 | Source / salvage | app/storage/schema.py current definitions, PR #122 forward-migration tests after reconciliation |
 
 #### Objective
@@ -354,16 +373,19 @@ Hard dependencies: P02-02. Parallel opportunities: P02-01, P02-04
 - [ ] Move the existing canonical schema under version control, preserve compatible reads/writes, and supply rehearsal/backfill/repair tooling for future packages.
 - [ ] Every listed objective test passes locally and at the required gate where applicable.
 - [ ] Every explicit non-goal remains out of the diff and no protected worktree/branch is modified during extraction.
+- [ ] The planning record has matching dependency, local-preparation, merge-readiness, ownership, gate and disposition fields.
 - [ ] Rollout/repair evidence is attached before merge; unresolved decisions remain blocked rather than encoded as guesses.
 
 #### Ownership and review
 
 | Role | Recommendation |
 | --- | --- |
-| DRI | Alan |
-| Implementer | Alan (proposed; pending consolidated-plan sign-off) |
+| Work-package DRI | Alan |
+| Primary implementer | Alan (proposed; pending Alan review) |
+| Technical-decision owner | D-MIG-01: Alan - immediate framework, sequencing and recovery mechanism |
 | Reviewer | Luke |
 | Final approver | Luke |
+| PR-level ownership exception | None |
 | Required expertise | Python/FastAPI, PostgreSQL, security-aware product engineering |
 | Higher-capability review | Mandatory before merge |
 
@@ -372,9 +394,12 @@ Hard dependencies: P02-02. Parallel opportunities: P02-01, P02-04
 | Field | Plan |
 | --- | --- |
 | Repository / base | `intelligence` (`main`) |
-| Gate / size / readiness | A1 / Large / Dependencies unmet |
+| Gate / size | A1 / Large |
+| Local preparation status | Not ready; named PR, decision or programme-acceptance prerequisites remain |
+| Merge readiness | Blocked pending PR dependencies P02-01, P02-02; Gate A0 active and verified; Luke review/final founder approval |
+| Technical-decision owner | None; implement the settled founder constraints and approved contracts |
 | Dependencies | P02-01, P02-02 |
-| Blocking decisions/checkpoints | D-MIG-01 |
+| Blocking decisions/checkpoints | None beyond dependencies and plan approval |
 | Source / salvage | src/natalyx_intelligence/shared/persistence.py runtime _ensure_schema |
 
 #### Objective
@@ -450,16 +475,19 @@ Hard dependencies: P02-01, P02-02. Parallel opportunities: P02-03
 - [ ] Replace intelligence runtime _ensure_schema DDL with the chosen framework, a separate revision namespace/advisory lock, deploy-time migration entrypoint, and cross-service compatibility evidence.
 - [ ] Every listed objective test passes locally and at the required gate where applicable.
 - [ ] Every explicit non-goal remains out of the diff and no protected worktree/branch is modified during extraction.
+- [ ] The planning record has matching dependency, local-preparation, merge-readiness, ownership, gate and disposition fields.
 - [ ] Rollout/repair evidence is attached before merge; unresolved decisions remain blocked rather than encoded as guesses.
 
 #### Ownership and review
 
 | Role | Recommendation |
 | --- | --- |
-| DRI | Alan |
-| Implementer | Alan (proposed; pending consolidated-plan sign-off) |
+| Work-package DRI | Alan |
+| Primary implementer | Alan (proposed; pending Alan review) |
+| Technical-decision owner | None; implement the settled founder constraints and approved contracts |
 | Reviewer | Luke |
 | Final approver | Luke |
+| PR-level ownership exception | None |
 | Required expertise | PostgreSQL migrations, FastAPI service operations |
 | Higher-capability review | Mandatory before merge |
 
@@ -496,19 +524,40 @@ Compatibility window: keep prior readers/writers and rollback image usable throu
 
 ## Risks and decisions
 
-| Type | ID / risk | Owner | Affected PRs / latest point | Treatment |
-| --- | --- | --- | --- | --- |
-| Blocking/product/compliance decision | D-MIG-01 - Adopt Alembic or justify a custom ordered runner; decide supported SQLite parity, expand/contract, locking, rollback and forward-repair contract. | Luke | P02-01, P02-02, P02-03; Before P02-02 | D-MIG-01 - Prefer an established framework unless the ADR proves current SQL compatibility makes it unsafe or disproportionate. |
-| Implementation risk | Irreversible DDL | Alan or named PR DRI | Package PRs; before associated gate | Mitigate through the explicit tests, rollout and forward-repair plan |
-| Implementation risk | Concurrent deploy race | Alan or named PR DRI | Package PRs; before associated gate | Mitigate through the explicit tests, rollout and forward-repair plan |
-| Implementation risk | Long backfill lock | Alan or named PR DRI | Package PRs; before associated gate | Mitigate through the explicit tests, rollout and forward-repair plan |
-| Implementation risk | SQLite semantics hide PostgreSQL failure | Alan or named PR DRI | Package PRs; before associated gate | Mitigate through the explicit tests, rollout and forward-repair plan |
+Founder outcomes, Alan's remaining technical ownership and external activation dependencies are recorded separately so a final policy is never mistaken for an active control.
+
+| ID | Status | Classification | Remaining owner | Affected / latest | Programme effect |
+| --- | --- | --- | --- | --- | --- |
+| D-MIG-01 | Founder constraints final; Alan immediate; operationally pending | Luke sets constraints; Alan decides immediately | Alan - immediate | P02-01, P02-02, P02-03; Before P02-02 | P02-01 decision work may proceed; P02-02, P02-03 and Gate A0 remain blocked until Alan's mechanism and evidence are accepted. |
+
+### D-MIG-01 - Migration framework and SQLite support
+
+| Field | Recorded decision or requirement |
+| --- | --- |
+| Decision state | Final founder constraints |
+| Founder outcome | Reliability-first migrations with zero intended data loss; PostgreSQL is authoritative for production and SQLite may remain a convenient synthetic local-development projection without full production parity. |
+| Founder constraints | Stage consequential changes and keep them backward-compatible wherever reasonably possible; Test recovery or rollback evidence before every consequential migration is used; Prefer a well-supported low-maintenance approach over a clever or bespoke runner; Planned beta downtime may be up to 30 minutes when scheduled, communicated and backed by a tested recovery plan; Destructive or irreversible real-user-data changes require explicit evidence and Luke approval |
+| What remains for Alan | Choose the migration framework; Choose sequencing/locking and expand-contract mechanics; Choose the detailed rollback, restore or forward-repair mechanism |
+| Evidence required | Migration ADR; Fresh/current/upgrade compatibility matrix; Tested recovery or rollback evidence; Destructive-change approval path |
+| Approval rule | Luke approves only destructive or irreversible actions that could affect real-user data; ordinary technical choices stay with Alan. |
+| External dependencies | None |
+| Affected PRs / latest point | P02-01, P02-02, P02-03; Before P02-02 |
+| Programme effect | P02-01 decision work may proceed; P02-02, P02-03 and Gate A0 remain blocked until Alan's mechanism and evidence are accepted. |
+| Independent recommendation | Prefer an established framework unless the ADR proves current SQL compatibility makes it unsafe or disproportionate. |
+
+| Implementation risk | Owner | Treatment |
+| --- | --- | --- |
+| Irreversible DDL | Alan | Mitigate through explicit tests, rollout and forward-repair evidence before the associated gate. |
+| Concurrent deploy race | Alan | Mitigate through explicit tests, rollout and forward-repair evidence before the associated gate. |
+| Long backfill lock | Alan | Mitigate through explicit tests, rollout and forward-repair evidence before the associated gate. |
+| SQLite semantics hide PostgreSQL failure | Alan | Mitigate through explicit tests, rollout and forward-repair evidence before the associated gate. |
 
 ## Existing-work salvage
 
 | Source | Head | Valuable content | Destination | Recommendation | Extraction status/safety |
 | --- | --- | --- | --- | --- | --- |
-| app#122 | e85382150853 | Case projection/lens surfaces, safe return_to, invitation TTL/CAS/self-member/one-GC constraints, transactional membership, fail-closed Learn, SQL-limited timeline, responsive/a11y tests and Python CI workflow. | P02-03 | Retain pending Alan reconciliation; selective port or rebase only after architecture approval | Reinspected at latest head. It is exactly e853821 (no newer delta); retention strengthened, but final extraction waits for Alan checkpoint. |
+| app#122 | e85382150853 | Case projection/lens surfaces, safe return_to, invitation TTL/CAS/self-member/one-GC constraints, transactional membership, fail-closed Learn, SQL-limited timeline, responsive/a11y tests and Python CI workflow. | P02-03 | Selective-port behavior and tests; supersede as programme architecture | Complete at e853821: authoritative behavior/tests and selectively portable implementation are classified; superseded architecture and evidence-only claims are named. |
+| feat/byos-journey-wave-2 | 5b63e3a7c364 | Projection-driven phase-1 cluster presentation, exact route allowlisting, person-versus-case-side ownership intent, transactional submission/work-item and review/audit patterns, fail-closed item retention, approved Learn status selection and 36 focused tests. | P02-03 | Preserve paused at the exact head; selectively port semantics/tests only after adaptation. Do not merge, cherry-pick, continue implementation or use its runtime schema directly. | Paused exact-head evidence; no direct merge |
 
 Package source inventory:
 
@@ -518,14 +567,14 @@ Package source inventory:
 
 Alan owns the technical proposal and implementation. Luke approves the architecture/compatibility contract. A higher-capability review is mandatory before merge.
 
-| PR | DRI | Implementer | Reviewer | Final approver | External/high-capability review |
-| --- | --- | --- | --- | --- | --- |
-| P02-01 | Alan | Alan (proposed) | Luke | Luke | Mandatory |
-| P02-02 | Alan | Alan (proposed) | Luke | Luke | Mandatory |
-| P02-03 | Alan | Alan (proposed) | Luke | Luke | Mandatory |
-| P02-04 | Alan | Alan (proposed) | Luke | Luke | Mandatory |
+| PR | WP DRI | Primary implementer | Technical-decision owner | Reviewer | Final approver | Exception |
+| --- | --- | --- | --- | --- | --- | --- |
+| P02-01 | Alan | Alan (proposed) | D-MIG-01: Alan - immediate framework, sequencing and recovery mechanism | Luke | Luke | None |
+| P02-02 | Alan | Alan (proposed) | D-MIG-01: Alan - immediate framework, sequencing and recovery mechanism | Luke | Luke | None |
+| P02-03 | Alan | Alan (proposed) | D-MIG-01: Alan - immediate framework, sequencing and recovery mechanism | Luke | Luke | None |
+| P02-04 | Alan | Alan (proposed) | None; implement the settled founder constraints and approved contracts | Luke | Luke | None |
 
-Luke decides product/lifecycle/commercial/privacy/PHI/provider policy and accepts gates. Alan proposes implementation design, decomposition, migrations, code, tests, rollout and repair. This is a recommendation pending Alan's review/sign-off, not a compulsory assignment.
+PR ownership inherits the proposed work-package split pending Alan's review. Named technical-decision ownership remains separate and never transfers implementation ownership across work packages; reciprocal and external review requirements remain intact.
 
 ## Definition of done
 

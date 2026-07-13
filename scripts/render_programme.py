@@ -18,6 +18,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from programme_data import (  # noqa: E402
+    ACTIVE_DECISION_BLOCKERS,
     AUTHORSHIP_CLASSES,
     AUTHORSHIP_CONTRACT,
     AUTHORSHIP_MATRIX,
@@ -31,10 +32,13 @@ from programme_data import (  # noqa: E402
     EARLY_PARALLEL_SEQUENCE,
     EVIDENCE,
     EXISTING_PRS,
+    EXTERNAL_DEPENDENT_DECISIONS,
     FIRST_THREE_IMPLEMENTATION_PRS,
     GATES,
     INSPECTED_AT,
+    IMMEDIATE_ALAN_DECISIONS,
     INVITATION_CONTRACT,
+    LATER_ALAN_DECISIONS,
     MIGRATION_DECISION_CONTRACT,
     PARALLEL_LANES,
     PLAN_BRANCH,
@@ -47,6 +51,7 @@ from programme_data import (  # noqa: E402
     PROPOSED_PRS,
     PROTECTED_WORKTREES,
     RECONCILIATION_CHECKPOINT,
+    RECONCILIATION_MATRIX,
     RELATED_ISSUES,
     RELEASE_STRATEGY,
     REVIEW_MODEL,
@@ -56,6 +61,7 @@ from programme_data import (  # noqa: E402
     TRANSITION_RULES,
     WORK_PACKAGE_OWNERSHIP,
     WORK_PACKAGES,
+    WAVE2_BRANCH,
     WP_BY_ID,
     plan_filename,
 )
@@ -73,6 +79,37 @@ def md_table(headers: list[str], rows: Iterable[Iterable[Any]]) -> str:
     for row in rows:
         output.append("| " + " | ".join(esc(cell) for cell in row) + " |")
     return "\n".join(output)
+
+
+def render_reconciliation_matrix(*, detailed: bool) -> str:
+    parts = [
+        md_table(
+            ["ID", "Recommendation", "Disposition", "Rationale", "Affected WPs / PRs / gates", "Decision"],
+            [[item["id"], item["recommendation"], item["conclusion"], item["rationale"], item["affected"], item["decision_required"]] for item in RECONCILIATION_MATRIX],
+        )
+    ]
+    if detailed:
+        parts.append("### Assessment detail")
+        for item in RECONCILIATION_MATRIX:
+            parts += [
+                f"#### {item['id']} — {item['conclusion']}",
+                md_table(
+                    ["Assessment field", "Recorded conclusion"],
+                    [
+                        ["Recommendation", item["recommendation"]],
+                        ["Supporting evidence", item["evidence"]],
+                        ["Prior plan treatment", item["current_plan"]],
+                        ["Assumptions", item["assumptions"]],
+                        ["Security, privacy and operational impact", item["impact"]],
+                        ["Dependency and migration impact", item["dependency_migration"]],
+                        ["Alternatives considered", item["alternatives"]],
+                        ["Rationale", item["rationale"]],
+                        ["Affected WPs / PRs / gates", item["affected"]],
+                        ["Explicit decision required", item["decision_required"]],
+                    ],
+                ),
+            ]
+    return "\n\n".join(parts)
 
 
 def bullets(items: Iterable[Any], *, checked: bool = False) -> str:
@@ -97,6 +134,87 @@ def prs_for(wp_id: str) -> list[dict[str, Any]]:
 def decisions_for(wp_id: str) -> list[dict[str, Any]]:
     ids = {pr["id"] for pr in prs_for(wp_id)}
     return [decision for decision in DECISIONS if ids.intersection(decision["affected"])]
+
+
+def joined(items: Iterable[Any]) -> str:
+    values = [str(item) for item in items]
+    return "; ".join(values) if values else "None"
+
+
+def render_decision_register(decisions: list[dict[str, Any]], *, detailed: bool, heading_level: int = 3) -> str:
+    parts = [
+        md_table(
+            ["ID", "Status", "Classification", "Remaining owner", "Affected / latest", "Programme effect"],
+            [
+                [
+                    decision["id"],
+                    decision["status"],
+                    decision["classification"],
+                    decision["remaining_owner"],
+                    f"{', '.join(decision['affected'])}; {decision['latest']}",
+                    decision["programme_effect"],
+                ]
+                for decision in decisions
+            ],
+        )
+    ]
+    if detailed:
+        heading = "#" * heading_level
+        for decision in decisions:
+            parts += [
+                f"{heading} {decision['id']} - {decision['title']}",
+                md_table(
+                    ["Field", "Recorded decision or requirement"],
+                    [
+                        ["Decision state", decision["decision_state"]],
+                        ["Founder outcome", decision["founder_decision"]],
+                        ["Founder constraints", joined(decision["constraints"])],
+                        ["What remains for Alan", joined(decision["alan_remaining"])],
+                        ["Evidence required", joined(decision["evidence_required"])],
+                        ["Approval rule", decision["approval_required"]],
+                        ["External dependencies", joined(decision["external_dependencies"])],
+                        ["Affected PRs / latest point", f"{', '.join(decision['affected'])}; {decision['latest']}"],
+                        ["Programme effect", decision["programme_effect"]],
+                        ["Independent recommendation", decision["recommendation"]],
+                    ],
+                ),
+            ]
+    return "\n\n".join(parts)
+
+
+def render_alan_decision_lanes() -> str:
+    by_id = {decision["id"]: decision for decision in DECISIONS}
+
+    def lane_table(ids: list[str]) -> str:
+        return md_table(
+            ["ID", "Alan owns", "Affected / latest", "Evidence", "Founder approval rule"],
+            [
+                [
+                    decision_id,
+                    joined(by_id[decision_id]["alan_remaining"]),
+                    f"{', '.join(by_id[decision_id]['affected'])}; {by_id[decision_id]['latest']}",
+                    joined(by_id[decision_id]["evidence_required"]),
+                    by_id[decision_id]["approval_required"],
+                ]
+                for decision_id in ids
+            ],
+        )
+
+    return "\n\n".join([
+        "### Immediate Alan decisions",
+        "These block current foundation work or Gate A0; founder constraints are final but the controls are not active until the evidence passes.",
+        lane_table(IMMEDIATE_ALAN_DECISIONS),
+        "### Later Alan decisions",
+        "These are resolved only at the named WP/checkpoint; Alan should not be forced to choose their mechanisms prematurely.",
+        lane_table(LATER_ALAN_DECISIONS),
+        "### External dependencies",
+        md_table(
+            ["ID", "Dependency", "Activation boundary"],
+            [[decision_id, joined(by_id[decision_id]["external_dependencies"]), by_id[decision_id]["programme_effect"]] for decision_id in EXTERNAL_DEPENDENT_DECISIONS],
+        ),
+        "### Active decision blockers",
+        "Only the following decision IDs may still appear in PR blocking fields: " + ", ".join(sorted(ACTIVE_DECISION_BLOCKERS)) + ". Founder-final policy rows without a remaining technical mechanism are not PR blockers.",
+    ])
 
 
 def evidence_for(wp_id: str) -> list[dict[str, Any]]:
@@ -201,7 +319,10 @@ def render_pr(pr: dict[str, Any], level: int = 3) -> str:
         [
             ["Repository / base", f"`{pr['repo']}` (`{pr['base']}`)"],
             ["Project item", f"[{pr['id']}]({pr['project_item']})"],
-            ["Gate / size / readiness", f"{pr['gate']} / {pr['size']} / {pr['readiness']}"],
+            ["Gate / size", f"{pr['gate']} / {pr['size']}"],
+            ["Local preparation status", pr["local_preparation_status"]],
+            ["Merge readiness", pr["merge_readiness"]],
+            ["Technical-decision owner", pr["technical_decision_owner"]],
             ["Dependencies", ", ".join(pr["deps"]) or "P00-01 plan sign-off only"],
             ["Blocking decisions/checkpoints", ", ".join(pr["blocked_by"]) or "None beyond dependencies and plan approval"],
             ["Source / salvage", ", ".join(pr["sources"]) or "None"],
@@ -241,15 +362,17 @@ def render_pr(pr: dict[str, Any], level: int = 3) -> str:
             pr["objective"],
             "Every listed objective test passes locally and at the required gate where applicable.",
             "Every explicit non-goal remains out of the diff and no protected worktree/branch is modified during extraction.",
-            "The Project item has matching dependency, readiness, ownership, gate and disposition fields.",
+            "The planning record has matching dependency, local-preparation, merge-readiness, ownership, gate and disposition fields.",
             "Rollout/repair evidence is attached before merge; unresolved decisions remain blocked rather than encoded as guesses.",
         ], checked=True),
         f"{h}# Ownership and review",
         md_table(
             ["Role", "Recommendation"],
             [
-                ["DRI", pr["dri"]], ["Implementer", f"{pr['implementer']} (proposed; pending consolidated-plan sign-off)"],
+                ["Work-package DRI", pr["wp_dri"]], ["Primary implementer", f"{pr['primary_implementer']} (proposed; pending Alan review)"],
+                ["Technical-decision owner", pr["technical_decision_owner"]],
                 ["Reviewer", pr["reviewer"]], ["Final approver", pr["approver"]],
+                ["PR-level ownership exception", pr["ownership_exception"]],
                 ["Required expertise", ", ".join(pr["expertise"])],
                 ["Higher-capability review", "Mandatory before merge" if pr["high_review"] else "Risk-proportionate; not mandatory by programme default"],
             ],
@@ -342,6 +465,9 @@ def package_salvage(wp: dict[str, Any]) -> str:
         destinations = set(item["destinations"])
         if ids.intersection(destinations):
             rows.append([item["key"], item["sha"][:12], item["useful"], ", ".join(sorted(ids.intersection(destinations))), item["disposition"], item["extraction"]])
+    if wp["id"] in WAVE2_BRANCH["wps"]:
+        destinations = sorted(ids.intersection(WAVE2_BRANCH["destinations"]))
+        rows.append([WAVE2_BRANCH["branch"], WAVE2_BRANCH["head"][:12], WAVE2_BRANCH["useful"], ", ".join(destinations) or ", ".join(WAVE2_BRANCH["destinations"]), WAVE2_BRANCH["disposition"], "Paused exact-head evidence; no direct merge"])
     for worktree in PROTECTED_WORKTREES:
         if any(pr_id in worktree["destination"] for pr_id in ids):
             rows.append([worktree["branch"], worktree["head"], worktree["status"], worktree["destination"], "Selective port from protected worktree", worktree["rule"]])
@@ -359,7 +485,7 @@ def render_wp(wp: dict[str, Any], *, top_level: int = 1, include_title: bool = T
     if include_title:
         content.append(f"{h1} {title}")
     content.append(
-        f"> Planning-only execution contract. Proposed implementers and owners remain recommendations until Alan reviews/signs off the consolidated plan and Luke accepts it. Project: [{PROJECT_CONVENTIONS['project']}]({PROJECT_URL})."
+        f"> Planning-only execution contract. The corrected work-package split remains proposed pending Alan's review. Local preparation and merge readiness are separate; the benched Project catalogue is not resynced. Project reference: [{PROJECT_CONVENTIONS['project']}]({PROJECT_URL})."
     )
     content.append(md_table(
         ["Plan", "Value"],
@@ -381,12 +507,30 @@ def render_wp(wp: dict[str, Any], *, top_level: int = 1, include_title: bool = T
         bullets(wp["architecture"]),
         contract_summary(wp),
     ]
+    if wp["id"] == "WP00":
+        content += [
+            f"{h2}# Frozen independent recommendation matrix",
+            "This matrix was completed from read-only repository/Drive evidence before any canonical planning source was edited.",
+            render_reconciliation_matrix(detailed=True),
+            f"{h2}# Preserved Wave 2 branch",
+            md_table(["Field", "Finding"], [
+                ["Branch / head", f"{WAVE2_BRANCH['branch']} / {WAVE2_BRANCH['head']}"],
+                ["Corrected #122 base", WAVE2_BRANCH["base"]],
+                ["Commit chain", "; ".join(WAVE2_BRANCH["ancestry"])],
+                ["Useful", WAVE2_BRANCH["useful"]],
+                ["Unsafe", WAVE2_BRANCH["unsafe"]],
+                ["Defect reproductions", "; ".join(WAVE2_BRANCH["reproductions"])],
+                ["Validation", WAVE2_BRANCH["tests"]],
+                ["Destinations", ", ".join(WAVE2_BRANCH["destinations"])],
+                ["Disposition", WAVE2_BRANCH["disposition"]],
+            ]),
+        ]
     if machines_for(wp["id"]):
         content.append(f"{h2}# Applicable state machines")
         for machine in machines_for(wp["id"]):
             content.append(render_machine(machine, top_level + 2))
     if wp["id"] == "WP02":
-        content += [f"{h2}# Migration ADR contract", "Options:\n\n" + numbered(MIGRATION_DECISION_CONTRACT["options"]), f"**Provisional recommendation.** {MIGRATION_DECISION_CONTRACT['provisional_recommendation']}", bullets(MIGRATION_DECISION_CONTRACT["requirements"])]
+        content += [f"{h2}# Migration ADR contract", "Options Alan must assess:\n\n" + numbered(MIGRATION_DECISION_CONTRACT["options"]), f"**Founder constraints and independent recommendation.** {MIGRATION_DECISION_CONTRACT['provisional_recommendation']}", bullets(MIGRATION_DECISION_CONTRACT["requirements"])]
     if wp["id"] in {"WP03", "WP06"}:
         content += [f"{h2}# Invitation and identity safety", "Retain from updated PR #122:\n\n" + bullets(INVITATION_CONTRACT["retain_from_122"]), "Required replacement contract:\n\n" + bullets(INVITATION_CONTRACT["required_changes"])]
     if wp["id"] in {"WP04", "WP05", "WP06", "WP07", "WP09", "WP10"}:
@@ -397,14 +541,14 @@ def render_wp(wp: dict[str, Any], *, top_level: int = 1, include_title: bool = T
         content += [f"{h2}# Append-only commercial contract", "Authoritative ledgers:\n\n" + bullets(f"`{item}`" for item in COMMERCIAL_LEDGER_CONTRACT["authoritative"]), "Derived projections:\n\n" + bullets(COMMERCIAL_LEDGER_CONTRACT["projections"]), "Rules:\n\n" + bullets(COMMERCIAL_LEDGER_CONTRACT["rules"])]
     if wp["id"] == "WP09":
         content += [f"{h2}# Durable document and S3 contract"]
-        for key in ("storage", "upload", "download", "recovery"):
+        for key in ("metadata", "storage", "upload", "download", "recovery"):
             content += [f"{h2}## {key.title()}", bullets(DOCUMENT_CONTRACT[key])]
     if wp["id"] == "WP11":
         content += [f"{h2}# Design-system release rubric", md_table(["Class", "Items"], [["Release-blocking", "; ".join(DESIGN_SYSTEM_RELEASE_POLICY["release_blocking"])], ["Desirable", "; ".join(DESIGN_SYSTEM_RELEASE_POLICY["desirable"])], ["Deferred", "; ".join(DESIGN_SYSTEM_RELEASE_POLICY["deferred"])] ]), DESIGN_SYSTEM_RELEASE_POLICY["rule"]]
     if wp["id"] == "WP13":
         content += [f"{h2}# Programme gate summary", render_gate_table(compact=False)]
     content.append(f"{h2} 4. Explicit PR sequence")
-    content.append(md_table(["Order", "ID", "Title", "Repository", "Dependencies", "Gate", "Size", "Readiness"], [[i, pr["id"], pr["title"], pr["repo"], ", ".join(pr["deps"]) or "P00-01", pr["gate"], pr["size"], pr["readiness"]] for i, pr in enumerate(package_prs, 1)]))
+    content.append(md_table(["Order", "ID", "Title", "Repository", "Dependencies", "Gate", "Local preparation", "Merge readiness"], [[i, pr["id"], pr["title"], pr["repo"], ", ".join(pr["deps"]) or "None", pr["gate"], pr["local_preparation_status"], pr["merge_readiness"]] for i, pr in enumerate(package_prs, 1)]))
     for pr in package_prs:
         content.append(render_pr(pr, top_level + 2))
     content += [
@@ -413,18 +557,16 @@ def render_wp(wp: dict[str, Any], *, top_level: int = 1, include_title: bool = T
         f"{h2} 6. Test and acceptance matrix",
         package_test_matrix(wp),
         f"{h2} 7. Risks and decisions",
-        md_table(
-            ["Type", "ID / risk", "Owner", "Affected PRs / latest point", "Project item / treatment"],
-            [["Blocking/product/compliance decision", decision["id"] + " — " + decision["question"], decision["owner"], ", ".join(decision["affected"]) + "; " + decision["latest"], f"[{decision['id']}]({PROJECT_URL}?query={decision['id']}) — {decision['recommendation']}"] for decision in decisions_for(wp["id"])]
-            + [["Implementation risk", risk, "Alan or named PR DRI", "Package PRs; before associated gate", "Mitigate through the explicit tests, rollout and forward-repair plan"] for risk in wp["risks"]],
-        ),
+        "Founder outcomes, Alan's remaining technical ownership and external activation dependencies are recorded separately so a final policy is never mistaken for an active control.",
+        render_decision_register(decisions_for(wp["id"]), detailed=True, heading_level=top_level + 2),
+        md_table(["Implementation risk", "Owner", "Treatment"], [[risk, next(item["dri"] for item in WORK_PACKAGE_OWNERSHIP if item["wp"] == wp["id"]), "Mitigate through explicit tests, rollout and forward-repair evidence before the associated gate."] for risk in wp["risks"]]),
         f"{h2} 8. Existing-work salvage",
         package_salvage(wp),
         "Package source inventory:\n\n" + bullets(wp["salvage"]),
         f"{h2} 9. Ownership recommendation",
         wp["coordination"],
-        md_table(["PR", "DRI", "Implementer", "Reviewer", "Final approver", "External/high-capability review"], [[pr["id"], pr["dri"], pr["implementer"] + " (proposed)", pr["reviewer"], pr["approver"], "Mandatory" if pr["high_review"] else "As risk warrants"] for pr in package_prs]),
-        "Luke decides product/lifecycle/commercial/privacy/PHI/provider policy and accepts gates. Alan proposes implementation design, decomposition, migrations, code, tests, rollout and repair. This is a recommendation pending Alan's review/sign-off, not a compulsory assignment.",
+        md_table(["PR", "WP DRI", "Primary implementer", "Technical-decision owner", "Reviewer", "Final approver", "Exception"], [[pr["id"], pr["wp_dri"], pr["primary_implementer"] + " (proposed)", pr["technical_decision_owner"], pr["reviewer"], pr["approver"], pr["ownership_exception"]] for pr in package_prs]),
+        "PR ownership inherits the proposed work-package split pending Alan's review. Named technical-decision ownership remains separate and never transfers implementation ownership across work packages; reciprocal and external review requirements remain intact.",
         f"{h2} 10. Definition of done",
         bullets([
             "Every proposed PR is merged in dependency order or explicitly dispositioned, with its objective acceptance criteria and Project item complete.",
@@ -459,10 +601,10 @@ def global_pr_table() -> str:
     for pr in topological_prs():
         wp = WP_BY_ID[pr["wp"]]
         rows.append([
-            pr["id"], pr["title"], pr["repo"], f"{pr['wp']} / {wp['title']}", pr["dri"], pr["implementer"], pr["reviewer"], pr["approver"],
-            ", ".join(pr["deps"]) or "P00-01 plan sign-off", pr["gate"], pr["size"], pr["readiness"], ", ".join(pr["blocked_by"]) or "None", ", ".join(pr["sources"]) or "None", f"[{pr['id']}]({pr['project_item']})",
+            pr["id"], pr["title"], pr["repo"], f"{pr['wp']} / {wp['title']}", pr["wp_dri"], pr["primary_implementer"], pr["technical_decision_owner"], pr["reviewer"], pr["approver"],
+            ", ".join(pr["deps"]) or "None", pr["gate"], pr["local_preparation_status"], pr["merge_readiness"], ", ".join(pr["blocked_by"]) or "None", f"[{pr['id']}]({pr['project_item']})",
         ])
-    return md_table(["ID", "Title", "Repository", "Work package", "DRI", "Implementer", "Reviewer", "Final approver", "Dependencies", "Gate", "Size", "Readiness", "Blocking decision", "Replacement/source PR", "Project item"], rows)
+    return md_table(["ID", "Title", "Repository", "Work package", "WP DRI", "Primary implementer", "Technical-decision owner", "Reviewer", "Final approver", "Dependencies", "Gate", "Local preparation", "Merge readiness", "Blocking decision", "Project item"], rows)
 
 
 def dependency_mermaid() -> str:
@@ -530,12 +672,26 @@ def render_extraction_ledger() -> str:
             "Generic fact/proposal/invitation rails still need explicit author/authority/evidence transition commands.",
             "The case projection is useful case-stage presentation, not a universal programme state machine.",
         ]),
-        "Decomposition impact: retain more of #122's CI, invitation and case-surface tests/implementation, but do not collapse WP03/WP04/WP07/WP09. Workspace/case separation and Alan reconciliation remain blocking.",
+        "Decomposition impact: retain #122's named invitation, CI and case-surface behavior/tests, but do not collapse WP03/WP04/WP07/WP09. The reconciliation checkpoint is complete; normal dependencies and unresolved decisions now govern readiness.",
+        "## Preserved Wave 2 branch",
+        md_table(["Field", "Finding"], [
+            ["Branch / exact head", f"{WAVE2_BRANCH['branch']} / {WAVE2_BRANCH['head']}"],
+            ["Corrected #122 base", WAVE2_BRANCH["base"]],
+            ["Commit ancestry", "; ".join(WAVE2_BRANCH["ancestry"])],
+            ["Useful", WAVE2_BRANCH["useful"]],
+            ["Unsafe / superseded", WAVE2_BRANCH["unsafe"]],
+            ["Independent reproductions", "; ".join(WAVE2_BRANCH["reproductions"])],
+            ["Validation", WAVE2_BRANCH["tests"]],
+            ["Destinations", ", ".join(WAVE2_BRANCH["destinations"])],
+            ["Disposition", WAVE2_BRANCH["disposition"]],
+        ]),
         "## Alan reconciliation checkpoint",
         md_table(["Field", "Contract"], [["Name", RECONCILIATION_CHECKPOINT["title"]], ["Status", RECONCILIATION_CHECKPOINT["status"]], ["Blocks", ", ".join(RECONCILIATION_CHECKPOINT["blocks"])], ["May amend", ", ".join(RECONCILIATION_CHECKPOINT["may_amend"])], ["Avoid wasted review", RECONCILIATION_CHECKPOINT["efficiency"]]]),
         "Finding recording:\n\n" + bullets(RECONCILIATION_CHECKPOINT["recording"]),
         "Resolution rule:\n\n" + bullets(RECONCILIATION_CHECKPOINT["resolution"]),
-        "Complete only when:\n\n" + bullets(RECONCILIATION_CHECKPOINT["complete_when"], checked=True),
+        "Completion evidence:\n\n" + bullets(RECONCILIATION_CHECKPOINT["complete_when"]),
+        "## Frozen independent recommendation matrix",
+        render_reconciliation_matrix(detailed=True),
         "## Protected local worktrees",
         md_table(["Repository", "Path", "Branch/head", "Protected content", "Destination", "Safety rule"], [[item["repo"], f"`{item['path']}`", f"{item['branch']} / {item['head']}", item["status"], item["destination"], item["rule"]] for item in PROTECTED_WORKTREES]),
         "## Cleanup tasks",
@@ -556,7 +712,7 @@ def render_pr_manifest() -> str:
         "## Critical path",
         " → ".join(f"`{item}`" for item in CRITICAL_PATH),
         "Required dependency joins:\n\n" + bullets(CRITICAL_JOINS),
-        "## Per-PR readiness and acceptance",
+        "## Per-PR local preparation, merge readiness and acceptance",
     ]
     for pr in topological_prs():
         parts.append(render_pr(pr, 3))
@@ -581,24 +737,24 @@ def render_project_structure() -> str:
         "GitHub's existing **Status** field is reused; no duplicate status field is created. Custom fields are the minimum set needed to hold the fields explicitly required by the programme brief for draft items as well as real PRs/issues.",
         "## Item catalogue",
         md_table(["Item type", "Expected count", "Naming convention"], [[name, count, {"Work packages": "[WPxx] title", "Proposed PRs": "[Pxx-yy] title", "Existing PRs": "Actual linked PR", "Existing issues": "Actual linked issue", "Decisions": "[DECISION D-*] title", "Review checkpoints": "[CHECKPOINT] title", "Programme gates": "[GATE Ax] title", "Cleanup tasks": "[CLEANUP C-*] title"}[name]] for name, count in counts.items()]),
-        "## Live post-sync validation",
-        md_table(["Check", "Verified result"], [[key.replace("_", " ").title(), value] for key, value in PROJECT_SYNC_RESULT.items()]),
-        "The synchronizer read these values back from Project 3 after the final update; it did not infer them from the local catalogue. All items remain planning-only and no proposed PR is marked `Ready to implement`.",
+        "## Desired catalogue and last live snapshot",
+        md_table(["Check", "Recorded result"], [[key.replace("_", " ").title(), value] for key, value in PROJECT_SYNC_RESULT.items()]),
+        "The desired 110-item catalogue is validated locally. The last read-back live snapshot remains 106 items and all Todo; this reconciliation did not apply remote Project changes. All implementation items remain planning-only and no proposed PR is marked `Ready to implement`.",
         "## Dependency and hierarchy representation",
         PROJECT_CONVENTIONS["hierarchy"],
         "Each proposed PR carries a Work package value and exact Dependencies text. Work-package draft bodies list child PR IDs, decisions, gates and plan path. Decision/gate/checkpoint bodies list what they block. This provides deterministic hierarchy without creating empty issues/PRs.",
         "## Status, readiness and disposition",
-        md_table(["Dimension", "Meaning"], [["Status", "Todo / In Progress / Done: execution state only."], ["Readiness", "Whether plan/decision/dependency/reconciliation conditions permit implementation."], ["Disposition", "How existing/proposed/decision/gate/cleanup material should be treated."], ["Ownership", "DRI/implementer/reviewer/approver recommendation; Alan remains proposed until sign-off."]]),
+        md_table(["Dimension", "Meaning"], [["Status", "Todo / In Progress / Done: execution state only."], ["Local preparation", "Whether isolated, uncommitted, synthetic-only work may occur before joint acceptance."], ["Merge readiness", "Whether dependencies, decisions, reciprocal review, A0 and applicable external controls permit merge."], ["Disposition", "How existing/proposed/decision/gate/cleanup material should be treated."], ["Ownership", "Work-package DRI and primary implementer, separate technical-decision owner, reciprocal reviewer and founder approver; all remain proposed pending Alan's review."]]),
         "## Project sync and maintenance",
         f"Dry-run/read current state:\n\n```bash\n{PYTHON} scripts/sync_project.py\n```",
-        f"Apply idempotent updates:\n\n```bash\n{PYTHON} scripts/sync_project.py --apply\n```",
-        "After any canonical change, regenerate Markdown, validate, re-render the PDF, then re-run the idempotent Project sync. Do not hand-edit IDs/titles/dependencies in only one surface.",
+        f"Apply idempotent updates only after separate reactivation/authorization (the script blocks apply while benched):\n\n```bash\n{PYTHON} scripts/sync_project.py --apply\n```",
+        "After any canonical change, regenerate Markdown, validate and re-render the PDF. Validate the desired catalogue locally; remote sync is a separate authorized action after the benched Project is reactivated.",
         "## Final Project validation checklist",
         bullets([
             "One identifiable item for every WP00-WP13.", f"One proposed-PR draft item for all {len(PROPOSED_PRS)} PR IDs.",
             "Actual linked PRs #112/#117/#119/#121/#122/#123/#124 and DS #7/#8.",
-            "Actual linked Learn #3 and Intelligence #14 dependency issues.", "Alan reconciliation checkpoint present and blocking named replacement work.",
-            "Every blocking decision and A0/A1/A2/B1/B2 gate present.", "Ownership, dependencies, readiness, plan path, source/salvage and disposition populated.",
+            "Actual linked Learn #3 and Intelligence #14 dependency issues.", "Alan reconciliation checkpoint present and complete; normal dependencies/decisions remain.",
+            "Every blocking decision and A0/A1/A2/B1/B2 gate present.", "Ownership, technical-decision responsibility, dependencies, local preparation, merge readiness, plan path, source/salvage and disposition populated.",
             "No duplicate titles/IDs and Project/document parity validator passes.",
         ], checked=True),
     ]
@@ -635,8 +791,8 @@ def render_consolidated() -> str:
             "[Document index and maintenance](#document-index-and-maintenance)", "[Detailed work packages](#detailed-work-packages)",
         ]),
         "## Executive summary",
-        "The programme is a controlled rebuild around **free Node 0 workspace → explicit entitlement/commitment/payment → typed promotion authorization → enrollment-pending paid case**, not a patch stack on the current case-shaped Node 0 branch. The live dev endpoint is currently 503, so A0 recovery and current CI/PostgreSQL evidence come first. PR #122's update materially improves invitation and case-surface safety and should be salvaged; PR #124 remains valuable but structurally unsafe unchanged. Alan's unfinished review is an explicit blocking checkpoint, not an assumed approval.",
-        "The canonical package proposes 50 focused PRs across app, infra, intelligence, Learn, participant design system and organisation planning. It keeps free education/safety capability, payment and truth state separate; uses one processor-neutral promotion authorization; preserves authorship/provenance; and gates real PII/PHI behind independent evidence rather than deploy success.",
+        "The programme is a controlled rebuild around **free Node 0 workspace → explicit entitlement/commitment/payment → typed promotion authorization → enrollment-pending paid case**, not a patch stack on the current case-shaped Node 0 branch. PR #122 is the named paid-case invitation/case-presentation behavior baseline; PR #124 is extraction evidence only; preserved Wave 2 at 5b63e3a is adapted test/semantic evidence and not a merge unit. Alan's completed review is independently dispositioned in the frozen matrix.",
+        f"The canonical package proposes {len(PROPOSED_PRS)} focused PRs across app, infra, intelligence, Learn, participant design system and organisation planning. It separates identity/participation/access, metadata coordination/document content, free workspace/paid case, payment/truth state; uses one processor-neutral promotion authorization; and requires forced RLS/non-owner runtime before B1 while PHI remains prohibited until B2.",
         "## Current verified verdict",
         md_table(["Area", "Verdict", "Evidence / consequence"], [
             ["Live cloud", "Not usable now", "dev.app.natalyx.health returned ALB 503 at the inspection snapshot; A0 is open."],
@@ -644,19 +800,23 @@ def render_consolidated() -> str:
             ["CI/Postgres", "Insufficient on main", "Container build + contract smoke exist; no main Python/PostgreSQL evidence job."],
             ["PR #122", "Materially improved, not final architecture", "Latest e853821 fixes return_to/TTL/CAS/lens/CI and should be selectively retained."],
             ["PR #124", "Do not merge unchanged", "Free Node 0 creates a canonical case; unaddressed link can lead to case membership; no commercial promotion/provenance contract."],
-            ["Payments/documents/PHI", "Not implemented/ready", "No money ledger; documents metadata-only; app-layer authorization and synthetic-first PHI gate remain."],
+            ["Wave 2", "Preserve and adapt, do not merge", "535 tests passed locally, but restart loss, stale approval, metadata/content conflation, caller-derived roles and absent RLS block direct reuse."],
+            ["CI governance", "Workflow accepted; enforcement decision open", "D-CI-01 records the private-repository plan limitation and required ruleset readback/negative bypass evidence."],
+            ["Payments/documents/PHI", "Not implemented/ready", "No money ledger; metadata is not content; forced RLS precedes B1 and PHI remains blocked until B2."],
         ]),
         "## Architecture principles",
         bullets([
             "natalyx-app owns routing, validation, permissions, participant/workspace/case/commercial truth and PHI policy.",
             "Workspace, entitlement, commitment, payment, case, invitation/claim, document and journey-stage state machines remain separate.",
+            "Identity, participation and access grants remain distinct; application services and RLS consume one subject-derived authorization context plus ownership and purpose.",
             "PostgreSQL is production authority; established migrations are preferred pending ADR; runtime identities lose DDL authority.",
             f"Only `{PROMOTION_EVENT['event_type']}` authorizes workspace-to-case promotion; redirects and raw webhooks never do.",
             "Commercial/money events are append-only; balances/statuses are projections.",
             "IP observations/provisional assertions remain attributed; GC/provider confirmation appends revisions and never silently erases/elevates source.",
             "Provider/intelligence/Learn projections are purpose-, role-, consent-, provenance- and version-bound.",
             "Security/accessibility/responsive interaction can block release; aesthetic/token purity alone generally cannot.",
-            "Synthetic only through A2, approved PII scope at B1, PHI only after formal B2.",
+            "Metadata requirements are not documents; content versions follow a separate upload/quarantine/scan lifecycle.",
+            "Synthetic only through A2; forced RLS/non-owner runtime and approved PII scope at B1; PHI only after formal B2.",
         ]),
         "## Dependency graph",
         dependency_mermaid(),
@@ -682,9 +842,9 @@ def render_consolidated() -> str:
         "## GitHub Project operating model",
         render_project_structure().replace("# GitHub Project structure — MVP Product Flow Reshape\n\n", ""),
         "## Ownership, delegation and review",
-        md_table(["Work package", "DRI", "Implementer", "Reviewer", "Approver", "Split"], [[item["wp"], item["dri"], item["implementer"] + " (proposed)", item["reviewer"], item["approver"], item["note"]] for item in WORK_PACKAGE_OWNERSHIP]),
+        md_table(["Work package", "DRI", "Primary implementer", "Reciprocal reviewer", "Founder approver", "Split"], [[item["wp"], item["dri"], item["implementer"] + " (proposed)", item["reviewer"], item["approver"], item["note"]] for item in WORK_PACKAGE_OWNERSHIP]),
         md_table(["Checkpoint", "When", "Owner", "Evidence"], [[item["checkpoint"], item["when"], item["owner"], item["evidence"]] for item in REVIEW_MODEL]),
-        "Delegation rule: Luke decides product/lifecycle/commercial/privacy/PHI/provider boundaries and accepts gates; Alan proposes implementation and owns technical delivery/validation after sign-off. Joint planning is mandatory for migration, invitation admission, authorship/projection, promotion, activation, document plane and B1/B2. External review is mandatory for payment/refund, auth security, document/PHI, provider sharing and AI truth boundaries.",
+        "Delegation rule: PRs inherit the proposed work-package DRI and primary implementer pending Alan's review. Alan reviews Luke-owned work; Luke reviews Alan-owned work and retains founder approval where required. Technical-decision ownership and external attestations remain separate from implementation ownership. P13-07 is the sole Joint-implementation exception.",
         "## Existing-PR extraction and Alan checkpoint",
         render_extraction_ledger().replace("# Existing PR extraction ledger\n\n", ""),
         "## Data authorship and provenance",
@@ -708,14 +868,17 @@ def render_consolidated() -> str:
         "Required changes:\n\n" + bullets(INVITATION_CONTRACT["required_changes"]),
         "## Documents and S3",
     ]
-    for key in ("storage", "upload", "download", "recovery"):
+    for key in ("metadata", "storage", "upload", "download", "recovery"):
         parts += [f"### {key.title()}", bullets(DOCUMENT_CONTRACT[key])]
     parts += [
         "## Design-system release rubric",
         md_table(["Class", "Items"], [["Release-blocking", "; ".join(DESIGN_SYSTEM_RELEASE_POLICY["release_blocking"])], ["Desirable", "; ".join(DESIGN_SYSTEM_RELEASE_POLICY["desirable"])], ["Deferred", "; ".join(DESIGN_SYSTEM_RELEASE_POLICY["deferred"])] ]),
         DESIGN_SYSTEM_RELEASE_POLICY["rule"],
         "## Decision register",
-        md_table(["ID", "Decision", "Owner / proposer", "Affected PRs", "Latest point", "Recommendation / treatment", "Project item"], [[d["id"], d["question"], f"{d['owner']} / {d['proposer']}", ", ".join(d["affected"]), d["latest"], d["recommendation"], f"[{d['id']}]({PROJECT_URL}?query={d['id']})"] for d in DECISIONS]),
+        "The register preserves all 24 IDs while separating founder outcome, technical control state and external activation evidence.",
+        render_decision_register(DECISIONS, detailed=True, heading_level=3),
+        "## Alan decision timing and external dependencies",
+        render_alan_decision_lanes(),
         "## Risk register",
         md_table(["ID", "Class", "Risk", "Owner", "Mitigation", "Gate"], [[r["id"], r["class"], r["risk"], r["owner"], r["mitigation"], r["gate"]] for r in RISK_REGISTER]),
         "## Release strategy and real-user/PHI boundaries",
@@ -743,18 +906,19 @@ def render_document_index() -> str:
 def render_readme() -> str:
     parts = [
         "# Natalyx repair programme planning package",
-        "> Planning only. No application, infrastructure, schema, deployment or cloud mutation is authorized by these files. Alan should review/sign off the consolidated plan before proposed assignments become expected work.",
+        "> Planning only. No application, infrastructure, schema, deployment or cloud mutation is authorized by these files. The corrected work-package split remains proposed pending Alan's review; local preparation never authorizes commit, PR creation or merge.",
         "## Executive summary",
-        f"This clean planning worktree on `{PLAN_BRANCH}` contains 14 standalone work-package plans, a {len(PROPOSED_PRS)}-PR manifest, extraction ledger, Project operating model, consolidated Markdown and a PDF rendered from that Markdown. The organisation Project [{PROJECT_CONVENTIONS['project']}]({PROJECT_URL}) is the operational control plane.",
+        f"This clean planning worktree on `{PLAN_BRANCH}` contains 14 standalone work-package plans, a {len(PROPOSED_PRS)}-PR manifest, frozen recommendation matrix, extraction ledger, desired Project catalogue, consolidated Markdown and a PDF rendered from that Markdown. Drive is the canonical review surface; the benched Project is not live authority until separately reactivated and synced.",
         "## Current verified verdict",
-        "The dev app endpoint returned ALB 503 at the inspection snapshot, and local AWS SSO was expired, so A0 is not passed and the exact running ECS revision still needs capture. Main lacks a Python/PostgreSQL evidence job. Updated PR #122 is stronger and worth selective reuse; PR #124 remains architecturally unsafe unchanged because Node 0 Free creates a canonical case and an unaddressed link can lead to case membership.",
+        "The dev app endpoint returned ALB 503 at the original inspection snapshot, so A0 remains unaccepted. Corrected #122 is the named behavior/test baseline; #124 is extraction evidence only; Wave 2@5b63e3a passed 535 local tests but contains independently reproduced restart-loss and stale-review defects and remains adapt/test evidence only. Required-check enforcement is bounded by D-CI-01.",
         "## Architecture principles",
         bullets([
             "Separate entry, workspace, entitlement, commitment, payment, case, claim/invitation and document state machines.",
+            "Separate identity, participation and access; lens/view never authorizes.",
             f"Only `{PROMOTION_EVENT['event_type']}` authorizes paid-case promotion.",
             "PostgreSQL production authority, versioned migrations, append-only commercial/authorship/audit history.",
             "IP provisional information remains attributed; GC/private/provider truth has explicit authorship, visibility, verification and revision.",
-            "Synthetic A0-A2, PII-only B1, formal human PHI B2.",
+            "Metadata coordination is not a document-content state; forced RLS/non-owner runtime precedes PII-only B1; formal human PHI approval remains B2.",
         ]),
         "## Dependency graph",
         dependency_mermaid(),
@@ -762,13 +926,17 @@ def render_readme() -> str:
         "Critical path:\n\n" + " → ".join(f"`{item}`" for item in CRITICAL_PATH),
         "Required dependency joins:\n\n" + bullets(CRITICAL_JOINS),
         "First three implementation PRs:\n\n" + numbered(f"`{item}` — {next(pr['title'] for pr in PROPOSED_PRS if pr['id'] == item)}" for item in FIRST_THREE_IMPLEMENTATION_PRS),
-        "CI/A0/migration design can progress after plan sign-off while Alan completes the explicit #122/#124 reconciliation checkpoint. Replacement auth, Node 0 and participant case work waits for that checkpoint.",
+        "The #122/#124/Wave 2 reconciliation checkpoint is complete. Local preparation and merge readiness are now separate; reciprocal review, D-CI-01, ordinary dependencies/decisions and gate contracts continue to govern commit, PR creation and merge.",
+        "## Founder decision resolution",
+        "All 24 decision IDs are classified. Founder-final outcomes are distinct from Alan's technical controls and from external activation evidence; no final policy is represented as an active control until its evidence passes.",
+        render_decision_register(DECISIONS, detailed=False),
+        render_alan_decision_lanes(),
         "## Programme gates",
         render_gate_table(compact=True),
         "## GitHub Project operating model",
-        f"Use [{PROJECT_CONVENTIONS['project']}]({PROJECT_URL}) as the authoritative tracker. {PROJECT_CONVENTIONS['hierarchy']} {PROJECT_CONVENTIONS['readiness']} {PROJECT_CONVENTIONS['assignment']}",
+        f"The desired catalogue for [{PROJECT_CONVENTIONS['project']}]({PROJECT_URL}) is maintained locally, but the Project remains benched and its last verified live state is 106 items. {PROJECT_CONVENTIONS['hierarchy']} {PROJECT_CONVENTIONS['readiness']} {PROJECT_CONVENTIONS['assignment']}",
         "## Ownership and review",
-        md_table(["Work package", "DRI", "Implementer", "Reviewer", "Approver", "Note"], [[item["wp"], item["dri"], item["implementer"] + " (proposed)", item["reviewer"], item["approver"], item["note"]] for item in WORK_PACKAGE_OWNERSHIP]),
+        md_table(["Work package", "DRI", "Primary implementer", "Reciprocal reviewer", "Founder approver", "Note"], [[item["wp"], item["dri"], item["implementer"] + " (proposed)", item["reviewer"], item["approver"], item["note"]] for item in WORK_PACKAGE_OWNERSHIP]),
         "## Document index",
         render_document_index(),
         "## Reproducible generation, validation and PDF render",
@@ -776,15 +944,15 @@ def render_readme() -> str:
         "Validate identifiers/dependencies/gates/cross-file coverage:\n\n```bash\n" + PYTHON + " scripts/validate_programme.py\n```",
         "Render the PDF **from consolidated-plan.md**:\n\n```bash\n" + PYTHON + " scripts/render_pdf.py consolidated-plan.md consolidated-plan.pdf\n```",
         "Inspect PDF metadata/text/pages:\n\n```bash\npdfinfo consolidated-plan.pdf\npdftotext consolidated-plan.pdf /tmp/consolidated-plan.txt\npdftoppm -f 1 -singlefile -png -r 110 consolidated-plan.pdf /tmp/natalyx-plan-first\n```",
-        "Synchronize the GitHub Project (dry-run, then apply):\n\n```bash\n" + PYTHON + " scripts/sync_project.py\n" + PYTHON + " scripts/sync_project.py --apply\n```",
+        "Validate the desired GitHub Project catalogue locally; apply only after separate reactivation/authorization:\n\n```bash\n" + PYTHON + " scripts/sync_project.py\n" + PYTHON + " scripts/sync_project.py --apply\n```",
         "## Maintenance instructions",
         numbered([
             "Edit programme_data.py, not a single rendered plan, when an ID/title/dependency/owner/gate/decision/disposition changes.",
-            "Record new Alan findings in the extraction/checkpoint data with exact head and evidence anchor.",
+            "Record new review or branch evidence in the extraction/matrix data with exact head and evidence anchor.",
             "Regenerate Markdown and run validate_programme.py; resolve every circular/missing/mismatch result.",
             "Re-render the PDF, inspect representative first/table/diagram/code/last pages and verify text/headings/page count.",
-            "Run git diff --check, then run the idempotent Project sync and verify expected counts/fields.",
-            "Never make a proposed item Ready to implement until plan approval, decisions, dependencies and checkpoint requirements are satisfied.",
+            "Run git diff --check and validate the desired Project catalogue. Remote sync is separately authorized and blocked while the Project remains benched.",
+            "Never make a proposed item Ready to implement until plan approval, decisions, dependencies and gate requirements are satisfied.",
         ]),
     ]
     return "\n\n".join(parts) + "\n"

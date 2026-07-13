@@ -2,8 +2,8 @@
 title: '\plantitle{Natalyx MVP Fixes}'
 title-meta: "Natalyx MVP Fixes"
 subtitle: "Work Package 12: Ask/Learn shell and mobile cutover"
-author: "L. Rhodes (plan owner) - A. Zhao (technical review requested)"
-date: "2026-07-10"
+author: "L. Rhodes (plan owner) - A. Zhao (technical feedback reconciled)"
+date: "2026-07-12"
 ---
 # Work Package 12: Ask/Learn shell and mobile cutover
 
@@ -14,7 +14,7 @@ date: "2026-07-10"
 | Work package | WP12 |
 | Plan file | `WP12 - Ask and Learn shell and mobile cutover.md` |
 | Proposed PRs | P12-01, P12-02, P12-03 |
-| Inspection snapshot | 2026-07-10 20:12 America/New_York |
+| Inspection snapshot | 2026-07-12 19:30 America/New_York |
 
 ## Purpose and outcome
 
@@ -40,6 +40,7 @@ Classification is explicit: **verified** is observed code/PR/live behavior; **ve
 | E-006 | verified | app / PR #122@e853821 | PR comment Review round 2 addressed and changed workflow/tests | Updated PR #122 reports 499 tests plus return_to, TTL, CAS, self-invite, lens and Learn fail-closed fixes; green checks were observed. These are salvage candidates, not blanket merge approval. |
 | E-012 | verified | app / PR #122@e853821 | app/storage/invitations.py and PR review-round comment | The updated case invitation work adds 14-day ceiling, CAS transitions, mismatch confirmation, self-invite refusal, return_to preservation and paired lens tests; it has no Node 0 workspace target. |
 | E-024 | verified | design-system / main@43dab986; PR #7@cedfcc4; PR #8@4656426 | components, tokens, Jinja attrs/parity guidance | Participant DS recipes and parity guidance exist; local brand assets are also dirty. Internal/operator DS is a separate repository and boundary. |
+| E-029 | verified preserved branch | app / feat/byos-journey-wave-2@5b63e3a7 | exact three-commit stack on e853821 | Wave 2 contains phase-1 cluster pages, metadata-only request/review, case anchoring and role/owner fixes. Controlled local evidence passed 535 tests with 9 skipped and 36/36 focused tests, but no branch checks, PostgreSQL, browser/accessibility or visual run exists. |
 
 ## Architecture and contracts
 
@@ -62,18 +63,21 @@ Classification is explicit: **verified** is observed code/PR/live behavior; **ve
 
 ## Explicit PR sequence
 
-| Order | ID | Title | Repository | Dependencies | Gate | Size | Readiness |
+| Order | ID | Title | Repository | Dependencies | Gate | Local preparation | Merge readiness |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | P12-01 | Unify Ask and Learn shell with explicit context scopes | app | P10-03, P11-04, P09-04 | A2 | Large | Dependencies unmet |
-| 2 | P12-02 | Complete mobile participant interaction and accessibility cutover | app | P05-03, P06-03, P09-04, P12-01 | A2 | Exceptional | Dependencies unmet |
-| 3 | P12-03 | Retire legacy participant routes behind verified redirects | app | P12-02, P13-04 | B1 | Large | Dependencies unmet |
+| 1 | P12-01 | Unify Ask and Learn shell with explicit context scopes | app | P10-03, P11-04, P09-04 | A2 | Not ready; named PR, decision or programme-acceptance prerequisites remain | Blocked pending PR dependencies P10-03, P11-04, P09-04; technical decisions/controls D-AI-01; Gate A0 active and verified; Alan review |
+| 2 | P12-02 | Complete mobile participant interaction and accessibility cutover | app | P05-03, P06-03, P09-04, P09-06, P12-01 | A2 | Not ready; named PR, decision or programme-acceptance prerequisites remain | Blocked pending PR dependencies P05-03, P06-03, P09-04, P09-06, P12-01; Gate A0 active and verified; Alan review |
+| 3 | P12-03 | Retire legacy participant routes behind verified redirects | app | P12-02, P13-04 | B1 | Not ready; named PR, decision or programme-acceptance prerequisites remain | Blocked pending PR dependencies P12-02, P13-04; Gate A0 active and verified; Alan review |
 
 ### P12-01 - Unify Ask and Learn shell with explicit context scopes
 
 | Field | Plan |
 | --- | --- |
 | Repository / base | `app` (`main`) |
-| Gate / size / readiness | A2 / Large / Dependencies unmet |
+| Gate / size | A2 / Large |
+| Local preparation status | Not ready; named PR, decision or programme-acceptance prerequisites remain |
+| Merge readiness | Blocked pending PR dependencies P10-03, P11-04, P09-04; technical decisions/controls D-AI-01; Gate A0 active and verified; Alan review |
+| Technical-decision owner | D-AI-01: Alan - later model/retrieval/schema/fallback mechanism |
 | Dependencies | P10-03, P11-04, P09-04 |
 | Blocking decisions/checkpoints | D-AI-01 |
 | Source / salvage | Current Ask widget/Learn workspace, PR #124 |
@@ -152,16 +156,19 @@ Hard dependencies: P10-03, P11-04, P09-04. Parallel opportunities: P12-03
 - [ ] Present general Learn, private personalization, and approved shared-case Ask as visibly distinct contexts with source cards and safe switching.
 - [ ] Every listed objective test passes locally and at the required gate where applicable.
 - [ ] Every explicit non-goal remains out of the diff and no protected worktree/branch is modified during extraction.
+- [ ] The planning record has matching dependency, local-preparation, merge-readiness, ownership, gate and disposition fields.
 - [ ] Rollout/repair evidence is attached before merge; unresolved decisions remain blocked rather than encoded as guesses.
 
 #### Ownership and review
 
 | Role | Recommendation |
 | --- | --- |
-| DRI | Luke |
-| Implementer | Luke (proposed; pending joint approval) |
+| Work-package DRI | Luke |
+| Primary implementer | Luke (proposed; pending Alan review) |
+| Technical-decision owner | D-AI-01: Alan - later model/retrieval/schema/fallback mechanism |
 | Reviewer | Alan |
-| Final approver | Joint |
+| Final approver | Luke |
+| PR-level ownership exception | None |
 | Required expertise | privacy UX, FastAPI/Jinja, accessibility |
 | Higher-capability review | Mandatory before merge |
 
@@ -170,8 +177,11 @@ Hard dependencies: P10-03, P11-04, P09-04. Parallel opportunities: P12-03
 | Field | Plan |
 | --- | --- |
 | Repository / base | `app` (`main`) |
-| Gate / size / readiness | A2 / Exceptional / Dependencies unmet |
-| Dependencies | P05-03, P06-03, P09-04, P12-01 |
+| Gate / size | A2 / Exceptional |
+| Local preparation status | Not ready; named PR, decision or programme-acceptance prerequisites remain |
+| Merge readiness | Blocked pending PR dependencies P05-03, P06-03, P09-04, P09-06, P12-01; Gate A0 active and verified; Alan review |
+| Technical-decision owner | None; implement the settled founder constraints and approved contracts |
+| Dependencies | P05-03, P06-03, P09-04, P09-06, P12-01 |
 | Blocking decisions/checkpoints | None beyond dependencies and plan approval |
 | Source / salvage | PR #122 mobile journey, PR #124 Node 0, DS PR #8 |
 
@@ -243,23 +253,26 @@ Disable the feature or return to the prior compatible image; retain append-only 
 
 #### Dependencies and parallel work
 
-Hard dependencies: P05-03, P06-03, P09-04, P12-01. Parallel opportunities: None inside this package beyond review/test preparation.
+Hard dependencies: P05-03, P06-03, P09-04, P09-06, P12-01. Parallel opportunities: None inside this package beyond review/test preparation.
 
 #### Objective acceptance criteria
 
 - [ ] Run a bounded participant-only mobile/accessibility pass across entry, auth, Node 0, GC claim, case, documents, Ask, and Learn using the released DS contract.
 - [ ] Every listed objective test passes locally and at the required gate where applicable.
 - [ ] Every explicit non-goal remains out of the diff and no protected worktree/branch is modified during extraction.
+- [ ] The planning record has matching dependency, local-preparation, merge-readiness, ownership, gate and disposition fields.
 - [ ] Rollout/repair evidence is attached before merge; unresolved decisions remain blocked rather than encoded as guesses.
 
 #### Ownership and review
 
 | Role | Recommendation |
 | --- | --- |
-| DRI | Luke |
-| Implementer | Luke (proposed; pending joint approval) |
+| Work-package DRI | Luke |
+| Primary implementer | Luke (proposed; pending Alan review) |
+| Technical-decision owner | None; implement the settled founder constraints and approved contracts |
 | Reviewer | Alan |
-| Final approver | Joint |
+| Final approver | Luke |
+| PR-level ownership exception | None |
 | Required expertise | responsive UI, accessibility, browser testing |
 | Higher-capability review | Risk-proportionate; not mandatory by programme default |
 
@@ -268,7 +281,10 @@ Hard dependencies: P05-03, P06-03, P09-04, P12-01. Parallel opportunities: None 
 | Field | Plan |
 | --- | --- |
 | Repository / base | `app` (`main`) |
-| Gate / size / readiness | B1 / Large / Dependencies unmet |
+| Gate / size | B1 / Large |
+| Local preparation status | Not ready; named PR, decision or programme-acceptance prerequisites remain |
+| Merge readiness | Blocked pending PR dependencies P12-02, P13-04; Gate A0 active and verified; Alan review |
+| Technical-decision owner | None; implement the settled founder constraints and approved contracts |
 | Dependencies | P12-02, P13-04 |
 | Blocking decisions/checkpoints | None beyond dependencies and plan approval |
 | Source / salvage | Current route inventory, PRs #112/#119 planning maps |
@@ -346,16 +362,19 @@ Hard dependencies: P12-02, P13-04. Parallel opportunities: P12-01
 - [ ] Move legacy participant entry/case/Ask/Learn routes behind allowlisted redirects and telemetry, then remove only after a measured compatibility window.
 - [ ] Every listed objective test passes locally and at the required gate where applicable.
 - [ ] Every explicit non-goal remains out of the diff and no protected worktree/branch is modified during extraction.
+- [ ] The planning record has matching dependency, local-preparation, merge-readiness, ownership, gate and disposition fields.
 - [ ] Rollout/repair evidence is attached before merge; unresolved decisions remain blocked rather than encoded as guesses.
 
 #### Ownership and review
 
 | Role | Recommendation |
 | --- | --- |
-| DRI | Luke |
-| Implementer | Luke (proposed; pending joint approval) |
+| Work-package DRI | Luke |
+| Primary implementer | Luke (proposed; pending Alan review) |
+| Technical-decision owner | None; implement the settled founder constraints and approved contracts |
 | Reviewer | Alan |
-| Final approver | Joint |
+| Final approver | Luke |
+| PR-level ownership exception | None |
 | Required expertise | Python/FastAPI, PostgreSQL, security-aware product engineering |
 | Higher-capability review | Risk-proportionate; not mandatory by programme default |
 
@@ -391,13 +410,33 @@ Compatibility window: keep prior readers/writers and rollback image usable throu
 
 ## Risks and decisions
 
-| Type | ID / risk | Owner | Affected PRs / latest point | Treatment |
-| --- | --- | --- | --- | --- |
-| Blocking/product/compliance decision | D-AI-01 - Approve scopes, allowed sources, model policy, proposal reviewers, class-5 evidence rail and degraded-mode copy. | Luke | P10-01, P10-02, P10-03, P12-01; Before P10-01 | D-AI-01 - Generic case members cannot create reviewed/provider truth; intelligence remains advisory and scope explicit. |
-| Implementation risk | Context ambiguity | Luke or named PR DRI | Package PRs; before associated gate | Mitigate through the explicit tests, rollout and forward-repair plan |
-| Implementation risk | Mobile-only dead ends | Luke or named PR DRI | Package PRs; before associated gate | Mitigate through the explicit tests, rollout and forward-repair plan |
-| Implementation risk | Premature legacy removal | Luke or named PR DRI | Package PRs; before associated gate | Mitigate through the explicit tests, rollout and forward-repair plan |
-| Implementation risk | Design drift | Luke or named PR DRI | Package PRs; before associated gate | Mitigate through the explicit tests, rollout and forward-repair plan |
+Founder outcomes, Alan's remaining technical ownership and external activation dependencies are recorded separately so a final policy is never mistaken for an active control.
+
+| ID | Status | Classification | Remaining owner | Affected / latest | Programme effect |
+| --- | --- | --- | --- | --- | --- |
+| D-AI-01 | Founder scope/cost final; Alan later; PHI externally gated | Luke sets scope and cost; Alan decides implementation later | Alan - later before P10-01 | P10-01, P10-02, P10-03, P12-01; Before P10-01 | P10/P12 synthetic planning may proceed; implementation completion waits for Alan's technical decision and PHI remains blocked through B2. |
+
+### D-AI-01 - Intelligence context and approval authority matrix
+
+| Field | Recorded decision or requirement |
+| --- | --- |
+| Decision state | Final founder policy; PHI externally dependent |
+| Founder outcome | AI is bounded and advisory: role-scoped education, retrieval, summaries, question drafts, next steps and provider preparation using approved Learn and authorized source-labelled context. It never diagnoses, ranks, approves, clears or writes durable truth; authorized human approval precedes memory, case or provider material. |
+| Founder constraints | Deterministic or curated fallback; $10 per active case/month and $100 total beta/month ceilings with alerts and graceful fallback; No PHI before B2 |
+| What remains for Alan | Choose Bedrock model, prompts, retrieval, schemas, fallback, human-review rails and cost controls |
+| Evidence required | Scope/authority negative tests; Fallback and malformed-response tests; Safety and cost evidence |
+| Approval rule | Luke approves broader AI authority, higher cost or any PHI use; B2 external approval is mandatory for PHI. |
+| External dependencies | B2 external security/privacy/compliance approval before PHI |
+| Affected PRs / latest point | P10-01, P10-02, P10-03, P12-01; Before P10-01 |
+| Programme effect | P10/P12 synthetic planning may proceed; implementation completion waits for Alan's technical decision and PHI remains blocked through B2. |
+| Independent recommendation | Generic case members cannot create reviewed/provider truth; intelligence remains advisory and scope explicit. |
+
+| Implementation risk | Owner | Treatment |
+| --- | --- | --- |
+| Context ambiguity | Luke | Mitigate through explicit tests, rollout and forward-repair evidence before the associated gate. |
+| Mobile-only dead ends | Luke | Mitigate through explicit tests, rollout and forward-repair evidence before the associated gate. |
+| Premature legacy removal | Luke | Mitigate through explicit tests, rollout and forward-repair evidence before the associated gate. |
+| Design drift | Luke | Mitigate through explicit tests, rollout and forward-repair evidence before the associated gate. |
 
 ## Existing-work salvage
 
@@ -406,9 +445,10 @@ Compatibility window: keep prior readers/writers and rollback image usable throu
 | app#112 | 9605d88e31bd | Source-first 81-node/12-cluster surface map, participant-renderer boundaries, wave plan and cross-repo seams. | P12-03 | Selective port, then supersede after extraction | Catalogued; content remains to be reconciled into replacement PR acceptance tests. |
 | app#119 | a8cd2f428535 | Concise product-leverage framing and boundaries for the MVP flow. | P12-03 | Retain as source or merge separately after plan decision | Catalogued; reconcile terminology into approved programme. |
 | app#121 | 529d377e2337 | Primary Node 0 participant model/UI, PDF/guide presentation and focused surface tests. | P12-02 | Selective UI/test port, then supersede | Unextracted; #124 may contain later copies but equivalence must be proved by file/commit comparison. |
-| app#122 | e85382150853 | Case projection/lens surfaces, safe return_to, invitation TTL/CAS/self-member/one-GC constraints, transactional membership, fail-closed Learn, SQL-limited timeline, responsive/a11y tests and Python CI workflow. | P12-02 | Retain pending Alan reconciliation; selective port or rebase only after architecture approval | Reinspected at latest head. It is exactly e853821 (no newer delta); retention strengthened, but final extraction waits for Alan checkpoint. |
-| app#124 | 84a5a847fea7 | Current consolidation of Node 0 questionnaire/guide/surfaces, GC onboarding, participant case shell, invitations, DS assets and large focused test suites. | P12-02 | Retain unchanged as evidence; selective port/rewrite after checkpoint | Unextracted; Alan review explicitly incomplete and unresolved. |
+| app#122 | e85382150853 | Case projection/lens surfaces, safe return_to, invitation TTL/CAS/self-member/one-GC constraints, transactional membership, fail-closed Learn, SQL-limited timeline, responsive/a11y tests and Python CI workflow. | P12-02 | Selective-port behavior and tests; supersede as programme architecture | Complete at e853821: authoritative behavior/tests and selectively portable implementation are classified; superseded architecture and evidence-only claims are named. |
+| app#124 | 84a5a847fea7 | Consolidated Node 0 questionnaire/guide/surfaces, GC onboarding, participant case shell, invitation delegation, DS assets and large focused test suites as extraction evidence. | P12-02 | Fully supersede as a merge unit; preserve selective concepts, copy, assets and tests as evidence | Complete at 84a5a84: all consolidated-review findings are dispositioned and assigned; no mergeable/cherry-pick unit is approved. |
 | ds#8 | 4656426e493e | Consumer parity and bounded app-owned layout guidance for Node 0/case/mobile adoption. | P12-02 | Prefer direct review/merge if still correct | Direct-reuse candidate; local dirty asset delta separately protected. |
+| feat/byos-journey-wave-2 | 5b63e3a7c364 | Projection-driven phase-1 cluster presentation, exact route allowlisting, person-versus-case-side ownership intent, transactional submission/work-item and review/audit patterns, fail-closed item retention, approved Learn status selection and 36 focused tests. | P12-02 | Preserve paused at the exact head; selectively port semantics/tests only after adaptation. Do not merge, cherry-pick, continue implementation or use its runtime schema directly. | Paused exact-head evidence; no direct merge |
 
 Package source inventory:
 
@@ -418,15 +458,15 @@ Package source inventory:
 
 ## Ownership recommendation
 
-Luke leads this work package, with Alan providing technical review. The split is proposed for review and can be amended before implementation begins.
+Luke is the proposed DRI and primary implementer for the participant shell and cutover. Alan reviews technical integration, authorization and failure behavior; accessibility review remains required where named.
 
-| PR | DRI | Implementer | Reviewer | Final approver | External/high-capability review |
-| --- | --- | --- | --- | --- | --- |
-| P12-01 | Luke | Luke (proposed) | Alan | Joint | Mandatory |
-| P12-02 | Luke | Luke (proposed) | Alan | Joint | As risk warrants |
-| P12-03 | Luke | Luke (proposed) | Alan | Joint | As risk warrants |
+| PR | WP DRI | Primary implementer | Technical-decision owner | Reviewer | Final approver | Exception |
+| --- | --- | --- | --- | --- | --- | --- |
+| P12-01 | Luke | Luke (proposed) | D-AI-01: Alan - later model/retrieval/schema/fallback mechanism | Alan | Luke | None |
+| P12-02 | Luke | Luke (proposed) | None; implement the settled founder constraints and approved contracts | Alan | Luke | None |
+| P12-03 | Luke | Luke (proposed) | None; implement the settled founder constraints and approved contracts | Alan | Luke | None |
 
-Luke leads implementation and product acceptance for this package; Alan reviews architecture, migration, security and failure behavior. This is a recommendation pending joint review, not a compulsory assignment.
+PR ownership inherits the proposed work-package split pending Alan's review. Named technical-decision ownership remains separate and never transfers implementation ownership across work packages; reciprocal and external review requirements remain intact.
 
 ## Definition of done
 

@@ -1,13 +1,13 @@
 # Work package 09 — Documents, active case, and provider handoffs
 
-> Planning-only execution contract. Proposed implementers and owners remain recommendations until Alan reviews/signs off the consolidated plan and Luke accepts it. Project: [MVP Product Flow Reshape](https://github.com/orgs/NatalyxPlatform/projects/3).
+> Planning-only execution contract. The corrected work-package split remains proposed pending Alan's review. Local preparation and merge readiness are separate; the benched Project catalogue is not resynced. Project reference: [MVP Product Flow Reshape](https://github.com/orgs/NatalyxPlatform/projects/3).
 
 | Plan | Value |
 | --- | --- |
 | Work package | WP09 |
 | Plan file | `09-documents-active-case-and-provider-handoffs.md` |
-| Proposed PRs | P09-01, P09-02, P09-03, P09-04, P09-05 |
-| Inspection snapshot | 2026-07-10 20:12 America/New_York |
+| Proposed PRs | P09-01, P09-02, P09-03, P09-04, P09-05, P09-06 |
+| Inspection snapshot | 2026-07-12 19:30 America/New_York |
 
 ## 1. Purpose and outcome
 
@@ -15,7 +15,7 @@
 
 **Why this package exists.** It creates a reviewable boundary so the programme can progress without mixing product, data, security, infrastructure and rollout concerns in one oversized change.
 
-**Completed outcome.** A secure document lifecycle, resilient storage/scan/download pipeline, usable active-case surfaces, and consent-scoped immutable provider snapshots with operational review.
+**Completed outcome.** A metadata-only requirement/work-item lifecycle distinct from the secure document-content lifecycle, resilient storage/scan/download, usable active-case surfaces, and consent-scoped immutable provider snapshots with operational review.
 
 **Explicit non-goals.**
 
@@ -34,10 +34,15 @@ Classification is explicit: **verified** is observed code/PR/live behavior; **ve
 | E-012 | verified | app / PR #122@e853821 | app/storage/invitations.py and PR review-round comment | The updated case invitation work adds 14-day ceiling, CAS transitions, mismatch confirmation, self-invite refusal, return_to preservation and paired lens tests; it has no Node 0 workspace target. |
 | E-018 | verified | app / PR #124@84a5a84 | app/storage/documents.py:1-114; app/storage/schema.py:785-801 | Documents are explicitly metadata-only; storage_uri/checksum fields exist but no durable upload, quarantine, scan, authorization-by-purpose, retention or recovery pipeline. |
 | E-019 | verified protected work | app / dirty feature/provider-exchange-layer-v0@84a5a84 | app/provider_handoffs.py:109-133 and uncommitted handoff modules | The protected provider work is not a PR. Its broad GC-owner fact selection can include private/provisional data, so only selective port after provenance/purpose review is safe. |
+| E-028 | verified review | app / PR #124 comment 4948149089 | Consolidated review — findings for the WP00 extraction ledger | Alan's completed review classifies #124 as high-value extraction material rather than a merge unit and identifies transaction, privacy, scoring, access, validation, invariant, exposure, retention, performance, CSS and CI findings. |
+| E-029 | verified preserved branch | app / feat/byos-journey-wave-2@5b63e3a7 | exact three-commit stack on e853821 | Wave 2 contains phase-1 cluster pages, metadata-only request/review, case anchoring and role/owner fixes. Controlled local evidence passed 535 tests with 9 skipped and 36/36 focused tests, but no branch checks, PostgreSQL, browser/accessibility or visual run exists. |
+| E-030 | independently reproduced defect | app / feat/byos-journey-wave-2@5b63e3a7 | app/storage/schema.py orphan cleanup; document review CAS/work-item payload | A second init_db deletes canonical case-anchored reviewer work because participant_id is empty. Separately, a stale v1 work item can approve v2 after same-row resubmission because it is not bound to an immutable submission revision. |
+| E-031 | verified | app / feat/byos-journey-wave-2@5b63e3a7 | case_members.py, case_documents.py, storage/documents.py, routes/agency.py | Membership roles still conflate participation, lens and access; document/reviewer loaders are broad or global; participant role/lens can be caller-supplied; operator actions lack a canonical organization-scoped staff capability; no RLS/non-owner runtime enforces denial. |
 
 ## 3. Architecture and contracts
 
-- Private bucket, block-public-access, KMS, opaque keys, application authorization, size/type/checksum gates, quarantine/scan, audit, retention, and orphan cleanup are mandatory.
+- A requirement, readiness marker or review work item is not a document and cannot be approved as if content exists.
+- Private bucket, block-public-access, KMS, opaque keys, application authorization, size/type/checksum gates, quarantine/scan, audit, retention, and orphan cleanup are mandatory for content.
 - Provider handoffs are purpose-bound snapshots with checksum/revision/expiry and consent; provider-visible items are allowlisted, not inferred from broad visibility.
 - ECS replacement must not lose upload/task state; recovery resumes from durable metadata and object state.
 
@@ -46,8 +51,8 @@ Classification is explicit: **verified** is observed code/PR/live behavior; **ve
 | Ownership boundary | `app`, `infra`; repository-specific PRs remain separate. |
 | Entities/state | `case`, `case_invitation`, `document + document_version + upload` |
 | Authorization | Authenticated subject/service plus entity membership, role, purpose, consent and expected revision; query parameters, links and UI state are never authority. |
-| API/service | Intent/finalize/status/download/replace/delete commands. Membership-scoped reads and evidence commands. |
-| Storage | Versioned document/upload/scan/object metadata. Handoff/packet/snapshot/transmission/evidence ledgers under migrations. |
+| API/service | Intent/finalize/status/download/replace/delete commands. Participant document commands join requirement IDs to immutable content versions. |
+| Storage | Versioned document/upload/scan/object metadata. Requirement submissions and durable typed work items use constrained case/org/owner anchors and immutable expected revisions. Handoff/packet/snapshot/transmission/evidence ledgers under migrations. |
 | Audit | Use the common transition envelope and append-only source/event identifiers; redact tokens, raw documents, prompts and sensitive payloads. |
 | Failure | Fail closed for authorization, provenance, money, document and PHI boundaries; expose a bounded actionable error and preserve retry/repair evidence. |
 | Observability | Correlation, policy/schema/config version, transition and dependency result metrics without PHI/PII payload logging. |
@@ -109,12 +114,19 @@ Owner: **natalyx-app; storage in natalyx-infra**. States: `upload_requested`, `u
 
 ### Durable document and S3 contract
 
+#### Metadata
+
+- Requirement/readiness submissions and reviewer work items are separate entities from document versions and objects.
+- A metadata-only marker cannot carry file bytes/storage_uri, enter document-approved state or claim that a clinic received/reviewed content.
+- Work items bind organization, case, requirement, owner scope and immutable submission revision; decision plus audit is atomic and completion is durable/idempotent.
+- Free text is minimum-necessary and strictly bounded; sensitive categories remain synthetic through A2 and content/PHI paths remain disabled until their gates.
+
 #### Storage
 
 - Private versioned quarantine bucket and clean vault with block-public-access, SSL-only and KMS encryption.
 - App can create short-lived unique upload targets in quarantine but cannot read unscanned content; scanner moves/copies only clean versions to vault.
 - Object key: env/{org_id}/{case_id}/{document_id}/{version_id}/{generated_object_id}; no names, emails, filenames or clinical labels.
-- Authorization is always a Postgres membership/role/visibility/consent decision independent of the key.
+- Authorization is always a PostgreSQL access-grant/ownership/purpose/consent decision independent of the key; participation or presentation lens alone is insufficient.
 - CloudTrail S3 data events and app document_access_event records provide purpose-aware access evidence.
 
 #### Upload
@@ -140,13 +152,14 @@ Owner: **natalyx-app; storage in natalyx-infra**. States: `upload_requested`, `u
 
 ## 4. Explicit PR sequence
 
-| Order | ID | Title | Repository | Dependencies | Gate | Size | Readiness |
+| Order | ID | Title | Repository | Dependencies | Gate | Local preparation | Merge readiness |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | P09-01 | Define document lifecycle, authorization, and retention contract | app | P00-01, P02-01 | A2 | Medium | Blocked by decision |
-| 2 | P09-02 | Provision private encrypted document and quarantine storage | infra | P09-01, P13-02 | A2 | Large | Dependencies unmet |
-| 3 | P09-03 | Implement resilient document upload, scan, and download | app | P09-02, P02-03 | A2 | Exceptional | Dependencies unmet |
-| 4 | P09-04 | Complete active-case participant document and progress surfaces | app | P03-03, P07-04, P09-03, P11-03 | A2 | Exceptional | Dependencies unmet |
-| 5 | P09-05 | Implement consent-scoped provider handoff snapshots and operations | app | P04-02, P09-03, P09-04, P10-02 | A2 | Exceptional | Dependencies unmet |
+| 1 | P09-01 | Define document lifecycle, authorization, and retention contract | app | P00-01, P02-01 | A2 | Technical-decision preparation only; implementation waits on named dependencies | Blocked pending PR dependencies P00-01, P02-01; Gate A0 active and verified; Luke review/final founder approval |
+| 2 | P09-02 | Provision private encrypted document and quarantine storage | infra | P09-01, P13-02 | A2 | Not ready; named PR, decision or programme-acceptance prerequisites remain | Blocked pending PR dependencies P09-01, P13-02; technical decisions/controls D-DOC-02; Gate A0 active and verified; Luke review/final founder approval |
+| 3 | P09-03 | Implement resilient document upload, scan, and download | app | P09-02, P02-03 | A2 | Not ready; named PR, decision or programme-acceptance prerequisites remain | Blocked pending PR dependencies P09-02, P02-03; technical decisions/controls D-DOC-01, D-DOC-02; Gate A0 active and verified; Luke review/final founder approval |
+| 4 | P09-04 | Ship phase-1 case progress and metadata-only request/review | app | P03-03, P03-05, P07-04, P09-01, P11-03 | A2 | Not ready; named PR, decision or programme-acceptance prerequisites remain | Blocked pending PR dependencies P03-03, P03-05, P07-04, P09-01, P11-03; Gate A0 active and verified; Luke review/final founder approval |
+| 5 | P09-05 | Implement consent-scoped provider handoff snapshots and operations | app | P04-02, P09-06, P10-02 | A2 | Not ready; named PR, decision or programme-acceptance prerequisites remain | Blocked pending PR dependencies P04-02, P09-06, P10-02; technical decisions/controls D-PROV-01; Gate A0 active and verified; Luke review/final founder approval |
+| 6 | P09-06 | Integrate content-bearing document versions into participant surfaces | app | P09-03, P09-04 | A2 | Not ready; named PR, decision or programme-acceptance prerequisites remain | Blocked pending PR dependencies P09-03, P09-04; Gate A0 active and verified; Luke review/final founder approval |
 
 ### P09-01 — Define document lifecycle, authorization, and retention contract
 
@@ -154,19 +167,24 @@ Owner: **natalyx-app; storage in natalyx-infra**. States: `upload_requested`, `u
 | --- | --- |
 | Repository / base | `app` (`main`) |
 | Project item | [P09-01](https://github.com/orgs/NatalyxPlatform/projects/3?query=P09-01) |
-| Gate / size / readiness | A2 / Medium / Blocked by decision |
+| Gate / size | A2 / Medium |
+| Local preparation status | Technical-decision preparation only; implementation waits on named dependencies |
+| Merge readiness | Blocked pending PR dependencies P00-01, P02-01; Gate A0 active and verified; Luke review/final founder approval |
+| Technical-decision owner | D-DOC-01: Alan - later download/recovery mechanism; privacy/legal validation; D-DOC-02: Alan - later scanner/quarantine mechanism; D-PHI-01: Alan - technical evidence; qualified external reviewers - control approval |
 | Dependencies | P00-01, P02-01 |
-| Blocking decisions/checkpoints | D-DOC-01, D-DOC-02, D-PHI-01 |
-| Source / salvage | Current metadata-only documents.py, provider branch |
+| Blocking decisions/checkpoints | None beyond dependencies and plan approval |
+| Source / salvage | Current metadata-only documents.py, Wave 2@5b63e3a, provider branch |
 
 #### Objective
 
-Record the document state machine, role/purpose authorization matrix, object-key independence, retention/deletion/replacement rules, and failure recovery before storage implementation.
+Record separate metadata-requirement/work-item and content-bearing document/version state machines, the authorization matrix, object-key independence, retention/deletion/replacement rules, and failure recovery before implementation.
 
 #### Scope
 
-- Upload/scan/available/review/replace/delete states
-- Size/type/checksum and filename policy
+- Requirement/readiness/work-item states that never imply content approval
+- Document/version/upload/scan/available/review/replace/delete states
+- Owner/person/case-side/case authorization and staff capabilities
+- Size/type/checksum and structured metadata policy
 - Presigned versus proxied download decision
 - Orphan/retention jobs
 
@@ -197,8 +215,9 @@ Record the document state machine, role/purpose authorization matrix, object-key
 Objective tests:
 
 - Threat-model abuse cases
-- state transition table review
+- metadata-versus-content transition table review
 - retention/legal-hold walkthrough
+- PHI-bearing free-text negative cases
 
 Local validation:
 
@@ -221,24 +240,26 @@ Disable the feature or return to the prior compatible image; retain append-only 
 
 #### Dependencies and parallel work
 
-Hard dependencies: P00-01, P02-01. Parallel opportunities: P09-03, P09-04, P09-05
+Hard dependencies: P00-01, P02-01. Parallel opportunities: P09-03, P09-05, P09-06
 
 #### Objective acceptance criteria
 
-- [ ] Record the document state machine, role/purpose authorization matrix, object-key independence, retention/deletion/replacement rules, and failure recovery before storage implementation.
+- [ ] Record separate metadata-requirement/work-item and content-bearing document/version state machines, the authorization matrix, object-key independence, retention/deletion/replacement rules, and failure recovery before implementation.
 - [ ] Every listed objective test passes locally and at the required gate where applicable.
 - [ ] Every explicit non-goal remains out of the diff and no protected worktree/branch is modified during extraction.
-- [ ] The Project item has matching dependency, readiness, ownership, gate and disposition fields.
+- [ ] The planning record has matching dependency, local-preparation, merge-readiness, ownership, gate and disposition fields.
 - [ ] Rollout/repair evidence is attached before merge; unresolved decisions remain blocked rather than encoded as guesses.
 
 #### Ownership and review
 
 | Role | Recommendation |
 | --- | --- |
-| DRI | Alan |
-| Implementer | Alan (proposed; pending consolidated-plan sign-off) |
+| Work-package DRI | Alan |
+| Primary implementer | Alan (proposed; pending Alan review) |
+| Technical-decision owner | D-DOC-01: Alan - later download/recovery mechanism; privacy/legal validation; D-DOC-02: Alan - later scanner/quarantine mechanism; D-PHI-01: Alan - technical evidence; qualified external reviewers - control approval |
 | Reviewer | Luke |
 | Final approver | Luke |
+| PR-level ownership exception | None |
 | Required expertise | application security, S3/KMS, privacy |
 | Higher-capability review | Mandatory before merge |
 
@@ -248,9 +269,12 @@ Hard dependencies: P00-01, P02-01. Parallel opportunities: P09-03, P09-04, P09-0
 | --- | --- |
 | Repository / base | `infra` (`main`) |
 | Project item | [P09-02](https://github.com/orgs/NatalyxPlatform/projects/3?query=P09-02) |
-| Gate / size / readiness | A2 / Large / Dependencies unmet |
+| Gate / size | A2 / Large |
+| Local preparation status | Not ready; named PR, decision or programme-acceptance prerequisites remain |
+| Merge readiness | Blocked pending PR dependencies P09-01, P13-02; technical decisions/controls D-DOC-02; Gate A0 active and verified; Luke review/final founder approval |
+| Technical-decision owner | D-DOC-02: Alan - later scanner/quarantine mechanism; D-PHI-01: Alan - technical evidence; qualified external reviewers - control approval |
 | Dependencies | P09-01, P13-02 |
-| Blocking decisions/checkpoints | D-DOC-02, D-PHI-01 |
+| Blocking decisions/checkpoints | D-DOC-02 |
 | Source / salvage | Existing infra platform stack patterns |
 
 #### Objective
@@ -319,24 +343,26 @@ Return to the prior reviewed stack/task definition when compatible; otherwise ke
 
 #### Dependencies and parallel work
 
-Hard dependencies: P09-01, P13-02. Parallel opportunities: P09-04, P09-05
+Hard dependencies: P09-01, P13-02. Parallel opportunities: P09-04, P09-05, P09-06
 
 #### Objective acceptance criteria
 
 - [ ] Provision dev/private document buckets, KMS policy, block-public-access, lifecycle/quarantine events, least-privilege task roles, and audit logging behind PHI/billable guardrails.
 - [ ] Every listed objective test passes locally and at the required gate where applicable.
 - [ ] Every explicit non-goal remains out of the diff and no protected worktree/branch is modified during extraction.
-- [ ] The Project item has matching dependency, readiness, ownership, gate and disposition fields.
+- [ ] The planning record has matching dependency, local-preparation, merge-readiness, ownership, gate and disposition fields.
 - [ ] Rollout/repair evidence is attached before merge; unresolved decisions remain blocked rather than encoded as guesses.
 
 #### Ownership and review
 
 | Role | Recommendation |
 | --- | --- |
-| DRI | Alan |
-| Implementer | Alan (proposed; pending consolidated-plan sign-off) |
+| Work-package DRI | Alan |
+| Primary implementer | Alan (proposed; pending Alan review) |
+| Technical-decision owner | D-DOC-02: Alan - later scanner/quarantine mechanism; D-PHI-01: Alan - technical evidence; qualified external reviewers - control approval |
 | Reviewer | Luke |
 | Final approver | Luke |
+| PR-level ownership exception | None |
 | Required expertise | AWS S3, KMS/IAM, CDK, security |
 | Higher-capability review | Mandatory before merge |
 
@@ -346,7 +372,10 @@ Hard dependencies: P09-01, P13-02. Parallel opportunities: P09-04, P09-05
 | --- | --- |
 | Repository / base | `app` (`main`) |
 | Project item | [P09-03](https://github.com/orgs/NatalyxPlatform/projects/3?query=P09-03) |
-| Gate / size / readiness | A2 / Exceptional / Dependencies unmet |
+| Gate / size | A2 / Exceptional |
+| Local preparation status | Not ready; named PR, decision or programme-acceptance prerequisites remain |
+| Merge readiness | Blocked pending PR dependencies P09-02, P02-03; technical decisions/controls D-DOC-01, D-DOC-02; Gate A0 active and verified; Luke review/final founder approval |
+| Technical-decision owner | D-DOC-01: Alan - later download/recovery mechanism; privacy/legal validation; D-DOC-02: Alan - later scanner/quarantine mechanism |
 | Dependencies | P09-02, P02-03 |
 | Blocking decisions/checkpoints | D-DOC-01, D-DOC-02 |
 | Source / salvage | Current metadata scaffold |
@@ -420,72 +449,84 @@ Prefer application rollback within the expand/contract window and a new forward-
 
 #### Dependencies and parallel work
 
-Hard dependencies: P09-02, P02-03. Parallel opportunities: P09-01
+Hard dependencies: P09-02, P02-03. Parallel opportunities: P09-01, P09-04, P09-05
 
 #### Objective acceptance criteria
 
 - [ ] Implement multipart-safe upload intent/finalize, checksum/type/size validation, quarantine/scan transitions, authorized download, replacement, deletion, and task-recovery behavior.
 - [ ] Every listed objective test passes locally and at the required gate where applicable.
 - [ ] Every explicit non-goal remains out of the diff and no protected worktree/branch is modified during extraction.
-- [ ] The Project item has matching dependency, readiness, ownership, gate and disposition fields.
+- [ ] The planning record has matching dependency, local-preparation, merge-readiness, ownership, gate and disposition fields.
 - [ ] Rollout/repair evidence is attached before merge; unresolved decisions remain blocked rather than encoded as guesses.
 
 #### Ownership and review
 
 | Role | Recommendation |
 | --- | --- |
-| DRI | Alan |
-| Implementer | Alan (proposed; pending consolidated-plan sign-off) |
+| Work-package DRI | Alan |
+| Primary implementer | Alan (proposed; pending Alan review) |
+| Technical-decision owner | D-DOC-01: Alan - later download/recovery mechanism; privacy/legal validation; D-DOC-02: Alan - later scanner/quarantine mechanism |
 | Reviewer | Luke |
 | Final approver | Luke |
+| PR-level ownership exception | None |
 | Required expertise | S3, secure uploads, background jobs, authorization |
 | Higher-capability review | Mandatory before merge |
 
-### P09-04 — Complete active-case participant document and progress surfaces
+### P09-04 — Ship phase-1 case progress and metadata-only request/review
 
 | Field | Plan |
 | --- | --- |
 | Repository / base | `app` (`main`) |
 | Project item | [P09-04](https://github.com/orgs/NatalyxPlatform/projects/3?query=P09-04) |
-| Gate / size / readiness | A2 / Exceptional / Dependencies unmet |
-| Dependencies | P03-03, P07-04, P09-03, P11-03 |
-| Blocking decisions/checkpoints | D-COM-04, CHECK-ALAN-122-124 |
-| Source / salvage | PR #122 selective/direct reuse after checkpoint, PR #124 case UI |
+| Gate / size | A2 / Exceptional |
+| Local preparation status | Not ready; named PR, decision or programme-acceptance prerequisites remain |
+| Merge readiness | Blocked pending PR dependencies P03-03, P03-05, P07-04, P09-01, P11-03; Gate A0 active and verified; Luke review/final founder approval |
+| Technical-decision owner | None; implement the settled founder constraints and approved contracts |
+| Dependencies | P03-03, P03-05, P07-04, P09-01, P11-03 |
+| Blocking decisions/checkpoints | None beyond dependencies and plan approval |
+| Source / salvage | PR #122 case projection behavior/tests, Wave 2@5b63e3a semantics/tests; implementation superseded, PR #124 presentation evidence |
 
 #### Objective
 
-Expose role-scoped active-case tasks, documents, progress, waiting and safe pause states after activation while keeping the server projection authoritative.
+Expose projection-driven phase-1 cluster progress and a revision-bound metadata requirement/readiness/reviewer-work workflow without creating or approving a document object.
 
 #### Scope
 
-- enrollment_pending versus active surfaces
-- IP/GC lenses
-- Documents/tasks/timeline/notifications
-- Mobile journey orientation
+- Versioned phase-1 workflow/request definitions
+- Projection-issued action capabilities for active/waiting/attention/paused/done states
+- Person versus case-side ownership
+- Atomic submission plus durable case work item
+- Revision-bound/idempotent staff decision plus audit
+- Exact phase-1 route exposure
 
 #### Explicit non-goals
 
+- No file bytes, storage URI, upload, scan, download or artifact approval
+- No caller-supplied role/lens authority
 - No client-owned state transition
-- No operator/provider leakage
+- No operator/provider ambient access
 
 #### Expected files or modules
 
+- `migrations/versions/*_case_requirements.py`
 - `app/case_home.py`
 - `app/case_journey.py`
+- `app/case_requirements.py`
 - `app/routes/case.py`
+- `app/routes/operator_case_work.py`
 - `app/templates/case/`
-- `tests/python/test_case_home.py`
+- `tests/python/test_case_requirements.py`
 
 #### Change map
 
 | Area | Planned change |
 | --- | --- |
-| Schema/model | None in this PR; any later schema change stays in its named migration PR. |
-| API/routes | Membership-scoped reads and evidence commands. |
-| UI/product surface | Participant control center and journey map backed by case projection. |
+| Schema/model | Requirement submissions and durable typed work items use constrained case/org/owner anchors and immutable expected revisions. |
+| API/routes | No public API/route contract change. |
+| UI/product surface | Participant progress and readiness surfaces remain projection-driven. |
 | Infrastructure/workflow | No cloud/infrastructure resource or workflow change. |
-| Migration/backfill | No migration or backfill. |
-| Security/privacy | Preserve existing fail-closed boundaries; validate the PR-specific privacy/security cases. |
+| Migration/backfill | Apply through the named versioned migration; no ad-hoc startup DDL. Backfill is none unless explicitly listed in scope. |
+| Security/privacy | Subject-derived participant capabilities and explicit organization-scoped staff capability gate every read/command. |
 | Architecture/docs/config | Document the contract, version pins and safe partial-merge behavior. |
 
 #### Tests and validation
@@ -493,9 +534,13 @@ Expose role-scoped active-case tasks, documents, progress, waiting and safe paus
 Objective tests:
 
 - IP/GC paired lenses
-- pending/active/paused
-- no membership
-- malformed/stale projection
+- viewer/nonmember/spoofed-role denial
+- restart durability
+- stale work item cannot approve resubmission
+- atomic submission/task and review/audit rollback
+- wrong case/org and unsupported type retained
+- paused/done action suppression
+- later-phase 404
 - mobile/no-JS/reduced-motion
 
 Local validation:
@@ -511,33 +556,35 @@ Emit correlation/idempotency/policy/version identifiers, transition/result count
 
 #### Rollout
 
-Deploy behind the narrowest practical feature/config gate, verify the named synthetic flow and diagnostics on a known revision, then widen only at the associated programme gate.
+Ship expand-only and dark by default; run the one-off migrator, verify readiness/old-revision compatibility, then enable writers/readers in a later compatible step.
 
 #### Rollback or forward repair
 
-Disable the feature or return to the prior compatible image; retain append-only audit/ledger history and repair with a new event/revision rather than destructive mutation.
+Prefer application rollback within the expand/contract window and a new forward-repair migration. An irreversible schema reversal requires its own approval and backup evidence.
 
 #### Dependencies and parallel work
 
-Hard dependencies: P03-03, P07-04, P09-03, P11-03. Parallel opportunities: P09-01, P09-02
+Hard dependencies: P03-03, P03-05, P07-04, P09-01, P11-03. Parallel opportunities: P09-02, P09-03, P09-05
 
 #### Objective acceptance criteria
 
-- [ ] Expose role-scoped active-case tasks, documents, progress, waiting and safe pause states after activation while keeping the server projection authoritative.
+- [ ] Expose projection-driven phase-1 cluster progress and a revision-bound metadata requirement/readiness/reviewer-work workflow without creating or approving a document object.
 - [ ] Every listed objective test passes locally and at the required gate where applicable.
 - [ ] Every explicit non-goal remains out of the diff and no protected worktree/branch is modified during extraction.
-- [ ] The Project item has matching dependency, readiness, ownership, gate and disposition fields.
+- [ ] The planning record has matching dependency, local-preparation, merge-readiness, ownership, gate and disposition fields.
 - [ ] Rollout/repair evidence is attached before merge; unresolved decisions remain blocked rather than encoded as guesses.
 
 #### Ownership and review
 
 | Role | Recommendation |
 | --- | --- |
-| DRI | Alan |
-| Implementer | Alan (proposed; pending consolidated-plan sign-off) |
+| Work-package DRI | Alan |
+| Primary implementer | Alan (proposed; pending Alan review) |
+| Technical-decision owner | None; implement the settled founder constraints and approved contracts |
 | Reviewer | Luke |
 | Final approver | Luke |
-| Required expertise | FastAPI/Jinja, accessibility, authorization, state projection |
+| PR-level ownership exception | None |
+| Required expertise | FastAPI/Jinja, accessibility, authorization, PostgreSQL transactions, state projection |
 | Higher-capability review | Mandatory before merge |
 
 ### P09-05 — Implement consent-scoped provider handoff snapshots and operations
@@ -546,9 +593,12 @@ Hard dependencies: P03-03, P07-04, P09-03, P11-03. Parallel opportunities: P09-0
 | --- | --- |
 | Repository / base | `app` (`main`) |
 | Project item | [P09-05](https://github.com/orgs/NatalyxPlatform/projects/3?query=P09-05) |
-| Gate / size / readiness | A2 / Exceptional / Dependencies unmet |
-| Dependencies | P04-02, P09-03, P09-04, P10-02 |
-| Blocking decisions/checkpoints | D-PROV-01, D-PHI-01 |
+| Gate / size | A2 / Exceptional |
+| Local preparation status | Not ready; named PR, decision or programme-acceptance prerequisites remain |
+| Merge readiness | Blocked pending PR dependencies P04-02, P09-06, P10-02; technical decisions/controls D-PROV-01; Gate A0 active and verified; Luke review/final founder approval |
+| Technical-decision owner | D-PROV-01: Alan - later provider-packet mechanism; privacy/provider validation; D-PHI-01: Alan - technical evidence; qualified external reviewers - control approval |
+| Dependencies | P04-02, P09-06, P10-02 |
+| Blocking decisions/checkpoints | D-PROV-01 |
 | Source / salvage | Protected provider-exchange worktree: selective port only after provenance fix |
 
 #### Objective
@@ -619,25 +669,135 @@ Prefer application rollback within the expand/contract window and a new forward-
 
 #### Dependencies and parallel work
 
-Hard dependencies: P04-02, P09-03, P09-04, P10-02. Parallel opportunities: P09-01, P09-02
+Hard dependencies: P04-02, P09-06, P10-02. Parallel opportunities: P09-01, P09-02, P09-03, P09-04
 
 #### Objective acceptance criteria
 
 - [ ] Create purpose-bound, reviewed, checksummed provider packets from explicitly allowed facts/documents and operate send/confirm/revoke/reroute without ambient provider access.
 - [ ] Every listed objective test passes locally and at the required gate where applicable.
 - [ ] Every explicit non-goal remains out of the diff and no protected worktree/branch is modified during extraction.
-- [ ] The Project item has matching dependency, readiness, ownership, gate and disposition fields.
+- [ ] The planning record has matching dependency, local-preparation, merge-readiness, ownership, gate and disposition fields.
 - [ ] Rollout/repair evidence is attached before merge; unresolved decisions remain blocked rather than encoded as guesses.
 
 #### Ownership and review
 
 | Role | Recommendation |
 | --- | --- |
-| DRI | Alan |
-| Implementer | Alan (proposed; pending consolidated-plan sign-off) |
+| Work-package DRI | Alan |
+| Primary implementer | Alan (proposed; pending Alan review) |
+| Technical-decision owner | D-PROV-01: Alan - later provider-packet mechanism; privacy/provider validation; D-PHI-01: Alan - technical evidence; qualified external reviewers - control approval |
 | Reviewer | Luke |
 | Final approver | Luke |
+| PR-level ownership exception | None |
 | Required expertise | provider workflows, privacy, document security, operations |
+| Higher-capability review | Mandatory before merge |
+
+### P09-06 — Integrate content-bearing document versions into participant surfaces
+
+| Field | Plan |
+| --- | --- |
+| Repository / base | `app` (`main`) |
+| Project item | [P09-06](https://github.com/orgs/NatalyxPlatform/projects/3?query=P09-06) |
+| Gate / size | A2 / Large |
+| Local preparation status | Not ready; named PR, decision or programme-acceptance prerequisites remain |
+| Merge readiness | Blocked pending PR dependencies P09-03, P09-04; Gate A0 active and verified; Luke review/final founder approval |
+| Technical-decision owner | D-DOC-01: Alan - later download/recovery mechanism; privacy/legal validation; D-DOC-02: Alan - later scanner/quarantine mechanism; D-PHI-01: Alan - technical evidence; qualified external reviewers - control approval |
+| Dependencies | P09-03, P09-04 |
+| Blocking decisions/checkpoints | None beyond dependencies and plan approval |
+| Source / salvage | P09-03 durable pipeline, Wave 2 metadata UI as contrast evidence, PR #122 participant case surfaces |
+
+#### Objective
+
+Connect metadata requirements to upload intents, quarantined/scanned content versions, replacement and authorized download without collapsing requirement state into object state.
+
+#### Scope
+
+- Requirement-to-upload intent linkage
+- Quarantine/scan/available and replacement projections
+- Owner/role-scoped upload and download controls
+- Content-version audit and restart recovery
+- Fail-closed partial merge when content pipeline is unavailable
+
+#### Explicit non-goals
+
+- No metadata endpoint accepts bytes
+- No readiness marker becomes document approval
+- No provider share by object key
+- No PHI before B2
+
+#### Expected files or modules
+
+- `app/documents/participant_service.py`
+- `app/routes/case_documents.py`
+- `app/templates/case/documents/`
+- `tests/python/test_case_document_integration.py`
+
+#### Change map
+
+| Area | Planned change |
+| --- | --- |
+| Schema/model | None in this PR; any later schema change stays in its named migration PR. |
+| API/routes | Participant document commands join requirement IDs to immutable content versions. |
+| UI/product surface | Content controls appear only when the content capability and approved gate state are present. |
+| Infrastructure/workflow | No cloud/infrastructure resource or workflow change. |
+| Migration/backfill | No migration or backfill. |
+| Security/privacy | Authorization is re-evaluated at intent, finalize, status and download. |
+| Architecture/docs/config | Document the contract, version pins and safe partial-merge behavior. |
+
+#### Tests and validation
+
+Objective tests:
+
+- Metadata endpoint rejects bytes
+- owner/role/viewer denial
+- quarantine/scan/replacement
+- restart recovery
+- multi-IP isolation
+- feature-disabled/partial-merge failure
+- mobile/no-JS
+
+Local validation:
+
+- `python -m unittest discover -s tests/python`
+- Run the focused test module(s) named above against SQLite and PostgreSQL where applicable.
+
+Cloud validation: run only through Gate **A2** on a known revision, using synthetic data until B1 and no PHI until B2. A merge or green deployment is not gate acceptance.
+
+#### Diagnostics and observability
+
+Emit correlation/idempotency/policy/version identifiers, transition/result counters and bounded failure reasons; never log tokens, processor payloads, raw documents, prompts, PHI or unnecessary PII.
+
+#### Rollout
+
+Deploy behind the narrowest practical feature/config gate, verify the named synthetic flow and diagnostics on a known revision, then widen only at the associated programme gate.
+
+#### Rollback or forward repair
+
+Disable the feature or return to the prior compatible image; retain append-only audit/ledger history and repair with a new event/revision rather than destructive mutation.
+
+#### Dependencies and parallel work
+
+Hard dependencies: P09-03, P09-04. Parallel opportunities: P09-01, P09-02
+
+#### Objective acceptance criteria
+
+- [ ] Connect metadata requirements to upload intents, quarantined/scanned content versions, replacement and authorized download without collapsing requirement state into object state.
+- [ ] Every listed objective test passes locally and at the required gate where applicable.
+- [ ] Every explicit non-goal remains out of the diff and no protected worktree/branch is modified during extraction.
+- [ ] The planning record has matching dependency, local-preparation, merge-readiness, ownership, gate and disposition fields.
+- [ ] Rollout/repair evidence is attached before merge; unresolved decisions remain blocked rather than encoded as guesses.
+
+#### Ownership and review
+
+| Role | Recommendation |
+| --- | --- |
+| Work-package DRI | Alan |
+| Primary implementer | Alan (proposed; pending Alan review) |
+| Technical-decision owner | D-DOC-01: Alan - later download/recovery mechanism; privacy/legal validation; D-DOC-02: Alan - later scanner/quarantine mechanism; D-PHI-01: Alan - technical evidence; qualified external reviewers - control approval |
+| Reviewer | Luke |
+| Final approver | Luke |
+| PR-level ownership exception | None |
+| Required expertise | secure documents, FastAPI/Jinja, authorization, resilient workflows |
 | Higher-capability review | Mandatory before merge |
 
 ## 5. Cross-repository coordination
@@ -647,7 +807,7 @@ Hard dependencies: P04-02, P09-03, P09-04, P10-02. Parallel opportunities: P09-0
 | `app` | routing, validation, authorization, participant/case/workflow truth, PHI policy and commercial domain |
 | `infra` | AWS resources, IAM/KMS/network/deployment/backup/audit contracts |
 
-Merge order inside this package: `P09-01` → `P09-02` → `P09-03` → `P09-04` → `P09-05`.
+Merge order inside this package: `P09-01` → `P09-02` → `P09-03` → `P09-04` → `P09-06` → `P09-05`.
 
 Handoff rule: producer contract/version must merge and be pinned before its consumer enables the feature. During a partial merge, consumers fail closed or retain the last approved version; they do not fabricate data or silently broaden access.
 
@@ -673,27 +833,139 @@ Compatibility window: keep prior readers/writers and rollback image usable throu
 
 ## 7. Risks and decisions
 
-| Type | ID / risk | Owner | Affected PRs / latest point | Project item / treatment |
-| --- | --- | --- | --- | --- |
-| Blocking/product/compliance decision | D-DATA-01 — Which provisional IP assertions may the GC see, which GC answers may the IP see, and which fields survive promotion/provider projection? | Luke | P04-02, P06-02, P06-03, P07-03, P07-04, P09-05, P10-01, P10-02; Before P04-02 | [D-DATA-01](https://github.com/orgs/NatalyxPlatform/projects/3?query=D-DATA-01) — Default deny; expose only explicit purpose-limited projections. Class 1/2 and class 4 never automatically cross roles. |
-| Blocking/product/compliance decision | D-COM-04 — Define evidence for enrollment funding confirmed, promotion authorization, and for onboarding/compatibility complete enough to move case active and earn/issue activation billing. | Luke | P07-02, P07-03, P07-04, P08-03, P09-04; Before P07-02 | [D-COM-04](https://github.com/orgs/NatalyxPlatform/projects/3?query=D-COM-04) — Funding confirmation is durable ledger evidence; promotion uses the sole typed authorization event; activation requires an explicit evidence checklist, actor and audit event. |
-| Blocking/product/compliance decision | D-DOC-01 — Set retention/legal-hold/deletion and choose presigned versus app-proxied downloads by document class. | Luke | P09-01, P09-03; Before P09-03 | [D-DOC-01](https://github.com/orgs/NatalyxPlatform/projects/3?query=D-DOC-01) — Purpose/role authorization independent of key; short-lived downloads; deletion tombstone/audit; legal/privacy review. |
-| Blocking/product/compliance decision | D-DOC-02 — Choose maximum size/types, scanner/quarantine mechanism, timeout/retry and fail-closed handling. | Luke | P09-01, P09-02, P09-03; Before P09-02 | [D-DOC-02](https://github.com/orgs/NatalyxPlatform/projects/3?query=D-DOC-02) — Narrow allowlist, checksum and content sniffing; unavailable scanner remains quarantined. |
-| Blocking/product/compliance decision | D-PROV-01 — Define permitted recipients/purposes, GC preview/consent, expiry, verification level and exact fact/document allowlists. | Luke | P09-05; Before P09-05 | [D-PROV-01](https://github.com/orgs/NatalyxPlatform/projects/3?query=D-PROV-01) — Class 1/2 excluded; class 4 only if GC explicitly selects for recipient/purpose; class 5 evidence linked. |
-| Blocking/product/compliance decision | D-PHI-01 — Approve data classification, vendors/BAAs, encryption/logging/access/incident/backup controls and prohibited data at each gate. | Luke | P09-01, P09-02, P09-05, P13-05, P13-06, P13-07; Before B1 for PII scope; before B2 for PHI | [D-PHI-01](https://github.com/orgs/NatalyxPlatform/projects/3?query=D-PHI-01) — B1 remains PII-only; B2 requires formal external security/privacy/compliance evidence. |
-| Implementation risk | PHI exposure | Alan or named PR DRI | Package PRs; before associated gate | Mitigate through the explicit tests, rollout and forward-repair plan |
-| Implementation risk | Malware | Alan or named PR DRI | Package PRs; before associated gate | Mitigate through the explicit tests, rollout and forward-repair plan |
-| Implementation risk | Orphaned objects | Alan or named PR DRI | Package PRs; before associated gate | Mitigate through the explicit tests, rollout and forward-repair plan |
-| Implementation risk | Stale provider packet | Alan or named PR DRI | Package PRs; before associated gate | Mitigate through the explicit tests, rollout and forward-repair plan |
-| Implementation risk | Dirty branch leakage | Alan or named PR DRI | Package PRs; before associated gate | Mitigate through the explicit tests, rollout and forward-repair plan |
+Founder outcomes, Alan's remaining technical ownership and external activation dependencies are recorded separately so a final policy is never mistaken for an active control.
+
+| ID | Status | Classification | Remaining owner | Affected / latest | Programme effect |
+| --- | --- | --- | --- | --- | --- |
+| D-AUTH-03 | Resolved by reconciliation | Reconciliation settled | Alan - implementation | P03-02, P03-03, P03-05, P04-01, P04-02, P09-04, P13-05; Resolved 2026-07-12 | No longer blocks the reconciled access/workspace PR sequence. |
+| D-DATA-01 | Founder decision final; implementation evidence pending | Luke decides product/privacy outcome | Alan - implementation | P04-02, P06-02, P06-03, P07-03, P07-04, P09-05, P10-01, P10-02; Before P04-02 | Founder ambiguity is removed across WP04, WP06, WP07, WP09 and WP10; A1 still requires the technical denial evidence. |
+| D-COM-04 | Founder decision final; implementation evidence pending | Luke decides commercial/product outcome | Alan - implementation | P07-02, P07-03, P07-04, P08-03, P09-04; Before P07-02 | P07-02 through P09-04 may proceed under the settled semantics. |
+| D-DOC-01 | Founder default final; Alan later; external validation before B1/B2 | Luke sets policy; Alan decides implementation later | Alan - later before P09-03; privacy/legal - validation | P09-01, P09-03, P09-06; Before P09-03 | P09-01 ADR work may proceed; P09-03/P09-06 and real-content activation wait for Alan's delivery choice and evidence. |
+| D-DOC-02 | Founder constraints final; Alan later | Luke sets constraints; Alan decides later | Alan - later before P09-02 | P09-01, P09-02, P09-03, P09-06; Before P09-02 | P09-01 contract work may proceed; P09-02/P09-03/P09-06 wait for Alan's technical selection and evidence. |
+| D-PROV-01 | Founder decision final; Alan later | Luke decides product/privacy outcome; Alan implements later | Alan - later before P09-05 | P09-05; Before P09-05 | Synthetic provider-snapshot design may proceed; P09-05 completion and real handoff require Alan's evidence and later external review. |
+| D-PHI-01 | Founder beta scope final; externally gated | Luke decides beta scope; external evidence required | Alan - B1/B2 evidence; external reviewers - approval | P09-01, P09-02, P09-05, P09-06, P13-05, P13-06, P13-07; Before B1 for PII scope; before B2 for PHI | B1 remains blocked until the limited PII control bundle is accepted; real documents/provider packets and all PHI remain blocked until B2. |
+
+### D-AUTH-03 - Identity, participation and access authorization contract
+
+| Field | Recorded decision or requirement |
+| --- | --- |
+| Decision state | Final |
+| Founder outcome | Identity, participation, access grants, ownership and operation authorization remain separate; participation or lens alone never authorizes. |
+| Founder constraints | Subject-derived authorization context; Application and RLS policy parity; Default-deny cross-resource access |
+| What remains for Alan | Encode the settled contract in application services and RLS |
+| Evidence required | Participation-without-grant and grant-without-capability denials; Application/RLS parity tests |
+| Approval rule | No further founder decision unless the boundary changes. |
+| External dependencies | None |
+| Affected PRs / latest point | P03-02, P03-03, P03-05, P04-01, P04-02, P09-04, P13-05; Resolved 2026-07-12 |
+| Programme effect | No longer blocks the reconciled access/workspace PR sequence. |
+| Independent recommendation | Identity binds principal to person; participation records domain relationship; grants carry resource-scoped capabilities; application and RLS consume a subject-derived context plus ownership and purpose. Participation/lens alone never authorizes. |
+
+### D-DATA-01 - IP-GC field projection allowlist
+
+| Field | Recorded decision or requirement |
+| --- | --- |
+| Decision state | Final |
+| Founder outcome | Use need-to-know sharing. Shared journey status and agreed relationship/outreach/logistics may cross roles; private IP notes, unconfirmed assertions and GC medical, reproductive, insurance, identity or wellbeing answers do not cross automatically. Provider packets require preview, consent and appropriate verification. |
+| Founder constraints | Default-deny field-and-purpose allowlists; Source-labelled corrections; Named-purpose provider projection only |
+| What remains for Alan | Define explicit field/purpose allowlists in code and projection contracts; Implement cross-role and provider negative tests |
+| Evidence required | Cross-role denial matrix; Provider projection allowlist tests; Correction/source-label evidence |
+| Approval rule | Luke approval is required for a broader sharing policy, not for compliant implementation detail. |
+| External dependencies | None |
+| Affected PRs / latest point | P04-02, P06-02, P06-03, P07-03, P07-04, P09-05, P10-01, P10-02; Before P04-02 |
+| Programme effect | Founder ambiguity is removed across WP04, WP06, WP07, WP09 and WP10; A1 still requires the technical denial evidence. |
+| Independent recommendation | Default deny; expose only explicit purpose-limited projections. Class 1/2 and class 4 never automatically cross roles. |
+
+### D-COM-04 - Enrollment funding and activation evidence
+
+| Field | Recorded decision or requirement |
+| --- | --- |
+| Decision state | Final |
+| Founder outcome | Use two-step commitment: settled $750 plus current accepted terms proves commercial enrollment, but payment alone never promotes. Exactly one enrollment-pending case follows explicit IP promotion and authenticated GC consent. The $1,630 activation tranche is earned only after defined IP/GC onboarding and screening coordination has begun; it never implies medical clearance. |
+| Founder constraints | Redirects/webhooks never promote; Typed promotion event only; Source-labelled facts and explicit evidence checklist |
+| What remains for Alan | Define typed events, activation checklist, idempotency and audit mechanics |
+| Evidence required | Duplicate, replay, partial-failure, promotion and activation evidence tests |
+| Approval rule | Luke approves any change to commercial enrollment or activation semantics. |
+| External dependencies | None |
+| Affected PRs / latest point | P07-02, P07-03, P07-04, P08-03, P09-04; Before P07-02 |
+| Programme effect | P07-02 through P09-04 may proceed under the settled semantics. |
+| Independent recommendation | Funding confirmation is durable ledger evidence; promotion uses the sole typed authorization event; activation requires an explicit evidence checklist, actor and audit event. |
+
+### D-DOC-01 - Document retention, deletion, replacement and download mode
+
+| Field | Recorded decision or requirement |
+| --- | --- |
+| Decision state | Final founder default; externally dependent activation |
+| Founder outcome | Retain clean active-case documents while active plus two years after close; signed consents, payment/access audits and deletion tombstones for seven years; failed/quarantine orphans seven days; superseded content 90 days unless required; honor valid deletion within 30 days subject to legal hold. Downloads require fresh authorization and links expire within five minutes. |
+| Founder constraints | Never public; Never withheld for non-payment; Legal hold and deletion remain auditable |
+| What remains for Alan | Choose proxy versus presigned delivery by class; Implement hold, deletion, tombstone, retry and authorization behavior |
+| Evidence required | Fresh-authorization and five-minute-link tests; Retention/hold/deletion exercise; Privacy/legal approval before real content |
+| Approval rule | Luke accepts live policy after privacy/legal review. |
+| External dependencies | Privacy/legal validation before B1/B2 real-content use |
+| Affected PRs / latest point | P09-01, P09-03, P09-06; Before P09-03 |
+| Programme effect | P09-01 ADR work may proceed; P09-03/P09-06 and real-content activation wait for Alan's delivery choice and evidence. |
+| Independent recommendation | Purpose/role authorization independent of key; short-lived downloads; deletion tombstone/audit; legal/privacy review. |
+
+### D-DOC-02 - Document limits and malware/quarantine provider
+
+| Field | Recorded decision or requirement |
+| --- | --- |
+| Decision state | Final founder constraints |
+| Founder outcome | Allow PDF, JPEG, PNG and non-macro DOCX up to 50 MiB. Reject spoofed, macro-enabled and archive-like input; quarantine until clean; treat password-protected, skipped, error and timeout results as unavailable. |
+| Founder constraints | Normal scan target no more than two minutes; Transient retries no more than 15 minutes; $50/month beta scanning ceiling with alerts; Synthetic only at A2 and no PHI before B2 |
+| What remains for Alan | Choose the AWS-native scanner, queue, retry, timeout, recovery and cost-control mechanisms |
+| Evidence required | Type/sniffing/spoof tests; Quarantine, error, timeout and retry tests; Cost estimate and alerts |
+| Approval rule | Luke approval is required if the solution exceeds the cost or safety constraints. |
+| External dependencies | None |
+| Affected PRs / latest point | P09-01, P09-02, P09-03, P09-06; Before P09-02 |
+| Programme effect | P09-01 contract work may proceed; P09-02/P09-03/P09-06 wait for Alan's technical selection and evidence. |
+| Independent recommendation | Narrow allowlist, checksum and content sniffing; unavailable scanner remains quarantined. |
+
+### D-PROV-01 - Provider handoff purposes and field allowlists
+
+| Field | Recorded decision or requirement |
+| --- | --- |
+| Decision state | Final founder policy |
+| Founder outcome | Provider handoff is a purpose-bound immutable snapshot for one verified recipient and named purpose, with participant preview/consent, clean documents and appropriately verified source-labelled facts. Unopened access expires after 14 days and can be revoked before access; downloaded copies cannot be recalled. |
+| Founder constraints | No ambient provider case access in MVP; Audit every issue/open/download/revoke/expire event; Reissue after expiry |
+| What remains for Alan | Choose recipient verification, snapshot checksum, expiry, revocation and audit mechanisms |
+| Evidence required | Wrong-recipient, expiry, revoke-before-access, reissue and checksum tests |
+| Approval rule | Luke approves broader recipient or ambient-access scope. |
+| External dependencies | Privacy/provider review before real handoff |
+| Affected PRs / latest point | P09-05; Before P09-05 |
+| Programme effect | Synthetic provider-snapshot design may proceed; P09-05 completion and real handoff require Alan's evidence and later external review. |
+| Independent recommendation | Class 1/2 excluded; class 4 only if GC explicitly selects for recipient/purpose; class 5 evidence linked. |
+
+### D-PHI-01 - PII/PHI boundary, vendors and control set
+
+| Field | Recorded decision or requirement |
+| --- | --- |
+| Decision state | Final founder scope; externally dependent activation |
+| Founder outcome | B1 is an invitation-only US beta of at most five IP/GC pairs using names, verified account/contact data, relationship/outreach/logistics, consent versions, nonclinical progress, feedback and processor references only. Medical, reproductive-health, psychological, insurance-health and clinical-clearance data are prohibited; no real document bytes or provider packets; AI receives de-identified nonclinical context only. |
+| Founder constraints | RLS/non-owner runtime and cross-tenant negative evidence; Access review plus incident and restore exercises; No PHI before B2 |
+| What remains for Alan | Implement inventory, cohort controls, RLS, cross-tenant denials, de-identification and prohibited-data tests |
+| Evidence required | Five-pair cohort configuration; RLS/cross-tenant/de-identification/prohibited-data tests; External privacy/legal approval |
+| Approval rule | Luke accepts B1 only after required evidence and external privacy/legal advice; B2 requires qualified external approval. |
+| External dependencies | External privacy/legal approval before B1; Qualified external security/privacy/compliance/legal approval before B2 |
+| Affected PRs / latest point | P09-01, P09-02, P09-05, P09-06, P13-05, P13-06, P13-07; Before B1 for PII scope; before B2 for PHI |
+| Programme effect | B1 remains blocked until the limited PII control bundle is accepted; real documents/provider packets and all PHI remain blocked until B2. |
+| Independent recommendation | B1 remains PII-only and content controls stay synthetic; B2 requires formal external security/privacy/compliance evidence before any PHI content path is enabled. |
+
+| Implementation risk | Owner | Treatment |
+| --- | --- | --- |
+| PHI exposure | Alan | Mitigate through explicit tests, rollout and forward-repair evidence before the associated gate. |
+| Malware | Alan | Mitigate through explicit tests, rollout and forward-repair evidence before the associated gate. |
+| Orphaned objects | Alan | Mitigate through explicit tests, rollout and forward-repair evidence before the associated gate. |
+| Stale provider packet | Alan | Mitigate through explicit tests, rollout and forward-repair evidence before the associated gate. |
+| Dirty branch leakage | Alan | Mitigate through explicit tests, rollout and forward-repair evidence before the associated gate. |
 
 ## 8. Existing-work salvage
 
 | Source | Head | Valuable content | Destination | Recommendation | Extraction status/safety |
 | --- | --- | --- | --- | --- | --- |
 | app#112 | 9605d88e31bd | Source-first 81-node/12-cluster surface map, participant-renderer boundaries, wave plan and cross-repo seams. | P09-04 | Selective port, then supersede after extraction | Catalogued; content remains to be reconciled into replacement PR acceptance tests. |
-| app#122 | e85382150853 | Case projection/lens surfaces, safe return_to, invitation TTL/CAS/self-member/one-GC constraints, transactional membership, fail-closed Learn, SQL-limited timeline, responsive/a11y tests and Python CI workflow. | P09-04 | Retain pending Alan reconciliation; selective port or rebase only after architecture approval | Reinspected at latest head. It is exactly e853821 (no newer delta); retention strengthened, but final extraction waits for Alan checkpoint. |
-| app#124 | 84a5a847fea7 | Current consolidation of Node 0 questionnaire/guide/surfaces, GC onboarding, participant case shell, invitations, DS assets and large focused test suites. | P09-04 | Retain unchanged as evidence; selective port/rewrite after checkpoint | Unextracted; Alan review explicitly incomplete and unresolved. |
+| app#122 | e85382150853 | Case projection/lens surfaces, safe return_to, invitation TTL/CAS/self-member/one-GC constraints, transactional membership, fail-closed Learn, SQL-limited timeline, responsive/a11y tests and Python CI workflow. | P09-04 | Selective-port behavior and tests; supersede as programme architecture | Complete at e853821: authoritative behavior/tests and selectively portable implementation are classified; superseded architecture and evidence-only claims are named. |
+| app#124 | 84a5a847fea7 | Consolidated Node 0 questionnaire/guide/surfaces, GC onboarding, participant case shell, invitation delegation, DS assets and large focused test suites as extraction evidence. | P09-04 | Fully supersede as a merge unit; preserve selective concepts, copy, assets and tests as evidence | Complete at 84a5a84: all consolidated-review findings are dispositioned and assigned; no mergeable/cherry-pick unit is approved. |
+| feat/byos-journey-wave-2 | 5b63e3a7c364 | Projection-driven phase-1 cluster presentation, exact route allowlisting, person-versus-case-side ownership intent, transactional submission/work-item and review/audit patterns, fail-closed item retention, approved Learn status selection and 36 focused tests. | P09-01, P09-04, P09-06 | Preserve paused at the exact head; selectively port semantics/tests only after adaptation. Do not merge, cherry-pick, continue implementation or use its runtime schema directly. | Paused exact-head evidence; no direct merge |
 | feature/provider-exchange-layer-v0 | 84a5a84 | substantial uncommitted provider handoff/ops/document work | P09-01/P09-03/P09-05 after provenance/security review | Selective port from protected worktree | Do not stage, reset, stash, switch, commit, clean or overwrite. |
 | main | current local | substantial uncommitted operator shell/design-system work | Not part of participant DS; review only if P09-05 operator UI needs approved internal recipes | Selective port from protected worktree | Preserve repo boundary and dirty worktree. |
 
@@ -707,15 +979,16 @@ Package source inventory:
 
 Alan owns implementation; Luke approves retention, provider purpose, and PHI boundary. External security/privacy and provider workflow review required.
 
-| PR | DRI | Implementer | Reviewer | Final approver | External/high-capability review |
-| --- | --- | --- | --- | --- | --- |
-| P09-01 | Alan | Alan (proposed) | Luke | Luke | Mandatory |
-| P09-02 | Alan | Alan (proposed) | Luke | Luke | Mandatory |
-| P09-03 | Alan | Alan (proposed) | Luke | Luke | Mandatory |
-| P09-04 | Alan | Alan (proposed) | Luke | Luke | Mandatory |
-| P09-05 | Alan | Alan (proposed) | Luke | Luke | Mandatory |
+| PR | WP DRI | Primary implementer | Technical-decision owner | Reviewer | Final approver | Exception |
+| --- | --- | --- | --- | --- | --- | --- |
+| P09-01 | Alan | Alan (proposed) | D-DOC-01: Alan - later download/recovery mechanism; privacy/legal validation; D-DOC-02: Alan - later scanner/quarantine mechanism; D-PHI-01: Alan - technical evidence; qualified external reviewers - control approval | Luke | Luke | None |
+| P09-02 | Alan | Alan (proposed) | D-DOC-02: Alan - later scanner/quarantine mechanism; D-PHI-01: Alan - technical evidence; qualified external reviewers - control approval | Luke | Luke | None |
+| P09-03 | Alan | Alan (proposed) | D-DOC-01: Alan - later download/recovery mechanism; privacy/legal validation; D-DOC-02: Alan - later scanner/quarantine mechanism | Luke | Luke | None |
+| P09-04 | Alan | Alan (proposed) | None; implement the settled founder constraints and approved contracts | Luke | Luke | None |
+| P09-05 | Alan | Alan (proposed) | D-PROV-01: Alan - later provider-packet mechanism; privacy/provider validation; D-PHI-01: Alan - technical evidence; qualified external reviewers - control approval | Luke | Luke | None |
+| P09-06 | Alan | Alan (proposed) | D-DOC-01: Alan - later download/recovery mechanism; privacy/legal validation; D-DOC-02: Alan - later scanner/quarantine mechanism; D-PHI-01: Alan - technical evidence; qualified external reviewers - control approval | Luke | Luke | None |
 
-Luke decides product/lifecycle/commercial/privacy/PHI/provider policy and accepts gates. Alan proposes implementation design, decomposition, migrations, code, tests, rollout and repair. This is a recommendation pending Alan's review/sign-off, not a compulsory assignment.
+PR ownership inherits the proposed work-package split pending Alan's review. Named technical-decision ownership remains separate and never transfers implementation ownership across work packages; reciprocal and external review requirements remain intact.
 
 ## 10. Definition of done
 

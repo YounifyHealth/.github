@@ -16,8 +16,8 @@ DRIVE_PACKAGE_URL = "https://drive.google.com/drive/folders/1fWFyWPcFMEm15BbHXng
 DRIVE_MD_FOLDER_URL = "https://drive.google.com/drive/folders/1eKIbuD0lWabm55ZbH3pAv1x-0_Wd3aH3"
 DRIVE_PDF_FOLDER_URL = "https://drive.google.com/drive/folders/1FtZIYVD0y7OmhO7WJmJpJS-ulxesxtU1"
 DRIVE_OVERVIEW_URL = "https://drive.google.com/file/d/1It9TNlHX63A6xmdLXtN9_Nzv30Ey-8qY/view?usp=drivesdk"
-INSPECTED_AT = "2026-07-10 20:12 America/New_York"
-PR_INSPECTED_AT = "2026-07-11T00:59:11Z (2026-07-10 20:59:11 America/New_York)"
+INSPECTED_AT = "2026-07-12 19:30 America/New_York"
+PR_INSPECTED_AT = "2026-07-12T23:30:00Z (2026-07-12 19:30 America/New_York)"
 PLAN_BRANCH = "plan/mvp-product-flow-reshape"
 PLAN_ROOT = "/Users/lukerhodes/Natalyx/natalyx-repair-program"
 
@@ -39,14 +39,14 @@ WORK_PACKAGES: list[dict[str, Any]] = [
         "slug": "preservation-cloud-diagnosis-and-pr-reconciliation",
         "title": "Preservation, cloud diagnosis, and PR reconciliation",
         "problem": "The live app is returning ALB 503 responses while overlapping draft PRs and protected dirty worktrees contain useful but contradictory implementations.",
-        "outcome": "A signed-off source-of-truth baseline, complete extraction ledger, Alan-review reconciliation, and explicit no-delete/no-close conditions before replacement work begins.",
+        "outcome": "A source-of-truth baseline with Alan's completed review independently dispositioned, existing work mapped, and explicit no-delete/no-close conditions before replacement work begins.",
         "non_goals": ["No code porting", "No PR closure or retargeting", "No branch/worktree cleanup", "No deployment or AWS mutation"],
         "architecture": [
             "Treat every existing branch and worktree as read-only evidence until its valuable files, tests, and reviewer findings have a named destination.",
-            "Use the organisation Project as the programme control plane and this repository-neutral package as the reviewable contract.",
+            "Use Drive as the canonical review surface; the locally validated Project catalogue remains benched until separately reactivated and synced.",
             "Do not infer live health from GitHub build success; Gate A0 requires a known revision and live evidence.",
         ],
-        "coordination": "Luke owns product/architecture acceptance and the closure decision. Alan owns technical reconciliation recommendations. Both sign the checkpoint before Node 0, invitation/auth, or participant case replacement work starts.",
+        "coordination": "Luke owns product/architecture acceptance and the closure decision. Alan's completed technical recommendations are recorded with independent dispositions; implementation ownership remains proposed until the amended package is jointly accepted.",
         "test_focus": ["SHA and timestamp reproducibility", "Project/document identifier parity", "No dirty-worktree mutation", "HTTP and workflow evidence captured separately"],
         "risks": ["Review findings arrive after decomposition", "A protected worktree contains the only copy of useful code", "A green PR is mistaken for live readiness"],
         "salvage": ["App PRs #112, #117, #119, #121, #122, #123, #124", "Design-system PRs #7 and #8", "Provider-exchange, Node 0 onboarding/quiz, Learn-rendering, and intelligence dirty worktrees"],
@@ -57,10 +57,10 @@ WORK_PACKAGES: list[dict[str, Any]] = [
         "slug": "ci-and-postgres-evidence-gate",
         "title": "CI and PostgreSQL evidence gate",
         "problem": "Main builds containers and runs a deploy-contract smoke, but does not run the Python suite or prove current schema behavior against PostgreSQL.",
-        "outcome": "A first, deliberately CI-only PR that runs the current tests, exercises the existing schema on PostgreSQL, and publishes diagnosable evidence without introducing the future migration framework.",
+        "outcome": "A first, deliberately CI-only PR that runs the current tests, exercises the existing schema on PostgreSQL, and publishes diagnosable evidence under stable required-check names without introducing the future migration framework.",
         "non_goals": ["No migration runner", "No product behavior changes", "No schema redesign", "No deployment"],
         "architecture": ["PostgreSQL is production authority; SQLite remains a local compatibility target, not production evidence.", "Separate current-schema evidence from tests that require the future migration mechanism."],
-        "coordination": "Alan proposes the workflow and test matrix; Luke approves the evidence threshold. This lane can begin after programme sign-off while the Alan PR-reconciliation checkpoint is still open.",
+        "coordination": "Alan proposes the workflow and test matrix; Luke approves the evidence threshold. Repository-enforced required-check governance remains bounded by D-CI-01, but the workflow itself can land after programme acceptance.",
         "test_focus": ["Current unit suite", "Fresh PostgreSQL database", "Current init_db idempotency", "Failure artifact and log clarity"],
         "risks": ["CI exposes existing backend drift", "Tests accidentally depend on protected branch code", "Secrets or DB credentials leak in logs"],
         "salvage": ["PR #122 Python-test workflow and PostgreSQL-compatible test fixes only after reconciliation"],
@@ -87,8 +87,8 @@ WORK_PACKAGES: list[dict[str, Any]] = [
         "problem": "Current invitation code mixes low-risk onboarding links with case membership, and existing flows need explicit recipient binding, return-to safety, consent, expiry, revocation, duplicate-claim, and mismatch semantics.",
         "outcome": "Separate workspace-claim and paid-case invitation lifecycles with safe authentication/resume behavior and no link-possession path to sensitive case access.",
         "non_goals": ["No automatic paid-case membership", "No email deliverability product", "No commercial promotion", "No PHI enablement"],
-        "architecture": ["An email-less link may create a pending low-risk workspace claim only.", "Paid-case membership requires authenticated identity binding, recipient or issuer confirmation as appropriate, explicit consent, and auditable redemption.", "Return targets are internal allowlisted paths and survive login/signup/confirmation without becoming redirect authority."],
-        "coordination": "Alan proposes implementation and threat-model details; Luke approves role/privacy policy. Replacement work waits for the Alan PR-reconciliation checkpoint.",
+        "architecture": ["An email-less link may create a pending low-risk workspace claim only.", "Identity binds an authenticated principal to a person; participation records the person's domain relationship; access grants carry resource-scoped capabilities; authorization consumes all three plus ownership and purpose.", "Paid-case membership requires authenticated identity binding, recipient or issuer confirmation as appropriate, explicit consent, and auditable redemption.", "Return targets are internal allowlisted paths and survive login/signup/confirmation without becoming redirect authority."],
+        "coordination": "Alan proposes implementation and threat-model details; Luke approves role/privacy policy. The reconciliation checkpoint is complete; replacement work still waits for package acceptance and its own dependencies/decisions.",
         "test_focus": ["Logged-out resume", "Token replay/expiry/revocation", "Duplicate and concurrent claims", "Identity mismatch", "Workspace-to-case access escalation"],
         "risks": ["Shared links forwarded", "Account mismatch", "Confused-deputy redirects", "Workspace data exposed during upgrade"],
         "salvage": ["PR #122 return_to, CAS, TTL, self-invite and mismatch fixes", "PRs #123/#124 hosted GC onboarding UX", "Dirty onboarding-link worktree"],
@@ -116,7 +116,7 @@ WORK_PACKAGES: list[dict[str, Any]] = [
         "outcome": "A deterministic entry router and resumable Node 0 Free flow for education, candidate tracking, preliminary safety checks, outreach guidance, and a willing candidate without a paid case.",
         "non_goals": ["No weighted ranking", "No GC authenticated soft onboarding", "No paid case", "No final Learn content"],
         "architecture": ["Routing is deterministic policy, not LLM authority.", "Candidate responses are provisional IP assertions, never GC-authored or medically verified facts.", "Safety-critical information and complete-the-match capability remain free."],
-        "coordination": "Luke owns entry/product boundary; Alan implements and validates. Replacement work waits for the Alan checkpoint and WP04 contracts.",
+        "coordination": "Luke is the proposed DRI and primary implementer; Alan reviews the technical architecture, security and failure behavior. Reconciliation is complete; replacement work waits for WP03/WP04 contracts, and commit/PR/merge waits for Alan's review and joint package acceptance.",
         "test_focus": ["All deterministic route outcomes", "Free candidate/outreach boundary", "Resume across sessions", "Critical-flag fail-safe", "Mobile interaction"],
         "risks": ["Paid features leak into Free", "Provisional score is overclaimed", "Route drift", "LLM dependency reintroduced"],
         "salvage": ["PR #117 quiz/guide algorithms and tests", "PR #121 primary surface", "PR #124 consolidated UI", "Quiz rewrite worktree"],
@@ -144,7 +144,7 @@ WORK_PACKAGES: list[dict[str, Any]] = [
         "outcome": "Versioned commercial configuration and acceptances, a separate commitment/enrollment lifecycle, one processor-neutral byos.workspace_promotion_authorized.v1 event, and exactly-once paid-case creation by its consumer.",
         "non_goals": ["No processor-specific webhook", "No automated unresolved pricing policy", "No activation before onboarding evidence", "No browser-redirect authority"],
         "architecture": ["Every commitment, invoice, payment, credit, refund, and promotion records the activated commercial-configuration version.", "Only the app-owned commitment/commercial domain emits byos.workspace_promotion_authorized.v1 after durable funding/terms/credit validation; a processor callback or redirect never emits it.", "The consumer creates/fetches one enrollment_pending case and restricted IP membership; GC case access follows the paid-case invitation contract."],
-        "coordination": "Luke owns commercial semantics and final contract. Alan proposes/implements the state machine and idempotency. Finance/legal review unresolved policy.",
+        "coordination": "Luke is the proposed DRI and primary implementer for the settled commercial contract. Alan reviews and retains the named technical-mechanism decisions; finance/legal review remains required where the live policy names it.",
         "test_focus": ["Terms/config version pinning", "Commitment retries", "Exact-once promotion", "Funding reversal handling", "No GC access escalation"],
         "risks": ["Configuration drift", "Duplicate promotion", "Redirect spoofing", "Unresolved policy encoded as default"],
         "salvage": ["Payment/business-model DOCX as authority", "PR #124 source workspace linkage concepts only"],
@@ -158,7 +158,7 @@ WORK_PACKAGES: list[dict[str, Any]] = [
         "outcome": "Immutable commercial ledgers, idempotent provider inbox, milestone engine, reproducible credits/refunds, reconciliation, and safe non-critical pause behavior.",
         "non_goals": ["No custody of pass-through funds", "No financing assumption", "No pregnancy-loss automation before policy", "No accounting-general-ledger replacement"],
         "architecture": ["Payments, credits, refunds, adjustments, invoices, and commercial events are append-only; mutable balances are derived projections.", "Processor events enter an idempotent inbox and become internal commands/events only after signature and amount/currency checks.", "Billing follows durable case evidence and never acts as first notification of clinical events."],
-        "coordination": "Luke owns price/refund/pause policy; Alan implements. Payment, finance, security, and legal review are required before live money movement.",
+        "coordination": "Luke is the proposed DRI and primary implementer for payment-domain work. Alan reviews and owns D-PAY-01's later processor/security mechanism; payment, finance, security and legal review remain required before live money movement.",
         "test_focus": ["Webhook replay/order", "Ledger invariants", "Milestone idempotency", "Refund table", "Node 0 credit floor", "Reconciliation mismatch"],
         "risks": ["Double charge/refund", "Processor lock-in", "Clinical timing harm", "Pass-through commingling", "Policy gaps"],
         "salvage": ["Business-model schedules and smoke paths; no current code is authoritative"],
@@ -169,9 +169,9 @@ WORK_PACKAGES: list[dict[str, Any]] = [
         "slug": "documents-active-case-and-provider-handoffs",
         "title": "Documents, active case, and provider handoffs",
         "problem": "Current documents are metadata-only; the dirty provider branch is unreviewed and can over-project facts. There is no durable private S3/KMS/quarantine/recovery pipeline.",
-        "outcome": "A secure document lifecycle, resilient storage/scan/download pipeline, usable active-case surfaces, and consent-scoped immutable provider snapshots with operational review.",
+        "outcome": "A metadata-only requirement/work-item lifecycle distinct from the secure document-content lifecycle, resilient storage/scan/download, usable active-case surfaces, and consent-scoped immutable provider snapshots with operational review.",
         "non_goals": ["No ambient provider case access", "No clinical approval by Natalyx", "No direct public objects", "No automatic promotion of AI/IP assertions"],
-        "architecture": ["Private bucket, block-public-access, KMS, opaque keys, application authorization, size/type/checksum gates, quarantine/scan, audit, retention, and orphan cleanup are mandatory.", "Provider handoffs are purpose-bound snapshots with checksum/revision/expiry and consent; provider-visible items are allowlisted, not inferred from broad visibility.", "ECS replacement must not lose upload/task state; recovery resumes from durable metadata and object state."],
+        "architecture": ["A requirement, readiness marker or review work item is not a document and cannot be approved as if content exists.", "Private bucket, block-public-access, KMS, opaque keys, application authorization, size/type/checksum gates, quarantine/scan, audit, retention, and orphan cleanup are mandatory for content.", "Provider handoffs are purpose-bound snapshots with checksum/revision/expiry and consent; provider-visible items are allowlisted, not inferred from broad visibility.", "ECS replacement must not lose upload/task state; recovery resumes from durable metadata and object state."],
         "coordination": "Alan owns implementation; Luke approves retention, provider purpose, and PHI boundary. External security/privacy and provider workflow review required.",
         "test_focus": ["Unauthorized object access", "Oversize/type/spoof", "Scan failure/quarantine", "Partial upload/task loss", "Snapshot immutability/revocation", "Mobile documents"],
         "risks": ["PHI exposure", "Malware", "Orphaned objects", "Stale provider packet", "Dirty branch leakage"],
@@ -200,7 +200,7 @@ WORK_PACKAGES: list[dict[str, Any]] = [
         "outcome": "Validated provenance-bearing Learn artifacts, approved-only serving, release-blocking DS accessibility/security/interaction contract, and app adoption of stable recipes/source cards.",
         "non_goals": ["No invented final content", "No universal zero-hex rule", "No internal/operator DS merge", "No full legacy redesign"],
         "architecture": ["Learn resources own authored artifacts/provenance; intelligence owns approved catalog delivery; app owns authorized presentation and context.", "Security, accessibility, responsive layout, and interaction defects can block release; token/style purity alone is backlog unless tied to concrete risk.", "Participant and internal/operator design systems remain separate."],
-        "coordination": "Luke approves content/product and release-blocker rubric; Alan implements contracts/adoption. Accessibility and content/provenance review required.",
+        "coordination": "Luke is the proposed DRI and primary implementer across Learn, intelligence-catalog, participant-design-system and app-adoption PRs. Alan reviews technical contracts and failure behavior; accessibility and content/provenance review remain required.",
         "test_focus": ["Artifact schema/provenance", "Approved-only catalog", "Missing-resource empty state", "Recipe escaping", "Keyboard/reduced-motion/mobile"],
         "risks": ["Fake/unapproved content", "Cross-repo version drift", "Aesthetic review blocks recovery", "Internal DS leakage"],
         "salvage": ["Dirty Learn rendering-contract branch", "Learn issue #3", "Intelligence issue #14 and dirty catalog work", "DS PRs #7/#8"],
@@ -214,7 +214,7 @@ WORK_PACKAGES: list[dict[str, Any]] = [
         "outcome": "A unified scope-labelled Ask/Learn shell, accessible mobile participant journey, and verified redirect-based legacy cutover with no broken or misleading controls.",
         "non_goals": ["No final content authoring", "No staff/operator redesign", "No broad visual rebrand", "No removal before telemetry proves safe"],
         "architecture": ["The shell labels general, private, and shared-case context and never implies a source exists when it does not.", "Server owns state and permissions; client code enhances interaction only.", "Legacy routes redirect through allowlisted, telemetry-observed compatibility paths before deletion."],
-        "coordination": "Luke owns journey acceptance; Alan implements and verifies. Accessibility review recommended.",
+        "coordination": "Luke is the proposed DRI and primary implementer for the participant shell and cutover. Alan reviews technical integration, authorization and failure behavior; accessibility review remains required where named.",
         "test_focus": ["Clickable IP/GC flows", "Context labels", "No-JS/reduced-motion/keyboard", "Mobile widths", "Redirect and stale bookmark", "Logout/login/resume"],
         "risks": ["Context ambiguity", "Mobile-only dead ends", "Premature legacy removal", "Design drift"],
         "salvage": ["PR #122 responsive journey and lens behavior", "PR #124 Node 0 surfaces", "DS PR #8 parity guidance"],
@@ -309,22 +309,22 @@ PROPOSED_PRS: list[dict[str, Any]] = [
         "Run the current suite on pull requests/main and prove the existing schema boots and behaves on an ephemeral PostgreSQL service before any migration redesign.",
         deps=["P00-01"], gate="A0", size="Medium",
         files=[".github/workflows/python-tests.yml", "tests/python/test_postgres_current_schema.py", "scripts/ci_postgres_evidence.py"],
-        scope=["Python-version/dependency cache and current test suite", "Ephemeral PostgreSQL current-schema evidence", "Sanitized failure artifacts"],
+        scope=["Stable, unfiltered unittest and PostgreSQL check names", "Pinned action SHAs and supported Python runtime", "Locked/constraint-backed dependencies, timeouts and cancellation", "Ephemeral PostgreSQL current-schema evidence", "Sanitized failure artifacts"],
         non_goals=["No migration-version table", "No new-schema tests", "No application behavior"],
-        changes={"schema": "None; exercise the schema that main owns today.", "workflow": "Add blocking unit and PostgreSQL evidence jobs."},
-        tests=["Current Python suite", "init_db twice on PostgreSQL", "representative create/read/authorization path", "intentional failure log-redaction check"],
-        sources=["PR #122 unittest workflow and backend-neutral fixes after reconciliation"],
+        changes={"schema": "None; exercise the schema that main owns today.", "workflow": "Add stable unittest and PostgreSQL evidence jobs; repository-side required-check enforcement remains D-CI-01 until independently read back."},
+        tests=["Current Python suite", "workflow trigger/path-bypass contract", "init_db twice on PostgreSQL", "representative create/read/authorization path", "intentional failure log-redaction check"],
+        blocked_by=["D-CI-01"], sources=["PR #122 unittest workflow and backend-neutral fixes after reconciliation"],
     ),
     proposed_pr(
         "P02-01", "WP02", "Decide migration architecture and compatibility contract", "app",
         "Record an ADR choosing an established migration framework or justified ordered runner, including PostgreSQL authority, SQLite support, locks, expand/contract, backfills, rollback, and forward repair.",
-        deps=["P01-01"], gate="A0", size="Small", readiness="Blocked by decision", dri="Alan", implementer="Alan", reviewer="Luke", approver="Luke", high_review=True,
+        deps=["P01-01"], gate="A0", size="Small", readiness="Ready for Alan decision", dri="Alan", implementer="Alan", reviewer="Luke", approver="Luke", high_review=True,
         files=["docs/adr/ADR-00x-versioned-migrations.md", "docs/agents/storage-data-layer.md"],
         scope=["Compare Alembic and custom runner against current SQL compatibility layer", "Specify old/new revision compatibility and irreversible-change policy"],
         non_goals=["No migration code", "No schema change"],
         changes={"architecture": "Decision record only; select framework before P02-02."},
         tests=["ADR decision checklist", "example expand/contract and interrupted-backfill walkthrough"],
-        blocked_by=["D-MIG-01"], sources=["app/storage/schema.py", "app/storage/connection.py"], expertise=["PostgreSQL migrations", "zero-downtime deployment"],
+        sources=["app/storage/schema.py", "app/storage/connection.py"], expertise=["PostgreSQL migrations", "zero-downtime deployment"],
     ),
     proposed_pr(
         "P02-02", "WP02", "Introduce versioned migration runner and readiness checks", "app",
@@ -346,7 +346,7 @@ PROPOSED_PRS: list[dict[str, Any]] = [
         non_goals=["No semantic Node 0 split", "No commercial schema"],
         changes={"schema": "Existing canonical schema becomes a checksummed baseline.", "migration": "Expand/contract rehearsal from previous main and representative legacy fixtures."},
         tests=["Fresh install", "Upgrade from captured pre-baseline schema", "previous app compatibility", "large-table backfill rehearsal", "failure injection"],
-        sources=["app/storage/schema.py current definitions", "PR #122 forward-migration tests after reconciliation"],
+        blocked_by=["D-MIG-01"], sources=["app/storage/schema.py current definitions", "PR #122 forward-migration tests after reconciliation"],
     ),
     proposed_pr(
         "P02-04", "WP02", "Move intelligence persistence to a revisioned migration namespace", "intelligence",
@@ -357,7 +357,7 @@ PROPOSED_PRS: list[dict[str, Any]] = [
         non_goals=["No context/product feature", "No app-owned table mutation"],
         changes={"schema": "Intelligence-owned tables enter a checksummed revision chain.", "migration": "Deploy-controlled one-off task; runtime verifies head only."},
         tests=["Fresh/legacy PostgreSQL", "concurrent app/intelligence migrators", "old/new service compatibility", "interrupted migration", "runtime non-owner"],
-        blocked_by=["D-MIG-01"], sources=["src/natalyx_intelligence/shared/persistence.py runtime _ensure_schema"], expertise=["PostgreSQL migrations", "FastAPI service operations"],
+        sources=["src/natalyx_intelligence/shared/persistence.py runtime _ensure_schema"], expertise=["PostgreSQL migrations", "FastAPI service operations"],
     ),
     proposed_pr(
         "P03-01", "WP03", "Harden auth return-to and participant resume", "app",
@@ -373,24 +373,24 @@ PROPOSED_PRS: list[dict[str, Any]] = [
     proposed_pr(
         "P03-02", "WP03", "Add low-risk workspace claim lifecycle", "app",
         "Create a pending Node 0 workspace claim that can start from an unaddressed link but requires identity binding, consent, expiry, revocation, and audit before low-risk access.",
-        deps=["P03-01", "P04-01"], gate="A1", size="Large", high_review=True,
+        deps=["P03-01", "P03-05", "P04-01"], gate="A1", size="Large", high_review=True,
         files=["app/storage/workspace_claims.py", "app/routes/node0_claims.py", "app/templates/node0/claim*.html", "tests/python/test_workspace_claims.py"],
         scope=["Hashed one-time token and claim state machine", "Identity bind/consent/revoke/duplicate/mismatch behavior", "No sensitive case scope"],
         non_goals=["No paid-case membership", "No possession-only private access"],
         changes={"schema": "Workspace claims and audit/idempotency fields.", "api": "Issue, inspect, bind, consent, claim, revoke endpoints.", "ui": "Low-risk claim and mismatch screens."},
         tests=["Forwarded link", "duplicate/concurrent claim", "expiry/revocation", "identity mismatch", "issuer visibility"],
-        blocked_by=["D-AUTH-01", "CHECK-ALAN-122-124"], sources=["PRs #123/#124", "dirty onboarding-link worktree"],
+        sources=["PRs #123/#124", "dirty onboarding-link worktree"],
     ),
     proposed_pr(
         "P03-03", "WP03", "Bind paid-case invitations to identity and consent", "app",
         "Implement a separate recipient-bound paid-case invitation that grants membership only after authenticated binding, required confirmation, consent, and case/role checks.",
-        deps=["P03-01", "P04-01"], gate="A2", size="Large", high_review=True,
+        deps=["P03-01", "P03-05"], gate="A2", size="Large", high_review=True,
         files=["app/storage/case_invitations.py", "app/case_members.py", "app/routes/case.py", "tests/python/test_case_invitations.py"],
         scope=["Case invite CAS transitions", "Recipient/issuer mismatch confirmation", "Consent-version capture and membership transaction"],
         non_goals=["No workspace token reuse", "No automatic GC migration from soft onboarding"],
         changes={"schema": "Case-invitation identity, consent, expiry, revocation, idempotency fields.", "api": "Separate paid-case redeem/confirm flow.", "security": "Membership grant is a single authorized transaction."},
         tests=["Replay", "self-invite", "active-member duplicate", "mismatch", "expired/revoked", "concurrent redemption rollback"],
-        blocked_by=["D-AUTH-01", "CHECK-ALAN-122-124"], sources=["PR #122 CAS/TTL/self-invite fixes", "current invitations.py"],
+        sources=["PR #122 CAS/TTL/self-invite fixes", "current invitations.py"],
     ),
     proposed_pr(
         "P03-04", "WP03", "Replace shared signup admission with claim-aware Cognito admission", "infra",
@@ -404,26 +404,37 @@ PROPOSED_PRS: list[dict[str, Any]] = [
         blocked_by=["D-AUTH-02"], sources=["infra platform-stack.ts current allowlist + shared invite code"], expertise=["Cognito", "AWS Lambda/KMS", "identity security"],
     ),
     proposed_pr(
+        "P03-05", "WP03", "Implement canonical identity, participation, access, and authorization contracts", "app",
+        "Encode the reconciled separation between authenticated identity, domain participation, resource access grants, operation policy and ownership before workspace/case schemas consume role semantics.",
+        deps=["P02-03", "P03-01"], gate="A1", size="Exceptional", high_review=True,
+        files=["docs/adr/ADR-00x-participation-access.md", "migrations/versions/*_participation_access.py", "app/authz/context.py", "app/storage/access_grants.py", "tests/security/test_participation_access.py"],
+        scope=["Subject-to-person identity binding", "Separate workspace/case participation lifecycle", "Explicit resource/capability access grants", "Operation policy consumed by application services and RLS", "Person/case-side/case ownership independent of visibility"],
+        non_goals=["No global role grants participant data access", "No lens or participation label as standalone authorization", "No Cognito group as case authority"],
+        changes={"architecture": "Identity, participation, access, authorization and ownership become separate contracts.", "schema": "Unique identity binding, participation and access-grant tables with lifecycle and scope constraints.", "security": "Every protected command derives context from the authenticated principal rather than caller-supplied role/lens."},
+        tests=["Duplicate identity/participation is unrepresentable", "Participation without grant denies", "Grant without operation capability denies", "ownership and cross-org negative matrix", "application/RLS policy parity"],
+        sources=["Alan consolidated #124 review", "corrected #122 role/lens behavior", "Wave 2 person/case-side ownership tests"], expertise=["domain modelling", "authorization", "PostgreSQL RLS", "identity security"],
+    ),
+    proposed_pr(
         "P04-01", "WP04", "Separate Node 0 workspace storage from paid cases", "app",
         "Introduce workspace, workspace membership, candidate, and selection entities so opening Node 0 never creates a canonical paid case.",
-        deps=["P02-03"], gate="A1", size="Exceptional", high_review=True,
+        deps=["P02-03", "P03-05"], gate="A1", size="Exceptional", high_review=True,
         files=["migrations/versions/*_node0_workspaces.py", "app/storage/workspaces.py", "app/storage/workspace_memberships.py", "app/storage/node0.py"],
         scope=["Workspace aggregate and memberships", "Candidate rows linked to workspace", "Case tables remain paid/manageable aggregate"],
         non_goals=["No UI rewrite", "No promotion", "No legacy deletion"],
         changes={"schema": "Add node0_workspaces, workspace_memberships, candidate assertion linkage and constraints.", "migration": "Expand only; old records remain readable."},
         tests=["Opening Node 0 creates no case", "workspace authorization", "candidate isolation", "concurrent workspace creation", "old app compatibility"],
-        blocked_by=["CHECK-ALAN-122-124"], sources=["PR #124 _ensure_node0_case as behavior to replace", "candidate worktrees"], expertise=["domain modelling", "PostgreSQL", "authorization"],
+        sources=["PR #124 _ensure_node0_case as behavior to replace", "candidate worktrees"], expertise=["domain modelling", "PostgreSQL", "authorization"],
     ),
     proposed_pr(
         "P04-02", "WP04", "Add attributable workspace revision and projection contracts", "app",
         "Represent IP assertions, GC confirmations, private notes, and reviewer/provider confirmations as attributable append-only revisions with purpose-limited projections.",
-        deps=["P04-01"], gate="A1", size="Large", high_review=True,
+        deps=["P04-01", "P03-05"], gate="A1", size="Large", high_review=True,
         files=["migrations/versions/*_authored_assertions.py", "app/storage/assertions.py", "app/domain/projections.py", "tests/python/test_authorship_projections.py"],
-        scope=["Authorship classes and supersedes links", "Verification/visibility/purpose metadata", "Projection allowlists for IP, GC, case, intelligence, provider"],
+        scope=["Authorship classes and supersedes links", "Verification/visibility/purpose metadata", "Projection allowlists for IP, GC, case, intelligence, provider", "Person-owned private-note contract and explicit-share projection"],
         non_goals=["No provider transmission", "No silent in-place overwrite"],
         changes={"schema": "Append-only assertion/revision and projection-audit records.", "security": "Default deny between roles; explicit purpose projection."},
         tests=["IP provisional remains attributed", "GC revision does not erase source", "private cross-role denial", "AI cannot upgrade verification", "provider projection allowlist"],
-        blocked_by=["D-DATA-01", "D-DATA-02", "CHECK-ALAN-122-124"], sources=["Current facts/memory models", "GC authorship audit"], expertise=["data provenance", "privacy", "authorization"],
+        sources=["Current facts/memory models", "GC authorship audit"], expertise=["data provenance", "privacy", "authorization"],
     ),
     proposed_pr(
         "P04-03", "WP04", "Adapt legacy Node 0 case-shaped data without semantic promotion", "app",
@@ -452,22 +463,22 @@ PROPOSED_PRS: list[dict[str, Any]] = [
         "Port the useful deterministic candidate, preliminary safety, and outreach behavior onto workspace/provenance contracts while preserving the complete-the-match free boundary.",
         deps=["P04-02", "P05-01"], gate="A1", size="Exceptional", high_review=True,
         files=["app/domain/node0_candidates.py", "app/storage/node0.py", "app/node0_conversation_guide.py", "app/resources/node0_conversation_guide_v1.json", "tests/python/test_node0_domain.py"],
-        scope=["Unlimited candidates", "Preliminary hard-criteria check with limitations", "Basic outreach sequencing and shareable intro packet"],
-        non_goals=["No weighted ranking", "No medical clearance", "No paid feature"],
-        changes={"schema": "Use workspace candidates/assertions from WP04.", "api": "Workspace-scoped candidate and guide commands."},
-        tests=["Deterministic metrics", "critical safety blocking", "author attribution", "candidate isolation", "free feature contract"],
-        blocked_by=["CHECK-ALAN-122-124"], sources=["PR #117 direct algorithm/test salvage", "PR #124", "quiz rewrite worktree"],
+        scope=["Unlimited candidates under bounded command/collection sizes", "Minimum-necessary relationship, outreach and logistics questions only", "Basic outreach sequencing and shareable intro packet", "Migration-backed case/workspace/candidate/outreach constraints", "Batched hydration plus archive/anonymize/delete behavior under D-DATA-02"],
+        non_goals=["No weighted ranking or suitability score", "No IP-entered health, substance, mental-health, citizenship, race or eligibility data", "No medical clearance", "No paid feature"],
+        changes={"schema": "Use workspace candidates/assertions from WP04 with FKs, uniqueness and one-active-outreach invariants.", "api": "Typed workspace-scoped commands reject malformed/oversize input and return neutral questions to clarify, never eligibility flags."},
+        tests=["Allowed/blocked field matrix", "no ranking/gating", "strict enum/body/collection limits", "author attribution", "candidate isolation", "concurrent outreach invariant", "retention/deletion", "query-count bound", "free feature contract"],
+        sources=["PR #117 direct algorithm/test salvage", "PR #124", "quiz rewrite worktree"],
     ),
     proposed_pr(
         "P05-03", "WP05", "Ship resumable Node 0 Free participant surface", "app",
         "Provide a coherent mobile-capable Node 0 Free workspace shell for candidate tracking, outreach, guide use, and resume without paid-case language.",
         deps=["P03-01", "P05-02", "P11-03"], gate="A1", size="Large",
         files=["app/routes/node0.py", "app/node0_surface.py", "app/templates/node0/*.html", "app/static/node0.*", "tests/python/test_node0_ui.py"],
-        scope=["Workspace home and candidate flow", "Honest preliminary labels/empty/error states", "Logout/login resume and mobile navigation"],
+        scope=["Workspace home and candidate flow", "Shared IP-owner guard across participant and API routes", "Exact public/cloud exposure registry", "Expiry-aware token views and no-store/referrer/noindex response policy", "Route-scoped Node 0 stylesheet", "Honest preliminary labels/empty/error states", "Logout/login resume and mobile navigation"],
         non_goals=["No Complete-only features", "No paid case/journey hero"],
         changes={"ui": "Participant DS recipes with responsive interaction and no fake content.", "api": "UI calls workspace-scoped commands only."},
-        tests=["Clickable Free path", "resume", "authorization", "no-JS/keyboard", "320/375/768px", "dependency failure"],
-        blocked_by=["CHECK-ALAN-122-124"], sources=["PRs #121/#124 selective UI port", "DS PR #8"],
+        tests=["Clickable Free path", "GC/viewer/staff/nonowner denial without 500", "exact route exposure negatives", "expired-token GET", "cache/referrer headers", "malformed/oversize form/PDF input", "resume", "no-JS/keyboard", "320/375/768px", "dependency failure"],
+        sources=["PRs #121/#124 selective UI port", "DS PR #8"],
     ),
     proposed_pr(
         "P06-01", "WP06", "Add Node 0 Complete entitlement and versioned feature gates", "app",
@@ -478,7 +489,7 @@ PROPOSED_PRS: list[dict[str, Any]] = [
         non_goals=["No hard-coded price", "No paid-case creation"],
         changes={"schema": "Append-only entitlement events plus current projection.", "security": "Every Complete feature checks server entitlement."},
         tests=["Grant replay", "suspend/revoke", "config version", "free-feature unaffected", "no case created"],
-        blocked_by=["D-COM-01"], sources=["Business-model Node 0 feature table"],
+        sources=["Business-model Node 0 feature table"],
     ),
     proposed_pr(
         "P06-02", "WP06", "Add GC soft onboarding and attributable confirmation", "app",
@@ -489,7 +500,7 @@ PROPOSED_PRS: list[dict[str, Any]] = [
         non_goals=["No paid-case membership", "No provider share", "No medical eligibility determination"],
         changes={"schema": "Use assertion/revision contract; onboarding progress events.", "ui": "GC consent and privacy explanations."},
         tests=["Paired IP/GC visibility", "private contact/health fields", "revision lineage", "claim replay/mismatch", "mobile resume"],
-        blocked_by=["D-DATA-01", "D-DATA-02", "CHECK-ALAN-122-124"], sources=["PRs #123/#124 UX only", "GC authorship audit"], expertise=["privacy", "accessible forms", "authorization"],
+        sources=["PRs #123/#124 UX only", "GC authorship audit"], expertise=["privacy", "accessible forms", "authorization"],
     ),
     proposed_pr(
         "P06-03", "WP06", "Add readiness report and role-scoped progress surfaces", "app",
@@ -500,7 +511,7 @@ PROPOSED_PRS: list[dict[str, Any]] = [
         non_goals=["No provider-confirmed status", "No final case activation"],
         changes={"ui": "Role-specific report/progress cards.", "api": "Read-only readiness projection with policy version."},
         tests=["Provisional labels", "critical missing data", "cross-role redaction", "stale revision", "print/mobile"],
-        blocked_by=["D-DATA-01"], sources=["PR #124 score/report concepts"],
+        sources=["PR #124 score/report concepts"],
     ),
     proposed_pr(
         "P07-01", "WP07", "Add versioned commercial configuration and terms acceptance", "app",
@@ -511,7 +522,7 @@ PROPOSED_PRS: list[dict[str, Any]] = [
         non_goals=["No unresolved Node 0 price value", "No payment provider"],
         changes={"schema": "Commercial configuration and acceptance ledgers.", "api": "Read active config and record acceptance commands."},
         tests=["Activation immutability", "currency/amount validation", "acceptance version", "no retroactive mutation"],
-        blocked_by=["D-COM-01", "D-COM-02", "D-COM-03"], sources=["Payment/business-model DOCX"], expertise=["commercial systems", "PostgreSQL"],
+        sources=["Payment/business-model DOCX"], expertise=["commercial systems", "PostgreSQL"],
     ),
     proposed_pr(
         "P07-02", "WP07", "Implement commitment and enrollment-pending lifecycle", "app",
@@ -522,7 +533,7 @@ PROPOSED_PRS: list[dict[str, Any]] = [
         non_goals=["No browser-triggered promotion", "No activation"],
         changes={"schema": "Commitment events/current projection.", "api": "Create, accept, cancel, inspect enrollment."},
         tests=["Acceptance prerequisites", "duplicate accept", "stale config", "cancel/expire", "resume"],
-        blocked_by=["D-COM-04"], sources=["Business-model conversion trigger"],
+        sources=["Business-model conversion trigger"],
     ),
     proposed_pr(
         "P07-03", "WP07", "Emit processor-neutral workspace promotion authorization", "app",
@@ -533,7 +544,7 @@ PROPOSED_PRS: list[dict[str, Any]] = [
         non_goals=["No case creation", "No redirect/webhook-as-authority", "No GC membership"],
         changes={"api": "Internal event producer only.", "security": "Only commercial-domain authority can emit the typed event."},
         tests=["Pending/failed/reversed funding", "stale terms/config", "duplicate/replayed inputs", "credit mismatch", "event payload/checksum"],
-        blocked_by=["D-COM-04", "D-DATA-01"], sources=["Business-model promotion invariants"], expertise=["event-driven systems", "payments", "commercial policy"],
+        sources=["Business-model promotion invariants"], expertise=["event-driven systems", "payments", "commercial policy"],
     ),
     proposed_pr(
         "P07-04", "WP07", "Promote workspace exactly once from authorization event", "app",
@@ -544,7 +555,7 @@ PROPOSED_PRS: list[dict[str, Any]] = [
         non_goals=["No redirect authority", "No GC case membership transfer", "No activation"],
         changes={"schema": "Promotion ledger and source-workspace unique constraint.", "api": "Internal event handler only.", "security": "Projection defaults deny and preserves provenance."},
         tests=["Replay/concurrency", "partial transaction", "funding event validation", "private candidate exclusion", "GC invitation required"],
-        blocked_by=["D-COM-04", "D-DATA-01", "CHECK-ALAN-122-124"], sources=["byos.workspace_promotion_authorized.v1 contract", "PR #124 source linkage concepts"], expertise=["event-driven systems", "privacy", "PostgreSQL"],
+        sources=["byos.workspace_promotion_authorized.v1 contract", "PR #124 source linkage concepts"], expertise=["event-driven systems", "privacy", "PostgreSQL"],
     ),
     proposed_pr(
         "P08-01", "WP08", "Add append-only commercial and money ledgers", "app",
@@ -555,7 +566,7 @@ PROPOSED_PRS: list[dict[str, Any]] = [
         non_goals=["No processor", "No mutable balance authority", "No pass-through custody"],
         changes={"schema": "Append-only financial ledgers and unique idempotency constraints.", "security": "Least-privilege write paths and redacted logs."},
         tests=["Double-entry-like conservation checks", "duplicate key", "credit floor", "refund totals", "concurrent append"],
-        blocked_by=["D-COM-01", "D-COM-02", "D-COM-03"], sources=["Payment/business-model DOCX"], expertise=["payments", "financial ledgers", "PostgreSQL"],
+        sources=["Payment/business-model DOCX"], expertise=["payments", "financial ledgers", "PostgreSQL"],
     ),
     proposed_pr(
         "P08-02", "WP08", "Add processor-neutral payment command and webhook inbox", "app",
@@ -566,7 +577,7 @@ PROPOSED_PRS: list[dict[str, Any]] = [
         non_goals=["No browser redirect settlement", "No financing implementation unless separately approved"],
         changes={"schema": "Processor-event inbox/outbox and mapping records.", "api": "Processor webhook and internal payment commands.", "infra": "Secrets/endpoints deferred to guarded environment configuration."},
         tests=["Signature failure", "replay/out-of-order", "amount/currency mismatch", "timeout/retry", "settlement event exactly once"],
-        blocked_by=["D-PAY-01", "D-COM-05"], sources=["Business-model processor-neutral requirement"], expertise=["payment security", "webhooks", "event systems"],
+        blocked_by=["D-PAY-01"], sources=["Business-model processor-neutral requirement"], expertise=["payment security", "webhooks", "event systems"],
     ),
     proposed_pr(
         "P08-03", "WP08", "Implement milestone invoicing, credits, and deterministic refunds", "app",
@@ -577,7 +588,7 @@ PROPOSED_PRS: list[dict[str, Any]] = [
         non_goals=["No unresolved pregnancy-loss automatic disposition", "No promise of reimbursement"],
         changes={"api": "Internal evidence-to-invoice commands and explainable refund quote.", "security": "Only authorized domain events trigger billing."},
         tests=["All milestone/refund rows", "duplicate/stale transition", "Node 0 credit", "pay-in-full/deposit math", "clinical notification separation"],
-        blocked_by=["D-COM-04", "D-COM-06", "D-COM-07"], sources=["Payment/business-model milestone/refund tables"], expertise=["payments", "commercial policy", "case state"],
+        sources=["Payment/business-model milestone/refund tables"], expertise=["payments", "commercial policy", "case state"],
     ),
     proposed_pr(
         "P08-04", "WP08", "Add payment reconciliation and safe service-pause operations", "app",
@@ -588,18 +599,18 @@ PROPOSED_PRS: list[dict[str, Any]] = [
         non_goals=["No organization-wide ambient access", "No critical-service lockout"],
         changes={"ui": "Internal role-gated discrepancy and adjustment surface.", "observability": "Metrics/alerts for settlement, refund, mismatch and reserve inputs."},
         tests=["Role denial", "mismatch workflow", "manual adjustment audit", "critical content remains accessible", "provider outage"],
-        blocked_by=["D-COM-08"], sources=["Business-model failure handling"], expertise=["payment operations", "authorization", "observability"],
+        sources=["Business-model failure handling"], expertise=["payment operations", "authorization", "observability"],
     ),
     proposed_pr(
         "P09-01", "WP09", "Define document lifecycle, authorization, and retention contract", "app",
-        "Record the document state machine, role/purpose authorization matrix, object-key independence, retention/deletion/replacement rules, and failure recovery before storage implementation.",
-        deps=["P00-01", "P02-01"], gate="A2", size="Medium", readiness="Blocked by decision", high_review=True,
+        "Record separate metadata-requirement/work-item and content-bearing document/version state machines, the authorization matrix, object-key independence, retention/deletion/replacement rules, and failure recovery before implementation.",
+        deps=["P00-01", "P02-01"], gate="A2", size="Medium", readiness="Ready for Alan decision", high_review=True,
         files=["docs/adr/ADR-00x-durable-documents.md", "docs/agents/documents.md", "docs/security/document-threat-model.md"],
-        scope=["Upload/scan/available/review/replace/delete states", "Size/type/checksum and filename policy", "Presigned versus proxied download decision", "Orphan/retention jobs"],
+        scope=["Requirement/readiness/work-item states that never imply content approval", "Document/version/upload/scan/available/review/replace/delete states", "Owner/person/case-side/case authorization and staff capabilities", "Size/type/checksum and structured metadata policy", "Presigned versus proxied download decision", "Orphan/retention jobs"],
         non_goals=["No bucket or application code"],
         changes={"architecture": "Decision and threat model only."},
-        tests=["Threat-model abuse cases", "state transition table review", "retention/legal-hold walkthrough"],
-        blocked_by=["D-DOC-01", "D-DOC-02", "D-PHI-01"], sources=["Current metadata-only documents.py", "provider branch"], expertise=["application security", "S3/KMS", "privacy"],
+        tests=["Threat-model abuse cases", "metadata-versus-content transition table review", "retention/legal-hold walkthrough", "PHI-bearing free-text negative cases"],
+        sources=["Current metadata-only documents.py", "Wave 2@5b63e3a", "provider branch"], expertise=["application security", "S3/KMS", "privacy"],
     ),
     proposed_pr(
         "P09-02", "WP09", "Provision private encrypted document and quarantine storage", "infra",
@@ -610,7 +621,7 @@ PROPOSED_PRS: list[dict[str, Any]] = [
         non_goals=["No production/PHI activation", "No application upload"],
         changes={"infra": "CDK resources and SSM outputs in dev, desired counts unchanged by default."},
         tests=["CDK assertions", "IAM negative cases", "public-access-block", "encryption/lifecycle/event contract"],
-        blocked_by=["D-DOC-02", "D-PHI-01"], sources=["Existing infra platform stack patterns"], expertise=["AWS S3", "KMS/IAM", "CDK", "security"],
+        blocked_by=["D-DOC-02"], sources=["Existing infra platform stack patterns"], expertise=["AWS S3", "KMS/IAM", "CDK", "security"],
     ),
     proposed_pr(
         "P09-03", "WP09", "Implement resilient document upload, scan, and download", "app",
@@ -624,26 +635,37 @@ PROPOSED_PRS: list[dict[str, Any]] = [
         blocked_by=["D-DOC-01", "D-DOC-02"], sources=["Current metadata scaffold"], expertise=["S3", "secure uploads", "background jobs", "authorization"],
     ),
     proposed_pr(
-        "P09-04", "WP09", "Complete active-case participant document and progress surfaces", "app",
-        "Expose role-scoped active-case tasks, documents, progress, waiting and safe pause states after activation while keeping the server projection authoritative.",
-        deps=["P03-03", "P07-04", "P09-03", "P11-03"], gate="A2", size="Exceptional", high_review=True,
-        files=["app/case_home.py", "app/case_journey.py", "app/routes/case.py", "app/templates/case/", "tests/python/test_case_home.py"],
-        scope=["enrollment_pending versus active surfaces", "IP/GC lenses", "Documents/tasks/timeline/notifications", "Mobile journey orientation"],
-        non_goals=["No client-owned state transition", "No operator/provider leakage"],
-        changes={"ui": "Participant control center and journey map backed by case projection.", "api": "Membership-scoped reads and evidence commands."},
-        tests=["IP/GC paired lenses", "pending/active/paused", "no membership", "malformed/stale projection", "mobile/no-JS/reduced-motion"],
-        blocked_by=["D-COM-04", "CHECK-ALAN-122-124"], sources=["PR #122 selective/direct reuse after checkpoint", "PR #124 case UI"], expertise=["FastAPI/Jinja", "accessibility", "authorization", "state projection"],
+        "P09-04", "WP09", "Ship phase-1 case progress and metadata-only request/review", "app",
+        "Expose projection-driven phase-1 cluster progress and a revision-bound metadata requirement/readiness/reviewer-work workflow without creating or approving a document object.",
+        deps=["P03-03", "P03-05", "P07-04", "P09-01", "P11-03"], gate="A2", size="Exceptional", high_review=True,
+        files=["migrations/versions/*_case_requirements.py", "app/case_home.py", "app/case_journey.py", "app/case_requirements.py", "app/routes/case.py", "app/routes/operator_case_work.py", "app/templates/case/", "tests/python/test_case_requirements.py"],
+        scope=["Versioned phase-1 workflow/request definitions", "Projection-issued action capabilities for active/waiting/attention/paused/done states", "Person versus case-side ownership", "Atomic submission plus durable case work item", "Revision-bound/idempotent staff decision plus audit", "Exact phase-1 route exposure"],
+        non_goals=["No file bytes, storage URI, upload, scan, download or artifact approval", "No caller-supplied role/lens authority", "No client-owned state transition", "No operator/provider ambient access"],
+        changes={"schema": "Requirement submissions and durable typed work items use constrained case/org/owner anchors and immutable expected revisions.", "ui": "Participant progress and readiness surfaces remain projection-driven.", "security": "Subject-derived participant capabilities and explicit organization-scoped staff capability gate every read/command."},
+        tests=["IP/GC paired lenses", "viewer/nonmember/spoofed-role denial", "restart durability", "stale work item cannot approve resubmission", "atomic submission/task and review/audit rollback", "wrong case/org and unsupported type retained", "paused/done action suppression", "later-phase 404", "mobile/no-JS/reduced-motion"],
+        sources=["PR #122 case projection behavior/tests", "Wave 2@5b63e3a semantics/tests; implementation superseded", "PR #124 presentation evidence"], expertise=["FastAPI/Jinja", "accessibility", "authorization", "PostgreSQL transactions", "state projection"],
     ),
     proposed_pr(
         "P09-05", "WP09", "Implement consent-scoped provider handoff snapshots and operations", "app",
         "Create purpose-bound, reviewed, checksummed provider packets from explicitly allowed facts/documents and operate send/confirm/revoke/reroute without ambient provider access.",
-        deps=["P04-02", "P09-03", "P09-04", "P10-02"], gate="A2", size="Exceptional", high_review=True,
+        deps=["P04-02", "P09-06", "P10-02"], gate="A2", size="Exceptional", high_review=True,
         files=["app/provider_handoffs.py", "app/storage/handoffs.py", "app/routes/operator_handoffs.py", "app/templates/internal/handoffs/", "tests/python/test_provider_handoffs.py"],
         scope=["Packet revisions/snapshots/checksums", "Consent, recipient, purpose, expiry", "Operator route review and transmission outcomes", "Inbound evidence becomes proposal"],
         non_goals=["No raw private/provisional bulk projection", "No provider truth without review"],
         changes={"schema": "Handoff/packet/snapshot/transmission/evidence ledgers under migrations.", "ui": "Case-scoped operator queue and GC review."},
         tests=["Purpose allowlist", "revoked consent", "stale route", "snapshot immutability", "delivery retry", "private/provisional exclusion"],
-        blocked_by=["D-PROV-01", "D-PHI-01"], sources=["Protected provider-exchange worktree: selective port only after provenance fix"], expertise=["provider workflows", "privacy", "document security", "operations"],
+        blocked_by=["D-PROV-01"], sources=["Protected provider-exchange worktree: selective port only after provenance fix"], expertise=["provider workflows", "privacy", "document security", "operations"],
+    ),
+    proposed_pr(
+        "P09-06", "WP09", "Integrate content-bearing document versions into participant surfaces", "app",
+        "Connect metadata requirements to upload intents, quarantined/scanned content versions, replacement and authorized download without collapsing requirement state into object state.",
+        deps=["P09-03", "P09-04"], gate="A2", size="Large", high_review=True,
+        files=["app/documents/participant_service.py", "app/routes/case_documents.py", "app/templates/case/documents/", "tests/python/test_case_document_integration.py"],
+        scope=["Requirement-to-upload intent linkage", "Quarantine/scan/available and replacement projections", "Owner/role-scoped upload and download controls", "Content-version audit and restart recovery", "Fail-closed partial merge when content pipeline is unavailable"],
+        non_goals=["No metadata endpoint accepts bytes", "No readiness marker becomes document approval", "No provider share by object key", "No PHI before B2"],
+        changes={"api": "Participant document commands join requirement IDs to immutable content versions.", "ui": "Content controls appear only when the content capability and approved gate state are present.", "security": "Authorization is re-evaluated at intent, finalize, status and download."},
+        tests=["Metadata endpoint rejects bytes", "owner/role/viewer denial", "quarantine/scan/replacement", "restart recovery", "multi-IP isolation", "feature-disabled/partial-merge failure", "mobile/no-JS"],
+        sources=["P09-03 durable pipeline", "Wave 2 metadata UI as contrast evidence", "PR #122 participant case surfaces"], expertise=["secure documents", "FastAPI/Jinja", "authorization", "resilient workflows"],
     ),
     proposed_pr(
         "P10-01", "WP10", "Version the scoped intelligence context envelope", "intelligence",
@@ -654,18 +676,18 @@ PROPOSED_PRS: list[dict[str, Any]] = [
         non_goals=["No durable app write", "No merged contexts"],
         changes={"api": "Versioned context/advisory contract with strict validation and safe compatibility window."},
         tests=["Cross-scope rejection", "unknown version", "private/shared fixtures", "redaction", "service auth"],
-        blocked_by=["D-DATA-01", "D-AI-01"], sources=["Current case_context advisory stub"], expertise=["FastAPI/Pydantic", "AI safety", "privacy"],
+        blocked_by=["D-AI-01"], sources=["Current case_context advisory stub"], expertise=["FastAPI/Pydantic", "AI safety", "privacy"],
     ),
     proposed_pr(
         "P10-02", "WP10", "Enforce private/shared memory and evidence-bound proposal approval", "app",
         "Store attributable private/shared memory revisions and require authorized evidence review before an intelligence proposal can affect case truth or provider material.",
         deps=["P04-02", "P10-01"], gate="A2", size="Exceptional", high_review=True,
         files=["app/case_intelligence.py", "app/storage/memory.py", "app/storage/proposals.py", "app/storage/facts.py", "tests/python/test_case_intelligence.py"],
-        scope=["Private and shared memory ledgers", "Proposal preview/approve/reject", "Evidence/source and reviewer authority", "Audit/outbox"],
+        scope=["Private and shared memory ledgers", "Affected-row inventory for source=node0_conversation_guide_note", "Immediate shared/intelligence exclusion plus idempotent person-owner quarantine/private remediation when rows exist", "Proposal preview/approve/reject", "Evidence/source and reviewer authority", "Audit/outbox"],
         non_goals=["No automatic AI approval", "No guide notes default shared"],
-        changes={"schema": "Revision/supersedes/provenance/evidence fields under migrations.", "security": "Role and purpose authorization on every projection/write."},
-        tests=["Private-to-shared denial", "wrong-role approval", "AI provenance remains proposal", "concurrent review", "provider projection"],
-        blocked_by=["D-DATA-01", "D-AI-01"], sources=["Current facts/memory/proposals scaffolds", "GC authorship audit"], expertise=["AI safety", "authorization", "data provenance"],
+        changes={"schema": "Revision/supersedes/provenance/evidence fields and the private-note remediation under versioned migrations.", "security": "Role and purpose authorization on every projection/write; ambiguous legacy ownership quarantines rather than broadens access."},
+        tests=["Zero-row inventory evidence", "affected rows disappear from shared/Ask reads before remediation", "idempotent owner-safe migration", "ambiguous-owner quarantine", "no note content in logs", "private-to-shared denial", "wrong-role approval", "AI provenance remains proposal", "concurrent review", "provider projection"],
+        blocked_by=["D-AI-01"], sources=["Current facts/memory/proposals scaffolds", "GC authorship audit"], expertise=["AI safety", "authorization", "data provenance"],
     ),
     proposed_pr(
         "P10-03", "WP10", "Harden Ask and Learn grounding and degraded-mode behavior", "intelligence",
@@ -747,7 +769,7 @@ PROPOSED_PRS: list[dict[str, Any]] = [
     proposed_pr(
         "P12-02", "WP12", "Complete mobile participant interaction and accessibility cutover", "app",
         "Run a bounded participant-only mobile/accessibility pass across entry, auth, Node 0, GC claim, case, documents, Ask, and Learn using the released DS contract.",
-        deps=["P05-03", "P06-03", "P09-04", "P12-01"], gate="A2", size="Exceptional",
+        deps=["P05-03", "P06-03", "P09-04", "P09-06", "P12-01"], gate="A2", size="Exceptional",
         files=["app/templates/participant*/", "app/templates/node0/", "app/templates/case/", "app/static/participant*/", "tests/browser/participant_mobile.spec.*"],
         scope=["Navigation/forms/cards/dialogs", "320/375/768 widths", "Keyboard/focus/reduced motion", "Error/loading/empty states"],
         non_goals=["No internal/operator surface", "No visual rebrand", "No zero-hex purity gate"],
@@ -812,36 +834,36 @@ PROPOSED_PRS: list[dict[str, Any]] = [
     ),
     proposed_pr(
         "P13-05", "WP13", "Enforce case RLS and a non-owner PostgreSQL runtime", "app",
-        "Move app runtime to a least-privilege non-DDL database role and enforce tenant/case membership policies with RLS/FORCE RLS before any PHI gate can open.",
-        deps=["P02-03", "P03-03", "P04-03", "P09-05", "P10-02"], gate="B2", size="Exceptional", high_review=True,
+        "Move app runtime to a least-privilege non-DDL database role and enforce organization/resource access policies with RLS/FORCE RLS before any real-user PII gate can open.",
+        deps=["P02-03", "P03-05", "P04-03", "P08-04", "P09-05", "P10-02"], gate="B1", size="Exceptional", high_review=True,
         files=["migrations/versions/*_case_rls.py", "app/storage/connection.py", "app/storage/session_context.py", "tests/security/test_case_rls.py", "docs/security/rls.md"],
-        scope=["Runtime/migrator role separation", "RLS/FORCE RLS on case/participant/document/commercial tables", "Transaction-local subject/org/case context", "Policy-negative and pool-reset tests"],
+        scope=["Runtime/migrator role separation with NOBYPASSRLS and runtime DML only", "RLS/FORCE RLS on workspace/case/participant/access/document/work-item/commercial/private-memory tables", "Transaction-local verified subject/org/resource/purpose context", "Organization-scoped staff capabilities", "Policy-negative and pool-reset tests"],
         non_goals=["No PHI gate activation", "No trust in app guards alone", "No runtime DDL"],
         changes={"schema": "RLS policies and least-privilege grants under a reviewed migration.", "security": "Database denies cross-case/ambient reads even if an app guard is missed."},
-        tests=["Cross-case/role denial", "connection-pool context reset", "migrator versus runtime grants", "background worker scope", "previous app compatibility during rollout"],
-        blocked_by=["D-PHI-01"], sources=["case-shell.md current app-layer-only/RLS gap"], expertise=["PostgreSQL RLS", "connection pooling", "security architecture"],
+        tests=["Unset context denies", "cross-org/case/owner/role denial", "staff queue organization scope", "connection-pool context reset", "migrator versus runtime grants", "background worker scope", "previous app compatibility during rollout"],
+        sources=["case-shell.md current app-layer-only/RLS gap", "Wave 2 unguarded document/reviewer loaders"], expertise=["PostgreSQL RLS", "connection pooling", "security architecture"],
     ),
     proposed_pr(
         "P13-06", "WP13", "Harden B1/B2 backups, audit, alarms, and cohort controls", "infra",
         "Add the infrastructure evidence and controls required for a named PII beta and later PHI review: backup/restore, data-event audit, least privilege, alarms, log retention, cohort disable, and emergency stop.",
-        deps=["P09-02", "P13-02", "P13-05"], gate="B2", size="Exceptional", high_review=True,
+        deps=["P09-02", "P13-02", "P13-05"], gate="B1", size="Exceptional", high_review=True,
         files=["lib/stacks/platform-stack.ts", "lib/constructs/audit.ts", "lib/constructs/backup.ts", "test/security-controls.test.ts", "docs/runbooks/security-operations.md"],
         scope=["RDS/S3 backup and restore evidence hooks", "CloudTrail S3 data events and access alarms", "Runtime/migrator/task-role least privilege", "Cohort disable and PHI gate kill switch", "Log retention/redaction contracts"],
         non_goals=["No production/PHI activation", "No evidence claim without restore/tabletop"],
         changes={"infra": "Guarded, cost-aware controls with explicit dev defaults and documented operational owners."},
         tests=["CDK policy assertions", "restore drill", "alarm path", "access-log redaction", "cohort/PHI gate disable", "role boundary"],
-        blocked_by=["D-PHI-01", "D-PHI-02"], sources=["Existing audit/backup/platform stack constructs"], expertise=["AWS security", "backup/restore", "CloudTrail/CloudWatch", "IAM"],
+        sources=["Existing audit/backup/platform stack constructs"], expertise=["AWS security", "backup/restore", "CloudTrail/CloudWatch", "IAM"],
     ),
     proposed_pr(
         "P13-07", "WP13", "Publish B1 and B2 privacy, PHI, and operational go-no-go runbooks", ".github",
         "Create the programme evidence index and explicit human approval packets for PII beta (B1) and PHI readiness (B2), linking rather than duplicating controlled company/compliance records.",
-        deps=["P13-04", "P13-05", "P13-06"], gate="B2", size="Large", readiness="Blocked by decision", dri="Luke", implementer="Joint", reviewer="External/TBD", approver="Luke", high_review=True,
+        deps=["P13-04", "P13-05", "P13-06"], gate="B1", size="Large", readiness="Ready for evidence assembly", dri="Luke", implementer="Joint", reviewer="External/TBD", approver="Luke", high_review=True,
         files=["natalyx-repair-program/gates/B1-real-user-pii.md", "natalyx-repair-program/gates/B2-phi-go-no-go.md", "natalyx-repair-program/evidence-index.md"],
         scope=["Data classification and real-user boundary", "Access/logging/incident/backup/vendor/compliance evidence", "Named approvers and expiry/revalidation", "Rollback/stop response"],
         non_goals=["No legal/compliance self-certification", "No PHI activation by merge"],
         changes={"documentation": "Controlled go/no-go checklists and evidence links only."},
         tests=["Evidence completeness review", "tabletop incident", "access review", "backup/restore evidence", "external security/privacy sign-off"],
-        blocked_by=["D-PHI-01", "D-PHI-02"], sources=["Natalyx compliance/company records by reference", "all gate evidence"], expertise=["privacy/security governance", "operations", "compliance"],
+        sources=["Natalyx compliance/company records by reference", "all gate evidence"], expertise=["privacy/security governance", "operations", "compliance"],
     ),
 ]
 
@@ -882,16 +904,23 @@ EVIDENCE: list[dict[str, Any]] = [
     {"id": "E-025", "wps": ["WP07", "WP08"], "kind": "design authority", "repo": "business model", "ref": "Natalyx_Payment_and_Business_Model_BYOS_MVP.docx v1.0", "location": "Sections 3-12 and implementation tables", "claim": "Node 0 Free must complete the match; Complete is optional/creditable; $8,900 JMF and $750 enrollment anchor the configurable model; promotion follows explicit commitment and funding, not willingness or redirect."},
     {"id": "E-026", "wps": ["WP13"], "kind": "verified", "repo": "app", "ref": "origin/main@fdf2bb4", "location": "app/main.py:145-148", "claim": "/healthz returns only status ok when the process can serve; it does not report revision, database, migration, intelligence, storage, or readiness."},
     {"id": "E-027", "wps": ["WP13"], "kind": "verified", "repo": "app/infra", "ref": "origin/main@fdf2bb4 / infra main@fec515f", "location": "app .github/workflows/aws-app-deploy.yml:60-190; infra CDK workflow", "claim": "Deployment reads infra-owned SSM contracts and guards billable ECS updates, but successful image build/contract smoke does not prove a healthy service revision."},
+    {"id": "E-028", "wps": ["WP00", "WP03", "WP04", "WP05", "WP09", "WP10", "WP13"], "kind": "verified review", "repo": "app", "ref": "PR #124 comment 4948149089", "location": "Consolidated review — findings for the WP00 extraction ledger", "claim": "Alan's completed review classifies #124 as high-value extraction material rather than a merge unit and identifies transaction, privacy, scoring, access, validation, invariant, exposure, retention, performance, CSS and CI findings."},
+    {"id": "E-029", "wps": ["WP00", "WP03", "WP09", "WP11", "WP12"], "kind": "verified preserved branch", "repo": "app", "ref": "feat/byos-journey-wave-2@5b63e3a7", "location": "exact three-commit stack on e853821", "claim": "Wave 2 contains phase-1 cluster pages, metadata-only request/review, case anchoring and role/owner fixes. Controlled local evidence passed 535 tests with 9 skipped and 36/36 focused tests, but no branch checks, PostgreSQL, browser/accessibility or visual run exists."},
+    {"id": "E-030", "wps": ["WP02", "WP09", "WP13"], "kind": "independently reproduced defect", "repo": "app", "ref": "feat/byos-journey-wave-2@5b63e3a7", "location": "app/storage/schema.py orphan cleanup; document review CAS/work-item payload", "claim": "A second init_db deletes canonical case-anchored reviewer work because participant_id is empty. Separately, a stale v1 work item can approve v2 after same-row resubmission because it is not bound to an immutable submission revision."},
+    {"id": "E-031", "wps": ["WP03", "WP09", "WP13"], "kind": "verified", "repo": "app", "ref": "feat/byos-journey-wave-2@5b63e3a7", "location": "case_members.py, case_documents.py, storage/documents.py, routes/agency.py", "claim": "Membership roles still conflate participation, lens and access; document/reviewer loaders are broad or global; participant role/lens can be caller-supplied; operator actions lack a canonical organization-scoped staff capability; no RLS/non-owner runtime enforces denial."},
+    {"id": "E-032", "wps": ["WP01"], "kind": "verified limitation", "repo": "GitHub", "ref": "2026-07-12", "location": "private-repository branch-protection/ruleset API", "claim": "The API returned a plan-level 403 requiring GitHub Pro or public visibility, so a stable workflow can be planned but bypass-resistant required-check enforcement cannot be claimed until D-CI-01 is resolved and read back."},
 ]
 
 
 DECISIONS: list[dict[str, Any]] = [
     {"id": "D-MIG-01", "title": "Migration framework and SQLite support", "owner": "Luke", "proposer": "Alan", "affected": ["P02-01", "P02-02", "P02-03"], "latest": "Before P02-02", "question": "Adopt Alembic or justify a custom ordered runner; decide supported SQLite parity, expand/contract, locking, rollback and forward-repair contract.", "recommendation": "Prefer an established framework unless the ADR proves current SQL compatibility makes it unsafe or disproportionate."},
-    {"id": "D-AUTH-01", "title": "Workspace claim and paid-case identity policy", "owner": "Luke", "proposer": "Alan", "affected": ["P03-02", "P03-03"], "latest": "Before P03-02", "question": "Which low-risk fields may a link-only claimant see, when is recipient/issuer confirmation required, and what consent/version binds each access elevation?", "recommendation": "Link possession creates pending workspace claim only; paid-case access always requires authenticated binding and explicit consent."},
+    {"id": "D-AUTH-01", "title": "Workspace claim and paid-case identity policy", "owner": "Luke", "proposer": "Alan", "status": "Resolved by reconciliation", "affected": ["P03-02", "P03-03"], "latest": "Resolved 2026-07-12", "question": "Which low-risk fields may a link-only claimant see, when is recipient/issuer confirmation required, and what consent/version binds each access elevation?", "recommendation": "A bearer link creates only a pending free-workspace claim with minimum-necessary relationship/outreach/logistics context; paid-case access always requires authenticated binding, explicit consent and recipient/issuer confirmation."},
     {"id": "D-AUTH-02", "title": "Claim-aware Cognito admission mechanism", "owner": "Luke", "proposer": "Alan", "affected": ["P03-04"], "latest": "Before P03-04", "question": "Choose a short-lived signed/server-verified participant admission proof and key/claim lifecycle while retaining a separate internal allowlist path.", "recommendation": "Bind proof to email, purpose, claim ID and expiry; it admits account creation only and never grants workspace/case membership."},
+    {"id": "D-AUTH-03", "title": "Identity, participation and access authorization contract", "owner": "Luke", "proposer": "Alan", "status": "Resolved by reconciliation", "affected": ["P03-02", "P03-03", "P03-05", "P04-01", "P04-02", "P09-04", "P13-05"], "latest": "Resolved 2026-07-12", "question": "How are authenticated identity, domain participation, resource access, ownership and authorization related and consumed by application services and RLS?", "recommendation": "Identity binds principal to person; participation records domain relationship; grants carry resource-scoped capabilities; application and RLS consume a subject-derived context plus ownership and purpose. Participation/lens alone never authorizes."},
+    {"id": "D-CI-01", "title": "Required-check enforcement for the private app repository", "owner": "Luke", "proposer": "Alan", "status": "Founder final; operationally pending", "affected": ["P01-01"], "latest": "Founder decision resolved 2026-07-13; control required before P01-01 merge or any later app implementation PR", "question": "Activate GitHub Team and enforce stable unittest/PostgreSQL checks with restricted routine bypass and independently verified negative-bypass evidence.", "recommendation": "Approved: GitHub Team for three billable users at approximately $12 USD/month before tax. Expenditure is authorized but not yet incurred. Alan owns activation-time ruleset design and evidence; Gate A0 and dependent implementation PRs remain blocked until Team is active, both checks are mandatory, routine bypass is restricted, and negative-bypass evidence is accepted.", "founder_decision": "Option A — GitHub Team approved as the private-repository enforcement control.", "constraints": ["Approximately $12 USD/month before tax for three billable users", "Commercial decision is final", "Expenditure is authorized but not yet incurred", "No claim of bypass-resistant enforcement before live configuration and readback"], "alan_remaining": ["Activate GitHub Team when enforcement is required", "Configure required unittest and PostgreSQL checks", "Restrict routine bypass", "Supply ruleset readback and negative-bypass evidence"], "gate_effect": "Gate A0 and dependent implementation PRs remain blocked until the operational control is active and verified."},
     {"id": "D-DATA-01", "title": "IP-GC field projection allowlist", "owner": "Luke", "proposer": "Alan", "affected": ["P04-02", "P06-02", "P06-03", "P07-03", "P07-04", "P09-05", "P10-01", "P10-02"], "latest": "Before P04-02", "question": "Which provisional IP assertions may the GC see, which GC answers may the IP see, and which fields survive promotion/provider projection?", "recommendation": "Default deny; expose only explicit purpose-limited projections. Class 1/2 and class 4 never automatically cross roles."},
     {"id": "D-DATA-02", "title": "Correction, supersession and unselected-candidate retention", "owner": "Luke", "proposer": "Alan", "affected": ["P04-02", "P04-03", "P06-02"], "latest": "Before P04-02", "question": "How long to retain unselected candidate assertions and how are GC corrections, conflicting relationship answers, and private IP notes represented?", "recommendation": "Append revisions with supersedes/derived-from; never silently erase source; shortest justified retention for unselected candidates."},
-    {"id": "D-DATA-03", "title": "Candidate scoring and sensitive preference policy", "owner": "Luke", "proposer": "Alan", "affected": ["P05-02", "P06-03"], "latest": "Before P05-02", "question": "Does any 0-100 candidate ranking or race-based preference survive, and what may provisional third-party answers gate?", "recommendation": "Remove candidate ranking and race preference; use source-labelled questions-to-clarify. Unverified IP answers cannot gate claim/onboarding/eligibility."},
+    {"id": "D-DATA-03", "title": "Candidate scoring and sensitive preference policy", "owner": "Luke", "proposer": "Alan", "status": "Resolved by reconciliation", "affected": ["P05-02", "P06-03"], "latest": "Resolved 2026-07-12", "question": "Does any 0-100 candidate ranking or race-based preference survive, and what may provisional third-party answers gate?", "recommendation": "No ranking, viability/eligibility flag or race preference survives. Pre-join IP input is limited to minimum-necessary relationship/outreach/logistics context and may produce neutral source-labelled questions only; it never gates claim, onboarding, provider use or critical decisions."},
     {"id": "D-COM-01", "title": "Node 0 Complete price", "owner": "Luke", "proposer": "Luke", "affected": ["P06-01", "P07-01", "P08-01"], "latest": "Before activation of a Complete configuration", "question": "Set the flat one-time price and tax treatment; it must remain fully creditable against the later JMF.", "recommendation": "Keep no active production value until explicitly approved; test with synthetic configuration."},
     {"id": "D-COM-02", "title": "Ratify JMF price book and effective date", "owner": "Luke", "proposer": "Luke", "affected": ["P07-01", "P08-01", "P08-03"], "latest": "Before P07-01 activation data", "question": "Ratify $8,900 JMF, $7,830 pay-in-full, $750 deposit and 20/30/20/20/10 post-deposit milestones as configuration v1 with effective date/currency.", "recommendation": "Use the document anchors but require explicit version activation rather than code literals."},
     {"id": "D-COM-03", "title": "Terms, privacy and refund language versions", "owner": "Luke", "proposer": "External/TBD", "affected": ["P07-01", "P07-02", "P08-03"], "latest": "Before P07-02 user acceptance", "question": "Approve the actual paid-service terms, privacy/consent disclosure and refundable-to-earned wording.", "recommendation": "External legal/privacy/finance review before any real acceptance."},
@@ -901,14 +930,339 @@ DECISIONS: list[dict[str, Any]] = [
     {"id": "D-COM-06", "title": "Pregnancy-loss credit or retained-revenue policy", "owner": "Luke", "proposer": "External/TBD", "affected": ["P08-03"], "latest": "Before automated pregnancy-stage refund logic", "question": "Decide retained revenue versus future-journey credit after heartbeat loss and contractual support window.", "recommendation": "Manual/counsel-reviewed hook until policy is approved; never hard-code."},
     {"id": "D-COM-07", "title": "Cancellation and non-clearance policy sign-off", "owner": "Luke", "proposer": "External/TBD", "affected": ["P08-03"], "latest": "Before real billing", "question": "Ratify earned/uncharged/refunded treatment, GC withdrawal/replacement and pay-in-full/financed reconciliation.", "recommendation": "Use document schedule as test anchor; require legal/finance approval for live policy."},
     {"id": "D-COM-08", "title": "Grace period and non-critical service pause", "owner": "Luke", "proposer": "Alan", "affected": ["P08-04"], "latest": "Before P08-04", "question": "Define reminder cadence, grace period, pauseable services and safety-critical/document access that can never be blocked.", "recommendation": "Default to continued safety and entitled-document access; pause only clearly non-critical future services."},
-    {"id": "D-DOC-01", "title": "Document retention, deletion, replacement and download mode", "owner": "Luke", "proposer": "Alan", "affected": ["P09-01", "P09-03"], "latest": "Before P09-03", "question": "Set retention/legal-hold/deletion and choose presigned versus app-proxied downloads by document class.", "recommendation": "Purpose/role authorization independent of key; short-lived downloads; deletion tombstone/audit; legal/privacy review."},
-    {"id": "D-DOC-02", "title": "Document limits and malware/quarantine provider", "owner": "Luke", "proposer": "Alan", "affected": ["P09-01", "P09-02", "P09-03"], "latest": "Before P09-02", "question": "Choose maximum size/types, scanner/quarantine mechanism, timeout/retry and fail-closed handling.", "recommendation": "Narrow allowlist, checksum and content sniffing; unavailable scanner remains quarantined."},
+    {"id": "D-DOC-01", "title": "Document retention, deletion, replacement and download mode", "owner": "Luke", "proposer": "Alan", "affected": ["P09-01", "P09-03", "P09-06"], "latest": "Before P09-03", "question": "Set retention/legal-hold/deletion and choose presigned versus app-proxied downloads by document class.", "recommendation": "Purpose/role authorization independent of key; short-lived downloads; deletion tombstone/audit; legal/privacy review."},
+    {"id": "D-DOC-02", "title": "Document limits and malware/quarantine provider", "owner": "Luke", "proposer": "Alan", "affected": ["P09-01", "P09-02", "P09-03", "P09-06"], "latest": "Before P09-02", "question": "Choose maximum size/types, scanner/quarantine mechanism, timeout/retry and fail-closed handling.", "recommendation": "Narrow allowlist, checksum and content sniffing; unavailable scanner remains quarantined."},
     {"id": "D-PROV-01", "title": "Provider handoff purposes and field allowlists", "owner": "Luke", "proposer": "Alan", "affected": ["P09-05"], "latest": "Before P09-05", "question": "Define permitted recipients/purposes, GC preview/consent, expiry, verification level and exact fact/document allowlists.", "recommendation": "Class 1/2 excluded; class 4 only if GC explicitly selects for recipient/purpose; class 5 evidence linked."},
     {"id": "D-AI-01", "title": "Intelligence context and approval authority matrix", "owner": "Luke", "proposer": "Alan", "affected": ["P10-01", "P10-02", "P10-03", "P12-01"], "latest": "Before P10-01", "question": "Approve scopes, allowed sources, model policy, proposal reviewers, class-5 evidence rail and degraded-mode copy.", "recommendation": "Generic case members cannot create reviewed/provider truth; intelligence remains advisory and scope explicit."},
     {"id": "D-OPS-01", "title": "Known-good recovery revision and rollback sequence", "owner": "Luke", "proposer": "Alan", "affected": ["P13-02"], "latest": "Before Gate A0 recovery action", "question": "Select the revision/schema pair to recover dev, rollback/forward-repair criteria and evidence owner.", "recommendation": "Use a tested immutable image and compatible schema; do not deploy from dirty or draft branches."},
-    {"id": "D-PHI-01", "title": "PII/PHI boundary, vendors and control set", "owner": "Luke", "proposer": "External/TBD", "affected": ["P09-01", "P09-02", "P09-05", "P13-05", "P13-06", "P13-07"], "latest": "Before B1 for PII scope; before B2 for PHI", "question": "Approve data classification, vendors/BAAs, encryption/logging/access/incident/backup controls and prohibited data at each gate.", "recommendation": "B1 remains PII-only; B2 requires formal external security/privacy/compliance evidence."},
+    {"id": "D-PHI-01", "title": "PII/PHI boundary, vendors and control set", "owner": "Luke", "proposer": "External/TBD", "affected": ["P09-01", "P09-02", "P09-05", "P09-06", "P13-05", "P13-06", "P13-07"], "latest": "Before B1 for PII scope; before B2 for PHI", "question": "Approve data classification, vendors/BAAs, encryption/logging/access/incident/backup controls and prohibited data at each gate.", "recommendation": "B1 remains PII-only and content controls stay synthetic; B2 requires formal external security/privacy/compliance evidence before any PHI content path is enabled."},
     {"id": "D-PHI-02", "title": "B1/B2 approvers and evidence expiry", "owner": "Luke", "proposer": "External/TBD", "affected": ["P13-06", "P13-07"], "latest": "Before B1", "question": "Name security/privacy/compliance approvers, evidence recency, exception authority and revalidation cadence.", "recommendation": "Luke is product go/no-go; independent qualified reviewers own their control attestations."},
 ]
+
+
+# Founder interview resolution, recorded 2026-07-13.  A final founder outcome is
+# intentionally separate from whether Alan's technical control is implemented or
+# whether an external reviewer has supplied the evidence needed to activate it.
+DECISION_RESOLUTION: dict[str, dict[str, Any]] = {
+    "D-MIG-01": {
+        "status": "Founder constraints final; Alan immediate; operationally pending",
+        "classification": "Luke sets constraints; Alan decides immediately",
+        "decision_state": "Final founder constraints",
+        "founder_decision": "Reliability-first migrations with zero intended data loss; PostgreSQL is authoritative for production and SQLite may remain a convenient synthetic local-development projection without full production parity.",
+        "constraints": ["Stage consequential changes and keep them backward-compatible wherever reasonably possible", "Test recovery or rollback evidence before every consequential migration is used", "Prefer a well-supported low-maintenance approach over a clever or bespoke runner", "Planned beta downtime may be up to 30 minutes when scheduled, communicated and backed by a tested recovery plan", "Destructive or irreversible real-user-data changes require explicit evidence and Luke approval"],
+        "remaining_owner": "Alan - immediate",
+        "alan_remaining": ["Choose the migration framework", "Choose sequencing/locking and expand-contract mechanics", "Choose the detailed rollback, restore or forward-repair mechanism"],
+        "evidence_required": ["Migration ADR", "Fresh/current/upgrade compatibility matrix", "Tested recovery or rollback evidence", "Destructive-change approval path"],
+        "approval_required": "Luke approves only destructive or irreversible actions that could affect real-user data; ordinary technical choices stay with Alan.",
+        "external_dependencies": [],
+        "programme_effect": "P02-01 decision work may proceed; P02-02, P02-03 and Gate A0 remain blocked until Alan's mechanism and evidence are accepted.",
+    },
+    "D-AUTH-01": {
+        "status": "Resolved by reconciliation",
+        "classification": "Reconciliation settled",
+        "decision_state": "Final",
+        "founder_decision": "A bearer link creates only a pending low-risk workspace claim; paid-case access requires authenticated binding, explicit consent and recipient/issuer confirmation.",
+        "constraints": ["Minimum-necessary relationship, outreach and logistics context only", "No bearer-link case membership"],
+        "remaining_owner": "Alan - implementation",
+        "alan_remaining": ["Implement the settled claim and paid-case invitation contracts"],
+        "evidence_required": ["Forwarded-link, expiry, mismatch, consent and membership negative tests"],
+        "approval_required": "No further founder decision unless access is broadened.",
+        "external_dependencies": [],
+        "programme_effect": "No longer blocks P03-02 or P03-03.",
+    },
+    "D-AUTH-02": {
+        "status": "Founder constraints final; Alan later",
+        "classification": "Alan decides later within founder constraints",
+        "decision_state": "Final founder constraints",
+        "founder_decision": "Participant admission uses short-lived signed or server-verified proof bound to email, purpose, claim and expiry; it admits account creation only and never grants workspace or case membership. Internal admission remains a separate allowlist path.",
+        "constraints": ["Short lived", "Replay, mismatch, expiry and revocation fail closed", "No membership or resource authorization from admission alone"],
+        "remaining_owner": "Alan - later at P03-04",
+        "alan_remaining": ["Choose the proof format, signer/verifier, key lifecycle and claim lifecycle"],
+        "evidence_required": ["Expiry, replay, wrong-email, wrong-purpose, mismatch and revocation tests", "Separate internal allowlist evidence"],
+        "approval_required": "Luke approval is not required unless Alan proposes broader access or materially weaker identity assurance.",
+        "external_dependencies": [],
+        "programme_effect": "P03-04 and Gate A1 remain blocked until the technical mechanism and evidence exist.",
+    },
+    "D-AUTH-03": {
+        "status": "Resolved by reconciliation",
+        "classification": "Reconciliation settled",
+        "decision_state": "Final",
+        "founder_decision": "Identity, participation, access grants, ownership and operation authorization remain separate; participation or lens alone never authorizes.",
+        "constraints": ["Subject-derived authorization context", "Application and RLS policy parity", "Default-deny cross-resource access"],
+        "remaining_owner": "Alan - implementation",
+        "alan_remaining": ["Encode the settled contract in application services and RLS"],
+        "evidence_required": ["Participation-without-grant and grant-without-capability denials", "Application/RLS parity tests"],
+        "approval_required": "No further founder decision unless the boundary changes.",
+        "external_dependencies": [],
+        "programme_effect": "No longer blocks the reconciled access/workspace PR sequence.",
+    },
+    "D-CI-01": {
+        "classification": "Luke decides commercial outcome; Alan configures immediately",
+        "decision_state": "Final founder decision; control pending",
+        "remaining_owner": "Alan - immediate",
+        "evidence_required": ["GitHub Team activation/readback", "Mandatory unittest and PostgreSQL checks", "Restricted routine bypass", "Negative-bypass evidence"],
+        "approval_required": "Luke accepts the enforcement evidence; the approved purchase itself needs no further founder decision.",
+        "external_dependencies": ["GitHub Team activation; expenditure authorized but not yet incurred"],
+        "programme_effect": "P01-01 merge, Gate A0 and dependent implementation PRs remain blocked until the live control is active and verified.",
+    },
+    "D-DATA-01": {
+        "status": "Founder decision final; implementation evidence pending",
+        "classification": "Luke decides product/privacy outcome",
+        "decision_state": "Final",
+        "founder_decision": "Use need-to-know sharing. Shared journey status and agreed relationship/outreach/logistics may cross roles; private IP notes, unconfirmed assertions and GC medical, reproductive, insurance, identity or wellbeing answers do not cross automatically. Provider packets require preview, consent and appropriate verification.",
+        "constraints": ["Default-deny field-and-purpose allowlists", "Source-labelled corrections", "Named-purpose provider projection only"],
+        "remaining_owner": "Alan - implementation",
+        "alan_remaining": ["Define explicit field/purpose allowlists in code and projection contracts", "Implement cross-role and provider negative tests"],
+        "evidence_required": ["Cross-role denial matrix", "Provider projection allowlist tests", "Correction/source-label evidence"],
+        "approval_required": "Luke approval is required for a broader sharing policy, not for compliant implementation detail.",
+        "external_dependencies": [],
+        "programme_effect": "Founder ambiguity is removed across WP04, WP06, WP07, WP09 and WP10; A1 still requires the technical denial evidence.",
+    },
+    "D-DATA-02": {
+        "status": "Founder default final; external validation before B1",
+        "classification": "Luke decides default; external specialist validates",
+        "decision_state": "Final founder default; externally dependent activation",
+        "founder_decision": "Retain candidate/workspace material for a 90-day minimum after explicit rejection, withdrawal or last legitimate outreach, honor earlier valid deletion, retain only non-identifying funnel metrics and a minimal audit tombstone, and preserve legal holds. Corrections append source-labelled revisions and private IP notes remain author-only.",
+        "constraints": ["No silent overwrite", "Deletion and anonymization are auditable", "Legal holds override ordinary deletion"],
+        "remaining_owner": "Alan - implementation; privacy/legal - validation",
+        "alan_remaining": ["Implement lifecycle, deletion, anonymization, correction and legal-hold behavior"],
+        "evidence_required": ["Retention/deletion tests", "Anonymization and tombstone evidence", "Privacy/legal approval before B1"],
+        "approval_required": "Luke accepts the live policy after privacy/legal review.",
+        "external_dependencies": ["Privacy/legal validation before B1"],
+        "programme_effect": "Synthetic implementation may proceed; real-user B1 activation remains externally dependent.",
+    },
+    "D-DATA-03": {
+        "status": "Resolved by reconciliation",
+        "classification": "Reconciliation settled",
+        "decision_state": "Final",
+        "founder_decision": "No candidate ranking, viability/eligibility flag or race preference survives; provisional pre-join input can generate neutral source-labelled questions only.",
+        "constraints": ["No sensitive third-party scoring or gating", "No provisional assertion becomes GC/provider truth"],
+        "remaining_owner": "Alan - implementation",
+        "alan_remaining": ["Remove legacy ranking/gating and preserve neutral-question behavior"],
+        "evidence_required": ["Prohibited-field and no-ranking tests"],
+        "approval_required": "No further founder decision unless ranking or eligibility behavior is proposed.",
+        "external_dependencies": [],
+        "programme_effect": "No longer blocks Node 0 implementation planning.",
+    },
+    "D-COM-01": {
+        "status": "Founder decision final for beta; tax externally dependent",
+        "classification": "Luke decides commercial outcome",
+        "decision_state": "Final beta policy; external tax wording pending",
+        "founder_decision": "Node 0 Complete is a voluntary $495 USD one-time upgrade paid by the IP or authorized IP account holder, never the GC, collected before Complete features and fully credited against the later Phase 1/JMF without gating matching or safety support.",
+        "constraints": ["Transparent one-time feature/credit wording", "Versioned prospective changes only", "No forced payment to identify, approach or reach agreement with a GC"],
+        "remaining_owner": "Alan - implementation",
+        "alan_remaining": ["Implement configurable price, payer ownership, durable payment/credit ledger and idempotent flows"],
+        "evidence_required": ["Synthetic success, failure, retry, duplicate and credit tests", "Tax wording before live activation"],
+        "approval_required": "Luke approves future commercial-policy changes; tax treatment requires specialist review.",
+        "external_dependencies": ["Tax treatment and customer-facing wording before live activation"],
+        "programme_effect": "P06-01, P07-01 and P08-01 may proceed synthetically; live activation remains gated.",
+    },
+    "D-COM-02": {
+        "status": "Founder decision final for v1; live activation gated",
+        "classification": "Luke decides commercial outcome",
+        "decision_state": "Final v1 policy; external activation dependencies",
+        "founder_decision": "Configuration v1 is $8,900 USD: a $750 deposit followed by $1,630, $2,445, $1,630, $1,630 and $815 milestones. Pay-in-full is $7,830 total, leaving $7,080 after the deposit; the separate $495 Complete credit must not be double-counted.",
+        "constraints": ["Versioned configuration", "Prospective changes only", "First live beta requires A2 plus approved terms and tax treatment"],
+        "remaining_owner": "Alan - implementation",
+        "alan_remaining": ["Implement versioned configuration, milestone and reconciliation behavior"],
+        "evidence_required": ["Synthetic schedule, pay-in-full and no-double-credit reconciliation tests"],
+        "approval_required": "Luke approves future price-book versions and first live activation.",
+        "external_dependencies": ["Approved terms and tax treatment before live activation"],
+        "programme_effect": "Synthetic commercial configuration and ledgers may proceed; real charging remains gated.",
+    },
+    "D-COM-03": {
+        "status": "Externally dependent; founder policy inputs settled",
+        "classification": "External specialist / later evidence required",
+        "decision_state": "Externally dependent",
+        "founder_decision": "No live acceptance or charge may rely on the contradictory current terms draft. D-COM-06 and D-COM-07 supply the approved business policy for a new versioned terms package.",
+        "constraints": ["Resolve refundable-until-onboarding versus non-refundable contradiction", "No retrospective policy changes", "Versioned terms/privacy/refund acceptance"],
+        "remaining_owner": "External legal/privacy/finance; Luke final business approval",
+        "alan_remaining": ["Implement versioned acceptance and keep real charging disabled until an approved version is active"],
+        "evidence_required": ["Approved paid-service terms", "Approved privacy/consent disclosure", "Approved tax/refund/accounting wording"],
+        "approval_required": "Luke approves the final business policy and customer-facing version after specialist review.",
+        "external_dependencies": ["Legal, privacy, tax and finance review before real-user acceptance or charging"],
+        "programme_effect": "Synthetic A2 preparation may proceed; live P07-02/P08 charging and B1 customer acceptance remain blocked.",
+    },
+    "D-COM-04": {
+        "status": "Founder decision final; implementation evidence pending",
+        "classification": "Luke decides commercial/product outcome",
+        "decision_state": "Final",
+        "founder_decision": "Use two-step commitment: settled $750 plus current accepted terms proves commercial enrollment, but payment alone never promotes. Exactly one enrollment-pending case follows explicit IP promotion and authenticated GC consent. The $1,630 activation tranche is earned only after defined IP/GC onboarding and screening coordination has begun; it never implies medical clearance.",
+        "constraints": ["Redirects/webhooks never promote", "Typed promotion event only", "Source-labelled facts and explicit evidence checklist"],
+        "remaining_owner": "Alan - implementation",
+        "alan_remaining": ["Define typed events, activation checklist, idempotency and audit mechanics"],
+        "evidence_required": ["Duplicate, replay, partial-failure, promotion and activation evidence tests"],
+        "approval_required": "Luke approves any change to commercial enrollment or activation semantics.",
+        "external_dependencies": [],
+        "programme_effect": "P07-02 through P09-04 may proceed under the settled semantics.",
+    },
+    "D-PAY-01": {
+        "status": "Founder constraints final; Alan later",
+        "classification": "Luke sets constraints; Alan decides later",
+        "decision_state": "Final founder constraints",
+        "founder_decision": "Offer card and US ACH, encourage but do not require ACH above $1,000, absorb ordinary beta fees without surcharging, and keep processor metadata free of GC, journey, clinical or document detail.",
+        "constraints": ["Card cost ceiling near 3% plus $0.30", "ACH cost ceiling near 1% capped at $10", "Processor-neutral domain and ledger contract"],
+        "remaining_owner": "Alan - later before P08-02",
+        "alan_remaining": ["Choose the processor/vendor, tokenization, webhook, settlement, return/refund and reconciliation mechanisms"],
+        "evidence_required": ["Provider security and cost comparison", "Synthetic settlement, return, refund, duplicate and reconciliation tests"],
+        "approval_required": "Luke approval is required only if the proposed processor exceeds the cost/privacy constraints or changes the payment experience.",
+        "external_dependencies": ["Payment/security/finance review before real money"],
+        "programme_effect": "P08-01 ledger work may proceed; P08-02 and A2 payment completion wait for Alan's processor decision and evidence.",
+    },
+    "D-COM-05": {
+        "status": "Founder decision final for beta",
+        "classification": "Luke decides beta scope",
+        "decision_state": "Final beta scope",
+        "founder_decision": "Financing is excluded and hidden from beta; Natalyx does not advertise, recommend or integrate a lender or treat lender status as funding evidence.",
+        "constraints": ["Card and ACH remain unaffected", "Reconsider only after demand evidence plus legal/privacy review"],
+        "remaining_owner": "None during beta",
+        "alan_remaining": ["Keep financing paths disabled and absent from beta UI/configuration"],
+        "evidence_required": ["Negative configuration/UI tests proving financing is unavailable"],
+        "approval_required": "A future financing proposal requires a new founder decision.",
+        "external_dependencies": [],
+        "programme_effect": "Financing no longer blocks P08-02; the feature is deliberately out of scope.",
+    },
+    "D-COM-06": {
+        "status": "Founder policy final; legal/accounting externally dependent",
+        "classification": "Luke decides policy; specialists translate",
+        "decision_state": "Final founder policy; external wording pending",
+        "founder_decision": "After post-heartbeat loss, never charge the $815 birth tranche; retain the delivered $1,630 pregnancy-support tranche and grant an equal $1,630 future credit to the same IP household for 36 months, with compassionate manual extension and defined offboarding support.",
+        "constraints": ["No automatic birth charge", "Auditable credit expiry/extension", "Compassionate support workflow"],
+        "remaining_owner": "Alan - implementation; legal/accounting - wording",
+        "alan_remaining": ["Implement credit ledger, expiry, extension and support workflow"],
+        "evidence_required": ["Loss, credit, expiry, extension and duplicate tests", "Approved legal/accounting treatment before live use"],
+        "approval_required": "Luke approves final customer-facing policy after specialist review.",
+        "external_dependencies": ["Legal and accounting review before live use"],
+        "programme_effect": "Synthetic P08-03 implementation may proceed; live policy activation remains gated.",
+    },
+    "D-COM-07": {
+        "status": "Founder policy final; legal/accounting externally dependent",
+        "classification": "Luke decides policy; specialists translate",
+        "decision_state": "Final founder policy; external wording pending",
+        "founder_decision": "Protect delivered work: the $750 is refundable until onboarding is delivered and then earned; activation follows D-COM-04. Non-clearance or pre-clearance GC withdrawal stops later charges. Unearned prepayment is refunded within ten business days, with refund or rollover choice and one replacement within 12 months without a second $750 deposit.",
+        "constraints": ["A new activation charge may apply for genuinely new onboarding", "No double charge or silent retained unearned value", "Refund and rollover are auditable"],
+        "remaining_owner": "Alan - implementation; legal/accounting - wording",
+        "alan_remaining": ["Implement reconciliation, refund, rollover and replacement behavior"],
+        "evidence_required": ["Withdrawal, non-clearance, refund, rollover, replacement and duplicate tests", "Approved legal/accounting treatment before live use"],
+        "approval_required": "Luke approves final customer-facing policy after specialist review.",
+        "external_dependencies": ["Legal and accounting review before live use"],
+        "programme_effect": "Synthetic P08-03 implementation may proceed; live refund/cancellation terms remain gated.",
+    },
+    "D-COM-08": {
+        "status": "Founder decision final; implementation evidence pending",
+        "classification": "Luke decides customer treatment",
+        "decision_state": "Final",
+        "founder_decision": "Use a humane 30-day grace period with reminders seven days before due, on the due date, and at 7, 14 and 30 days overdue; no beta late fee and human outreach before pause. Only future non-critical paid work may pause after 30 days.",
+        "constraints": ["Never block safety content, existing documents/data, correction/export/deletion, consent/revocation, urgent support or already-required provider coordination"],
+        "remaining_owner": "Alan - implementation",
+        "alan_remaining": ["Implement reminder, escalation, grace and capability-specific pause states"],
+        "evidence_required": ["Reminder cadence and protected-access tests"],
+        "approval_required": "Luke approves changes to grace or protected access.",
+        "external_dependencies": [],
+        "programme_effect": "P08-04 may proceed under the settled policy.",
+    },
+    "D-DOC-01": {
+        "status": "Founder default final; Alan later; external validation before B1/B2",
+        "classification": "Luke sets policy; Alan decides implementation later",
+        "decision_state": "Final founder default; externally dependent activation",
+        "founder_decision": "Retain clean active-case documents while active plus two years after close; signed consents, payment/access audits and deletion tombstones for seven years; failed/quarantine orphans seven days; superseded content 90 days unless required; honor valid deletion within 30 days subject to legal hold. Downloads require fresh authorization and links expire within five minutes.",
+        "constraints": ["Never public", "Never withheld for non-payment", "Legal hold and deletion remain auditable"],
+        "remaining_owner": "Alan - later before P09-03; privacy/legal - validation",
+        "alan_remaining": ["Choose proxy versus presigned delivery by class", "Implement hold, deletion, tombstone, retry and authorization behavior"],
+        "evidence_required": ["Fresh-authorization and five-minute-link tests", "Retention/hold/deletion exercise", "Privacy/legal approval before real content"],
+        "approval_required": "Luke accepts live policy after privacy/legal review.",
+        "external_dependencies": ["Privacy/legal validation before B1/B2 real-content use"],
+        "programme_effect": "P09-01 ADR work may proceed; P09-03/P09-06 and real-content activation wait for Alan's delivery choice and evidence.",
+    },
+    "D-DOC-02": {
+        "status": "Founder constraints final; Alan later",
+        "classification": "Luke sets constraints; Alan decides later",
+        "decision_state": "Final founder constraints",
+        "founder_decision": "Allow PDF, JPEG, PNG and non-macro DOCX up to 50 MiB. Reject spoofed, macro-enabled and archive-like input; quarantine until clean; treat password-protected, skipped, error and timeout results as unavailable.",
+        "constraints": ["Normal scan target no more than two minutes", "Transient retries no more than 15 minutes", "$50/month beta scanning ceiling with alerts", "Synthetic only at A2 and no PHI before B2"],
+        "remaining_owner": "Alan - later before P09-02",
+        "alan_remaining": ["Choose the AWS-native scanner, queue, retry, timeout, recovery and cost-control mechanisms"],
+        "evidence_required": ["Type/sniffing/spoof tests", "Quarantine, error, timeout and retry tests", "Cost estimate and alerts"],
+        "approval_required": "Luke approval is required if the solution exceeds the cost or safety constraints.",
+        "external_dependencies": [],
+        "programme_effect": "P09-01 contract work may proceed; P09-02/P09-03/P09-06 wait for Alan's technical selection and evidence.",
+    },
+    "D-PROV-01": {
+        "status": "Founder decision final; Alan later",
+        "classification": "Luke decides product/privacy outcome; Alan implements later",
+        "decision_state": "Final founder policy",
+        "founder_decision": "Provider handoff is a purpose-bound immutable snapshot for one verified recipient and named purpose, with participant preview/consent, clean documents and appropriately verified source-labelled facts. Unopened access expires after 14 days and can be revoked before access; downloaded copies cannot be recalled.",
+        "constraints": ["No ambient provider case access in MVP", "Audit every issue/open/download/revoke/expire event", "Reissue after expiry"],
+        "remaining_owner": "Alan - later before P09-05",
+        "alan_remaining": ["Choose recipient verification, snapshot checksum, expiry, revocation and audit mechanisms"],
+        "evidence_required": ["Wrong-recipient, expiry, revoke-before-access, reissue and checksum tests"],
+        "approval_required": "Luke approves broader recipient or ambient-access scope.",
+        "external_dependencies": ["Privacy/provider review before real handoff"],
+        "programme_effect": "Synthetic provider-snapshot design may proceed; P09-05 completion and real handoff require Alan's evidence and later external review.",
+    },
+    "D-AI-01": {
+        "status": "Founder scope/cost final; Alan later; PHI externally gated",
+        "classification": "Luke sets scope and cost; Alan decides implementation later",
+        "decision_state": "Final founder policy; PHI externally dependent",
+        "founder_decision": "AI is bounded and advisory: role-scoped education, retrieval, summaries, question drafts, next steps and provider preparation using approved Learn and authorized source-labelled context. It never diagnoses, ranks, approves, clears or writes durable truth; authorized human approval precedes memory, case or provider material.",
+        "constraints": ["Deterministic or curated fallback", "$10 per active case/month and $100 total beta/month ceilings with alerts and graceful fallback", "No PHI before B2"],
+        "remaining_owner": "Alan - later before P10-01",
+        "alan_remaining": ["Choose Bedrock model, prompts, retrieval, schemas, fallback, human-review rails and cost controls"],
+        "evidence_required": ["Scope/authority negative tests", "Fallback and malformed-response tests", "Safety and cost evidence"],
+        "approval_required": "Luke approves broader AI authority, higher cost or any PHI use; B2 external approval is mandatory for PHI.",
+        "external_dependencies": ["B2 external security/privacy/compliance approval before PHI"],
+        "programme_effect": "P10/P12 synthetic planning may proceed; implementation completion waits for Alan's technical decision and PHI remains blocked through B2.",
+    },
+    "D-OPS-01": {
+        "status": "Founder constraints final; Alan immediate; operationally pending",
+        "classification": "Luke sets constraints; Alan decides immediately",
+        "decision_state": "Final founder constraints",
+        "founder_decision": "Use fail-closed recovery: protect data integrity over uptime, restore only a reviewed proven-compatible application-image/schema pair, use safe read-only or unavailability when uncertain, and forward-repair when rollback is unsafe. Target 30-minute beta recovery; allow up to two hours emergency downtime and notify Luke when more than one hour is expected.",
+        "constraints": ["Zero intended loss or corruption", "No expensive 24/7 coverage for synthetic/early controlled beta without evidence", "Real-user, destructive or uncertain-loss recovery requires explicit human approval"],
+        "remaining_owner": "Alan - immediate",
+        "alan_remaining": ["Choose exact compatibility, rollback/forward-repair and automation mechanisms", "Name the evidence owner and write the runbook"],
+        "evidence_required": ["Documented recovery procedure", "Successful synthetic recovery exercise", "Known-compatible image/schema evidence"],
+        "approval_required": "Luke accepts A0 evidence and explicitly approves risky real-user/destructive recovery.",
+        "external_dependencies": [],
+        "programme_effect": "P13-02 and Gate A0 remain blocked until the runbook and synthetic exercise pass; A1 must exercise the control.",
+    },
+    "D-PHI-01": {
+        "status": "Founder beta scope final; externally gated",
+        "classification": "Luke decides beta scope; external evidence required",
+        "decision_state": "Final founder scope; externally dependent activation",
+        "founder_decision": "B1 is an invitation-only US beta of at most five IP/GC pairs using names, verified account/contact data, relationship/outreach/logistics, consent versions, nonclinical progress, feedback and processor references only. Medical, reproductive-health, psychological, insurance-health and clinical-clearance data are prohibited; no real document bytes or provider packets; AI receives de-identified nonclinical context only.",
+        "constraints": ["RLS/non-owner runtime and cross-tenant negative evidence", "Access review plus incident and restore exercises", "No PHI before B2"],
+        "remaining_owner": "Alan - B1/B2 evidence; external reviewers - approval",
+        "alan_remaining": ["Implement inventory, cohort controls, RLS, cross-tenant denials, de-identification and prohibited-data tests"],
+        "evidence_required": ["Five-pair cohort configuration", "RLS/cross-tenant/de-identification/prohibited-data tests", "External privacy/legal approval"],
+        "approval_required": "Luke accepts B1 only after required evidence and external privacy/legal advice; B2 requires qualified external approval.",
+        "external_dependencies": ["External privacy/legal approval before B1", "Qualified external security/privacy/compliance/legal approval before B2"],
+        "programme_effect": "B1 remains blocked until the limited PII control bundle is accepted; real documents/provider packets and all PHI remain blocked until B2.",
+    },
+    "D-PHI-02": {
+        "status": "Founder governance final; external reviewers pending",
+        "classification": "Luke decides governance; external evidence required",
+        "decision_state": "Final founder governance; externally dependent activation",
+        "founder_decision": "Luke accepts B1 from Alan's technical evidence plus external privacy/legal advice, without separate independent technical sign-off. B1 evidence is at most 60 days old and reruns after material change or 180 days. B2 requires qualified external security, privacy/compliance and legal/vendor review with release evidence at most 30 days old and assessments at most 12 months old.",
+        "constraints": ["No critical exceptions", "High B1 exceptions are written, time-limited and externally reviewed", "High B2 exceptions require joint Luke and relevant external approval"],
+        "remaining_owner": "Alan - evidence; external reviewers - attestations; Luke - go/no-go",
+        "alan_remaining": ["Maintain evidence recency, change-triggered reruns and exception records"],
+        "evidence_required": ["B1/B2 evidence index with dates", "Named reviewers", "Exception register", "Signed go/no-go"],
+        "approval_required": "Luke is final product go/no-go within the specified external-review model.",
+        "external_dependencies": ["Named privacy/legal advisers for B1", "Named qualified security/privacy/compliance/legal reviewers for B2"],
+        "programme_effect": "B1 and B2 remain blocked until the corresponding evidence is current and the required humans sign off.",
+    },
+}
+
+for _decision in DECISIONS:
+    _decision.update(DECISION_RESOLUTION[_decision["id"]])
+
+assert set(DECISION_RESOLUTION) == {decision["id"] for decision in DECISIONS}
+
+IMMEDIATE_ALAN_DECISIONS = ["D-CI-01", "D-MIG-01", "D-OPS-01"]
+LATER_ALAN_DECISIONS = ["D-AUTH-02", "D-PAY-01", "D-DOC-01", "D-DOC-02", "D-PROV-01", "D-AI-01", "D-PHI-01", "D-PHI-02"]
+EXTERNAL_DEPENDENT_DECISIONS = ["D-DATA-02", "D-COM-01", "D-COM-02", "D-COM-03", "D-PAY-01", "D-COM-06", "D-COM-07", "D-DOC-01", "D-PROV-01", "D-AI-01", "D-PHI-01", "D-PHI-02"]
+ACTIVE_DECISION_BLOCKERS = {"D-CI-01", "D-MIG-01", "D-AUTH-02", "D-PAY-01", "D-DOC-01", "D-DOC-02", "D-PROV-01", "D-AI-01", "D-OPS-01"}
 
 
 GATES: list[dict[str, Any]] = [
@@ -916,24 +1270,26 @@ GATES: list[dict[str, Any]] = [
         "id": "A0",
         "title": "Infrastructure recovery and known-revision health",
         "prerequisites": ["P01-01", "P02-02", "P13-01", "P13-02"],
-        "decisions": ["D-MIG-01", "D-OPS-01"],
+        "decisions": ["D-MIG-01", "D-CI-01", "D-OPS-01"],
         "owner": "Alan",
         "verifier": "Luke",
         "acceptance": [
+            "GitHub Team is active for NatalyxPlatform; unittest and PostgreSQL checks are mandatory, routine bypass is restricted, and negative-bypass evidence is accepted.",
+            "Alan's migration ADR records the supported low-maintenance framework, PostgreSQL authority, staged compatibility and the tested recovery path; P02-02/P02-03 evidence passes.",
             "CloudFormation/ECS/ALB state is captured from refreshed dev credentials and is stable.",
             "The running app and intelligence image SHAs/task definitions are known and map to reviewed commits.",
             "Liveness and readiness are both healthy; PostgreSQL, migrations and required private intelligence dependencies pass their bounded checks.",
             "A synthetic unauthenticated health request and authenticated minimal route succeed without PII/PHI.",
-            "Rollback or forward-repair path is rehearsed and the prior compatible revision is identified.",
+            "The fail-closed recovery runbook is exercised synthetically; the prior compatible image/schema pair is identified and the 30-minute planned-beta recovery target is evidenced.",
         ],
-        "evidence": ["AWS account/region and stack/service snapshots", "ALB status and target health", "image SHA/task definition", "readiness JSON/log correlation", "CI/PostgreSQL artifacts", "rollback rehearsal"],
+        "evidence": ["GitHub Team/ruleset readback and negative-bypass result", "Migration ADR and consequential-migration recovery evidence", "AWS account/region and stack/service snapshots", "ALB status and target health", "image SHA/task definition", "readiness JSON/log correlation", "CI/PostgreSQL artifacts", "fail-closed synthetic recovery exercise"],
         "failure": "Do not proceed to participant validation. Freeze live updates, retain evidence, restore the known compatible image/schema or forward-repair under the approved runbook, and keep the Project gate blocked.",
     },
     {
         "id": "A1",
         "title": "Synthetic core participant journey",
-        "prerequisites": ["P02-04", "P03-01", "P03-02", "P03-04", "P04-01", "P04-02", "P04-03", "P05-01", "P05-02", "P05-03", "P11-03", "P13-03"],
-        "decisions": ["D-AUTH-01", "D-AUTH-02", "D-DATA-01", "D-DATA-02", "D-DATA-03"],
+        "prerequisites": ["P02-04", "P03-01", "P03-02", "P03-04", "P03-05", "P04-01", "P04-02", "P04-03", "P05-01", "P05-02", "P05-03", "P11-03", "P13-03"],
+        "decisions": ["D-AUTH-02", "D-DATA-01", "D-DATA-02"],
         "owner": "Alan",
         "verifier": "Luke",
         "acceptance": [
@@ -941,6 +1297,7 @@ GATES: list[dict[str, Any]] = [
             "Candidate/outreach data remains IP-attributed and provisional; no score or answer becomes GC/provider truth.",
             "A synthetic GC begins a low-risk claim, binds identity/consent and sees only the allowed workspace projection.",
             "Cross-role negative tests prove class-2 IP assertions and class-4 GC-private answers do not leak.",
+            "The admission proof is short-lived, claim/purpose/email-bound and cannot grant workspace or case membership; replay, mismatch, expiry and revocation fail closed.",
             "Both roles log out/in/resume and complete the mobile journey at tested widths.",
             "Known revision, audit events, correlation IDs and sanitized evidence are attached to the gate item.",
         ],
@@ -950,17 +1307,19 @@ GATES: list[dict[str, Any]] = [
     {
         "id": "A2",
         "title": "Synthetic commercial, promotion, billing and document journey",
-        "prerequisites": ["P03-03", "P06-01", "P06-02", "P06-03", "P07-01", "P07-02", "P07-03", "P07-04", "P08-01", "P08-02", "P08-03", "P08-04", "P09-01", "P09-02", "P09-03", "P09-04", "P09-05", "P10-01", "P10-02", "P10-03", "P10-04", "P11-01", "P11-02", "P11-04", "P12-01", "P12-02", "P13-04"],
+        "prerequisites": ["P03-03", "P06-01", "P06-02", "P06-03", "P07-01", "P07-02", "P07-03", "P07-04", "P08-01", "P08-02", "P08-03", "P08-04", "P09-01", "P09-02", "P09-03", "P09-04", "P09-05", "P09-06", "P10-01", "P10-02", "P10-03", "P10-04", "P11-01", "P11-02", "P11-04", "P12-01", "P12-02", "P13-04"],
         "decisions": ["D-COM-01", "D-COM-02", "D-COM-03", "D-COM-04", "D-PAY-01", "D-COM-05", "D-COM-06", "D-COM-07", "D-COM-08", "D-DOC-01", "D-DOC-02", "D-PROV-01", "D-AI-01"],
         "owner": "Alan",
         "verifier": "Luke",
         "acceptance": [
             "Synthetic Complete entitlement does not itself create a case and records its commercial configuration version/credit.",
+            "Synthetic configuration uses the founder-approved $495 Complete and $8,900 v1 journey schedules, including credits, refunds, loss policy and humane grace behavior; no real charge or live terms acceptance occurs.",
             "Only byos.workspace_promotion_authorized.v1 authorizes exactly one enrollment_pending case; callbacks/redirects/replays create none/duplicates.",
             "Recipient-bound paid-case invitation and consent grant correct membership; activation waits for approved evidence.",
             "Enrollment/activation/milestone/credit/refund ledgers reconcile, including duplicate and out-of-order provider events.",
             "Synthetic files follow upload/quarantine/scan/available/download/replacement/revocation/recovery and never become public.",
             "Provider packet contains only purpose-allowed consented sources; intelligence scopes and proposals do not upgrade truth.",
+            "Financing is absent; scanning and AI stay within their $50/month and $100/month beta ceilings with alerts and fail-safe fallback.",
         ],
         "evidence": ["A2 synthetic run artifact", "processor simulator event ledger", "promotion idempotency query", "invoice/refund explanations", "S3/KMS/IAM/quarantine assertions", "provider snapshot checksum", "Ask/proposal safety evals"],
         "failure": "Disable commercial/document/provider features, retain free/safety content, prevent live money or real documents, reconcile synthetic ledger inconsistencies, and restore the A1-known revision or forward-repair as approved.",
@@ -968,24 +1327,26 @@ GATES: list[dict[str, Any]] = [
     {
         "id": "B1",
         "title": "Real-user and PII beta readiness",
-        "prerequisites": ["A2", "P12-03", "P13-07"],
+        "prerequisites": ["A2", "P12-03", "P13-05", "P13-06", "P13-07"],
         "decisions": ["D-PHI-01", "D-PHI-02"],
         "owner": "Luke",
         "verifier": "External/TBD",
         "acceptance": [
-            "A written B1 data-classification boundary permits named PII and expressly prohibits PHI/clinical documents.",
+            "A written B1 data-classification boundary limits the invitation-only US cohort to at most five IP/GC pairs and permits only the approved nonclinical PII fields.",
+            "Medical, reproductive-health, psychological, insurance-health and clinical-clearance data, real document bytes and real provider packets are expressly prohibited; AI receives only de-identified nonclinical context.",
+            "The exact release uses a NOBYPASSRLS non-owner runtime, FORCE RLS on every in-scope table, verified transaction-local context and passing pool-reset/cross-org/cross-resource negative tests.",
             "Named beta users, support/on-call, access review, incident response, backup/restore, retention/deletion and complaint routes are ready.",
-            "Security/privacy review has no unresolved critical finding; vendors handling PII are approved.",
+            "Alan's technical evidence is current; external privacy/legal advice is recorded; there is no unresolved critical finding and any high exception is written, time-limited and externally reviewed.",
             "A2 evidence is current for the exact candidate revision and rollback/feature-disable controls are operational.",
             "Consent/privacy/terms copy is approved and data-subject correction/deletion workflows are testable.",
         ],
-        "evidence": ["Signed B1 checklist", "data inventory/classification", "access review", "incident tabletop", "backup/restore result", "vendor register", "current A2 bundle"],
+        "evidence": ["Signed B1 checklist and five-pair cohort roster", "data inventory/classification and prohibited-data tests", "runtime/migrator grants and RLS policy matrix", "cross-org/pool-reset results", "de-identification evidence", "access review", "incident tabletop", "backup/restore result", "vendor register", "external privacy/legal advice", "current A2 bundle no older than 60 days"],
         "failure": "No real-user invitation. Continue synthetic-only, close control gaps, invalidate stale evidence and re-run the exact affected reviews/tests before a new go/no-go.",
     },
     {
         "id": "B2",
         "title": "PHI readiness and formal go/no-go",
-        "prerequisites": ["B1", "P13-05", "P13-06", "P13-07"],
+        "prerequisites": ["B1"],
         "decisions": ["D-PHI-01", "D-PHI-02"],
         "owner": "Luke",
         "verifier": "External security/privacy/compliance reviewers",
@@ -994,7 +1355,10 @@ GATES: list[dict[str, Any]] = [
             "Application, infrastructure, document, provider and intelligence threat models have current evidence and no unresolved critical/high risk without accepted exception.",
             "Operational staff training, access provisioning/deprovisioning, monitoring, support and emergency stop are complete.",
             "The exact release passed A2 and B1 revalidation; a signed human go/no-go records scope, date, evidence versions and approvers.",
+            "Qualified external security, privacy/compliance and legal/vendor reviewers are named; release evidence is no older than 30 days and underlying assessments are no older than 12 months.",
+            "No critical exception is open; any high exception has joint Luke and relevant external-reviewer approval.",
             "The gate states explicitly that testing/deployment alone did not establish HIPAA/PHI readiness.",
+            "PHI-capable upload, provider and intelligence paths remain disabled until this signed approval; B1 controls are necessary but not sufficient.",
         ],
         "evidence": ["Signed go/no-go", "risk/security/privacy assessments", "BAA/vendor evidence", "access/log/incident/backup controls", "penetration/security testing", "training/operations evidence", "current technical gate bundles"],
         "failure": "PHI remains prohibited. Keep B1 PII scope only if still independently valid; disable any PHI-capable upload/context path, remediate, and repeat formal review." ,
@@ -1141,17 +1505,17 @@ AUTHORSHIP_CLASSES = {
 
 AUTHORSHIP_MATRIX: list[dict[str, str]] = [
     {"element": "Pathfinder known-carrier/route answers", "class": "1", "subject": "IP journey", "author": "IP", "storage": "participants.intake_data and pathfinder_context", "provenance": "participant settings; inconsistent per-field source", "visibility": "IP/app routing; legacy reviewer surfaces", "verification": "Not applicable as GC truth", "correction": "IP appends/amends route-answer revision", "gc_sees": "No by default", "ip_sees_gc": "N/A", "influence": "Entry routing only", "promotion": "Route/source reference only", "contract": "Never create a GC fact, entitlement, membership or case."},
-    {"element": "IP preferences about a GC/journey (location, communication, involvement, reduction/twins, relationship)", "class": "1", "subject": "IP preferences", "author": "IP", "storage": "legacy participant intake_data", "provenance": "participant-supplied, no field history", "visibility": "IP; some selected axes in frozen matching UI", "verification": "IP preference, not eligibility", "correction": "IP revision", "gc_sees": "Only an approved purpose-limited projection", "ip_sees_gc": "Only separate GC preference projection", "influence": "Routing/compatibility discussion", "promotion": "As IP preference with author", "contract": "Race-based preference is separately blocked for Luke/external review."},
+    {"element": "IP preferences about a GC/journey (location, communication, involvement, reduction/twins, relationship)", "class": "1", "subject": "IP preferences", "author": "IP", "storage": "legacy participant intake_data", "provenance": "participant-supplied, no field history", "visibility": "IP; some selected axes in frozen matching UI", "verification": "IP preference, not eligibility", "correction": "IP revision", "gc_sees": "Only an approved purpose-limited projection", "ip_sees_gc": "Only separate GC preference projection", "influence": "Routing/compatibility discussion", "promotion": "As IP preference with author", "contract": "Race-based preference is prohibited; sensitive/clinical preferences do not enter pre-join candidate ranking or gates."},
     {"element": "Candidate nickname/name and pronouns", "class": "2", "subject": "Prospective GC", "author": "IP/co-IP", "storage": "node0_candidates columns", "provenance": "row creator only; no field history", "visibility": "IP/co-IP only", "verification": "Unverified", "correction": "IP revision; GC identity later supersedes reference", "gc_sees": "No current path", "ip_sees_gc": "GC-authored identity after explicit share", "influence": "Candidate list/guide", "promotion": "Link selected candidate reference only", "contract": "Paid identity comes from authenticated GC/person record."},
     {"element": "Relationship to prospective GC", "class": "1", "subject": "IP-GC relationship", "author": "IP", "storage": "node0_candidates.responses_json q1_2", "provenance": "Implicit IP", "visibility": "IP private", "verification": "Observation", "correction": "IP revision; GC may provide separate relationship answer", "gc_sees": "No by default", "ip_sees_gc": "Approved relationship projection", "influence": "Outreach route", "promotion": "Optional IP-attributed context", "contract": "Conflicting answers coexist; neither silently overwrites."},
-    {"element": "Pregnancy history, family-complete, citizenship and age", "class": "2", "subject": "Prospective GC", "author": "IP", "storage": "responses_json q2_1-q2_4", "provenance": "Implicit IP; copied to guide packet", "visibility": "IP private", "verification": "Unverified third-party assertion", "correction": "GC class-3/4 revision; reviewer class-5 later", "gc_sees": "Only if Luke approves labelled confirmation prompt", "ip_sees_gc": "Only purpose-limited status", "influence": "Current score/status/invite gate", "promotion": "Exclude raw values by default", "contract": "Cannot gate account/claim/onboarding/eligibility from IP answer."},
-    {"element": "Gestational-health or systemic-health assertions", "class": "2", "subject": "Prospective GC health", "author": "IP", "storage": "responses_json q3_1-q3_2 and guide packet", "provenance": "Implicit IP", "visibility": "IP private", "verification": "Unverified/sensitive", "correction": "GC private self-report; provider evidence class 5", "gc_sees": "Prefer remove before consent; otherwise labelled prompt", "ip_sees_gc": "Only reviewed coordination outcome", "influence": "Current critical/status/guide", "promotion": "Do not promote raw assertion", "contract": "Remove or make optional/provisional; never provider material."},
-    {"element": "Substance, schedule, support and stability assertions", "class": "2", "subject": "Prospective GC circumstances", "author": "IP", "storage": "responses_json q4_1/q4_3/q4_4/q5_5", "provenance": "Implicit IP", "visibility": "IP private", "verification": "Unverified", "correction": "GC self-report revision", "gc_sees": "No by default", "ip_sees_gc": "Only explicit progress/status projection", "influence": "Current score/things-to-uncover", "promotion": "Exclude raw; optional private question list", "contract": "May inform low-pressure questions only."},
+    {"element": "Pregnancy history, family-complete, citizenship and age", "class": "2 prohibited pre-join", "subject": "Prospective GC", "author": "IP", "storage": "legacy responses_json q2_1-q2_4 only", "provenance": "Implicit IP; copied to guide packet", "visibility": "Quarantined legacy evidence", "verification": "Unverified third-party assertion", "correction": "GC class-3/4 revision; reviewer class-5 later", "gc_sees": "No pre-join prompt derived from IP assertion", "ip_sees_gc": "Only purpose-limited reviewed status", "influence": "None in replacement flow", "promotion": "Exclude raw values", "contract": "Do not collect from the IP in the replacement pre-join flow; never score, rank, gate or project."},
+    {"element": "Gestational-health or systemic-health assertions", "class": "2 prohibited pre-join", "subject": "Prospective GC health", "author": "IP", "storage": "legacy responses_json q3_1-q3_2 and guide packet only", "provenance": "Implicit IP", "visibility": "Quarantined legacy evidence", "verification": "Unverified/sensitive", "correction": "GC private self-report; provider evidence class 5", "gc_sees": "No pre-join prompt derived from IP assertion", "ip_sees_gc": "Only reviewed coordination outcome", "influence": "None in replacement flow", "promotion": "Exclude", "contract": "Do not collect from the IP; never use for guide, provider material, scoring, ranking or critical decisions."},
+    {"element": "Substance, schedule, support and stability assertions", "class": "1 logistics / 2 prohibited sensitive", "subject": "Prospective GC circumstances", "author": "IP", "storage": "legacy responses_json q4_1/q4_3/q4_4/q5_5", "provenance": "Implicit IP", "visibility": "IP private; sensitive legacy values quarantined", "verification": "Unverified", "correction": "GC self-report revision", "gc_sees": "No sensitive pre-join prompt", "ip_sees_gc": "Only explicit progress/status projection", "influence": "Neutral outreach/logistics questions only", "promotion": "Exclude raw", "contract": "Schedule/outreach logistics may produce neutral questions; substance, mental-health, household and eligibility assertions are not collected from the IP."},
     {"element": "Candidate state and derived proximity", "class": "2", "subject": "Prospective GC location", "author": "IP/system derivative", "storage": "responses_json q4_2 plus IP profile state", "provenance": "IP and derived-from missing", "visibility": "IP private", "verification": "Unverified", "correction": "GC class-3 state revision", "gc_sees": "Optional labelled confirmation", "ip_sees_gc": "GC-shared state as separate revision", "influence": "Score/route", "promotion": "GC-authored state only when permitted", "contract": "Derived value inherits weakest source status."},
     {"element": "Worldview, communication, power, tested relationship and privacy observations", "class": "1", "subject": "Relationship", "author": "IP", "storage": "responses_json q5_1-q5_6", "provenance": "Implicit IP", "visibility": "IP private", "verification": "Personal observation", "correction": "IP revision; GC separate answer", "gc_sees": "No automatic visibility", "ip_sees_gc": "Only GC-approved projection", "influence": "Private outreach guide", "promotion": "Exclude unless expressly shared", "contract": "Suitable for private reflection, not eligibility."},
     {"element": "GC spouse/household assertion", "class": "2", "subject": "GC/third party", "author": "IP", "storage": "responses_json q5_7", "provenance": "Implicit IP", "visibility": "IP private", "verification": "Unverified", "correction": "GC private revision", "gc_sees": "No default", "ip_sees_gc": "Purpose-limited status only", "influence": "Conversation prompt", "promotion": "Exclude", "contract": "No provider/case truth."},
     {"element": "Observed openness/signals", "class": "1", "subject": "IP-GC interaction", "author": "IP", "storage": "responses_json q5_8", "provenance": "Implicit IP", "visibility": "IP private", "verification": "Observation", "correction": "IP revision", "gc_sees": "No default", "ip_sees_gc": "N/A", "influence": "Low-pressure outreach route", "promotion": "Exclude or retain IP-private", "contract": "Never imply GC consent/willingness."},
-    {"element": "Archetype, score, status, score suppression, things-to-uncover and guide route", "class": "2 derived", "subject": "Prospective GC", "author": "System from IP input", "storage": "node0_candidates derived columns/JSON", "provenance": "No derived_from/source version", "visibility": "IP private", "verification": "Unverified derivative", "correction": "Recompute from revision; retain old derivation", "gc_sees": "No by default", "ip_sees_gc": "N/A", "influence": "Ordering, readiness, guide and invite gating", "promotion": "Do not promote as truth", "contract": "Recommendation is remove ranking; use non-ranking questions-to-clarify."},
+    {"element": "Legacy archetype, score, status, score suppression, things-to-uncover and guide route", "class": "2 derived legacy", "subject": "Prospective GC", "author": "System from IP input", "storage": "legacy node0_candidates derived columns/JSON", "provenance": "No derived_from/source version", "visibility": "Excluded from replacement projections", "verification": "Unverified derivative", "correction": "Do not recompute in replacement flow", "gc_sees": "No", "ip_sees_gc": "N/A", "influence": "None in replacement flow", "promotion": "Exclude", "contract": "Remove ranking, viability/status flags and eligibility/guide gating; only allow neutral questions from approved non-sensitive inputs."},
     {"element": "Guide evidence/scaffold/snapshot/PDF", "class": "2 derived", "subject": "Outreach about GC", "author": "System for IP", "storage": "candidate guide JSON/PDF", "provenance": "Raw IP responses copied", "visibility": "IP private", "verification": "Unverified", "correction": "New immutable version on source change", "gc_sees": "No automatic visibility", "ip_sees_gc": "N/A", "influence": "Conversation preparation/Ask", "promotion": "Exclude by default", "contract": "Workspace-private; never provider/canonical truth."},
     {"element": "Candidate ordering/outreach state/decline", "class": "1/2", "subject": "IP workflow and GC response", "author": "IP, GC or system", "storage": "candidate row plus timeline", "provenance": "Single enum obscures actor/reason", "visibility": "IP; GC only own flow", "verification": "Workflow evidence", "correction": "Append actor/reason transition", "gc_sees": "Own invitation status", "ip_sees_gc": "Purpose-limited response status", "influence": "Outreach workflow", "promotion": "Selected relationship history only", "contract": "Decline is not eligibility; retain append-only actor."},
     {"element": "Invited email and IP message", "class": "2/1", "subject": "Prospective GC contact / IP message", "author": "IP", "storage": "invitations", "provenance": "Created-by subject", "visibility": "Issuer/internal; token landing", "verification": "Email unverified until identity bind", "correction": "Revoke/reissue; mismatch confirmation", "gc_sees": "Own invitation/message", "ip_sees_gc": "Claim status, not private answers", "influence": "Identity claim", "promotion": "Membership audit reference only", "contract": "Original recipient assertion remains in audit; do not silently rewrite."},
@@ -1205,16 +1569,19 @@ MIGRATION_DECISION_CONTRACT = {
         "Custom ordered Python migrations with a demonstrated reason not to use an established framework",
         "A standalone established runner such as Flyway/dbmate if its runtime/deployment burden fits",
     ],
-    "provisional_recommendation": "Favor Alembic unless the ADR proves it cannot safely serve the current raw-SQL/SQLite compatibility architecture.",
+    "provisional_recommendation": "Founder constraints are final: Alan should prefer Alembic or another well-supported low-maintenance framework, while retaining authority to choose a different established runner or justify a custom runner in the ADR.",
     "requirements": [
-        "PostgreSQL is production authority; SQLite is a supported local/test projection only if the ADR retains it.",
+        "Zero intended data loss is the governing reliability objective.",
+        "PostgreSQL is production authority; SQLite may remain a convenient synthetic local-development projection without full production parity.",
         "Fingerprint existing databases before baseline stamping; never blindly stamp unknown schema.",
         "App and intelligence use separate revision namespaces and PostgreSQL advisory-lock keys.",
         "Migration identities hold DDL; app/intelligence runtime identities do not after adoption.",
         "Run migrations in a deploy-controlled one-off task before app rollout, not opportunistically from web startup.",
-        "Use expand in release N, bounded/backpressure-aware backfill, dual-compatible N+1, then contract only when N cannot run.",
+        "Stage consequential changes and keep them backward-compatible wherever reasonably possible; use expand in release N, bounded/backpressure-aware backfill, dual-compatible N+1, then contract only when N cannot run.",
         "CI covers fresh, current, one-revision-behind, N-1 app on expanded schema, concurrent runner, checksum drift and interrupted backfill.",
-        "Irreversible changes require backup evidence, explicit approval and forward-repair plan. Schema rollback is not automatic.",
+        "Every consequential migration has tested recovery or rollback evidence before use.",
+        "Scheduled and communicated beta downtime may be up to 30 minutes when a tested recovery plan exists.",
+        "Irreversible changes that could affect real-user data require explicit evidence and Luke approval plus a forward-repair plan. Schema rollback is not automatic.",
     ],
 }
 
@@ -1264,7 +1631,8 @@ INVITATION_CONTRACT = {
     "required_changes": [
         "Exactly one target: workspace_id or case_id; include purpose, role, access_class, recipient_binding_mode and policy version.",
         "Email-less possession may only open pending low-risk workspace claim; it cannot reveal sensitive data or grant paid-case membership.",
-        "Paid-case invitation is addressed, authenticated, consented and atomically redeemed; mismatch requires explicit policy/issuer handling and preferably fresh bound token.",
+        "Paid-case invitation is addressed, authenticated, consented and atomically redeems invitation plus participation, access grant and audit; mismatch requires explicit policy/issuer handling and preferably a fresh bound token.",
+        "Workspace-claim issuance commits supersession, hashed claim, candidate/workspace linkage and required audit atomically; external identity steps use an explicit idempotent completion state.",
         "Cognito admission and app membership are separate decisions; account creation never equals workspace/case access.",
         "Verified identity comes from auth claims, not form-entered email; duplicate claims return the original result.",
         "Never put raw token/email/PHI in general participant timeline payloads; revoke/expire/supersede fail closed.",
@@ -1274,11 +1642,17 @@ INVITATION_CONTRACT = {
 
 
 DOCUMENT_CONTRACT = {
+    "metadata": [
+        "Requirement/readiness submissions and reviewer work items are separate entities from document versions and objects.",
+        "A metadata-only marker cannot carry file bytes/storage_uri, enter document-approved state or claim that a clinic received/reviewed content.",
+        "Work items bind organization, case, requirement, owner scope and immutable submission revision; decision plus audit is atomic and completion is durable/idempotent.",
+        "Free text is minimum-necessary and strictly bounded; sensitive categories remain synthetic through A2 and content/PHI paths remain disabled until their gates.",
+    ],
     "storage": [
         "Private versioned quarantine bucket and clean vault with block-public-access, SSL-only and KMS encryption.",
         "App can create short-lived unique upload targets in quarantine but cannot read unscanned content; scanner moves/copies only clean versions to vault.",
         "Object key: env/{org_id}/{case_id}/{document_id}/{version_id}/{generated_object_id}; no names, emails, filenames or clinical labels.",
-        "Authorization is always a Postgres membership/role/visibility/consent decision independent of the key.",
+        "Authorization is always a PostgreSQL access-grant/ownership/purpose/consent decision independent of the key; participation or presentation lens alone is insufficient.",
         "CloudTrail S3 data events and app document_access_event records provide purpose-aware access evidence.",
     ],
     "upload": [
@@ -1312,16 +1686,16 @@ DESIGN_SYSTEM_RELEASE_POLICY = {
 
 RECONCILIATION_CHECKPOINT = {
     "id": "CHECK-ALAN-122-124",
-    "title": "Alan review reconciliation: PRs #122 and #124",
-    "status": "Unresolved input",
-    "owner": "Alan",
+    "title": "Alan review reconciliation: PRs #122/#124 and preserved Wave 2",
+    "status": "Complete — independently reconciled 2026-07-12",
+    "owner": "Luke",
     "approver": "Luke",
-    "blocks": ["P03-01", "P03-02", "P03-03", "P03-04", "P04-01", "P04-02", "P04-03", "P05-01", "P05-02", "P05-03", "P06-01", "P06-02", "P06-03", "P09-04"],
+    "blocks": [],
     "may_amend": ["WP01", "WP03", "WP04", "WP05", "WP06", "WP09", "WP10", "WP11", "WP12", "WP13"],
     "recording": [
         "Record each finding with PR/head SHA, file/line or diff anchor, severity, reproducible behavior, architecture/product implication, proposed acceptance test and destination PR ID.",
         "Mark whether the finding concerns reusable behavior, obsolete architecture, security/privacy, accessibility, migration, concurrency, test coverage or product semantics.",
-        "Update this extraction ledger first; then update the canonical programme data, regenerate all plans/manifest and re-sync the Project so no source diverges.",
+        "Update the extraction ledger and canonical programme data together; regenerate all plans/manifest. The benched Project catalogue may be dry-run validated but is not remotely mutated by this reconciliation.",
     ],
     "resolution": [
         "Evidence beats plan text: a verified defect or missing contract amends the package.",
@@ -1330,12 +1704,192 @@ RECONCILIATION_CHECKPOINT = {
     ],
     "efficiency": "Do not ask Alan to polish code already known to be architecturally obsolete. Complete the safety/defect review at the contract/test level, identify reusable commits/tests, and stop once findings are captured. Obsolete code can be superseded while its findings become replacement acceptance tests.",
     "complete_when": [
-        "Alan confirms his #122 changes and unfinished #124 findings are fully captured.",
+        "Alan's #122 changes, completed #124 findings and preserved Wave 2 branch are fully captured.",
         "Every finding has a disposition and destination or explicit no-action rationale.",
         "Luke and Alan accept the workspace/case, invitation, authorship and PR-boundary contract, or an explicit unresolved decision remains blocked.",
-        "No replacement implementation item is marked Ready to implement until both the checkpoint and its own dependencies/decisions are clear.",
+        "The checkpoint is complete; each implementation item remains independently blocked by its unresolved decisions, dependencies and gate evidence.",
     ],
 }
+
+
+RECONCILIATION_MATRIX: list[dict[str, str]] = [
+    {
+        "id": "REC-01", "recommendation": "Treat PR #124 as WP00 extraction material, not a merge/conflict-resolution unit.",
+        "evidence": "Alan comment 4948149089; #124@84a5a84; merge-tree against #122@e853821 produced about 93 conflict regions across 11 files.",
+        "current_plan": "Already warned against merge but left final disposition pending.", "assumptions": "Corrected #122 and replacement PRs remain available as source history.",
+        "impact": "Avoids stale invitation/security behavior and case-shaped Node 0 reaching users; preserves useful tests/copy/assets.", "dependency_migration": "WP00 ledger; P03/P04/P05/P06/P09/P10/P11/P12 destinations; no branch mutation.",
+        "alternatives": "Merge whole branch; cherry-pick mixed commits; file-level extraction.", "conclusion": "Accept",
+        "rationale": "No independently mergeable unit survives the stale base and domain blockers. Preserve concepts/tests through clean replacement work.", "affected": "WP00; P03-02/03; P04-01/02/03; P05-02/03; P06-02/03; P09-04; P10-02; P11-03/04; P12-02", "decision_required": "No — disposition resolved; closure/deletion still requires later team confirmation.",
+    },
+    {
+        "id": "REC-02", "recommendation": "Use corrected PR #122 as the invitation/case-shell baseline.",
+        "evidence": "e853821; 499-test report and green workflow; verified return_to, TTL ceiling, CAS, self/existing-member refusal, one-live-GC invariant, transactional join, paired lenses and fail-closed Learn.",
+        "current_plan": "Selective salvage, pending reconciliation.", "assumptions": "Behavioral tests can be ported without retaining startup DDL or the case-only domain model.",
+        "impact": "Retains proven concurrency/auth safety while preventing weak participation/provenance/schema semantics becoming programme authority.", "dependency_migration": "P01-01, P03-01/03/05, P09-04, P11-03/04, P12-02; re-express schema through WP02.",
+        "alternatives": "Treat all #122 code/schema as canonical; discard it; behavior/test baseline only.", "conclusion": "Accept with modification",
+        "rationale": "#122 is authoritative for named tested behavior and reusable tests, not for final entities, runtime DDL, generic fact/proposal authority or the whole journey model.", "affected": "WP01; WP02; WP03; WP09; WP10; WP11; WP12", "decision_required": "No.",
+    },
+    {
+        "id": "REC-03", "recommendation": "Node 0 must delegate invitations to shared authority and make issuance/redemption transactionally complete.",
+        "evidence": "#124 splits supersede/create/link/timeline and redemption/profile facts across commits; corrected #122 supplies CAS/TTL guards.",
+        "current_plan": "Separate workspace claim and paid-case invitation but transaction boundary was underspecified.", "assumptions": "Identity-provider interaction may require an idempotent completion workflow around a database transaction/outbox.",
+        "impact": "Prevents valid orphan tokens, partial membership/onboarding and possession-only case access.", "dependency_migration": "P03-02 atomically binds workspace claim/identity/consent; P03-03 atomically redeems invite/participation/access/consent/audit; P06-02 resumes optional onboarding idempotently.",
+        "alternatives": "One huge cross-system transaction; explicit idempotent saga/outbox; current sequential commits.", "conclusion": "Accept with modification",
+        "rationale": "One invitation authority serves separate resource targets and lifecycles; optional profile completion is resumable rather than forced into membership redemption.", "affected": "WP03 P03-02/03; WP06 P06-02; A1/A2", "decision_required": "No; D-AUTH-02 remains for Cognito admission mechanics.",
+    },
+    {
+        "id": "REC-04", "recommendation": "Resolve canonical identity, participation, access and authorization before schema encoding.",
+        "evidence": "#122/Wave 2 account_memberships roles double as party role, lens and authorization; first-active membership selection; no party/person alignment; callers pass viewer role/lens; RLS absent.",
+        "current_plan": "Roles, membership and projections were present but their ownership was not explicit.", "assumptions": "A principal can be staff globally without participant-data access and a person can participate without an active grant.",
+        "impact": "Eliminates confused role authority and gives application/RLS one auditable policy input.", "dependency_migration": "P03-05 adds identity binding, participation and access-grant constraints; later domain migrations and P13-05 consume the contract.",
+        "alternatives": "Single membership table/role enum; participation-only authorization; separate grants/capabilities.", "conclusion": "Accept with modification",
+        "rationale": "Identity binds principal to person; participation records domain relationship; grants carry resource capabilities; authorization uses verified context, ownership and purpose. Lens is presentation only.", "affected": "P03-02/03/05; P04-01/02; P09-04; P13-05; A1/B1", "decision_required": "Resolved as D-AUTH-03.",
+    },
+    {
+        "id": "REC-05", "recommendation": "Restrict IP-entered pre-join GC information and remove unverified suitability ranking/gating.",
+        "evidence": "#124 scores mental health, substance, citizenship, pregnancy and support claims into 0-100/high_viability/critical_flag and sorts/gates guidance.",
+        "current_plan": "Provisional attribution existed but still allowed a preliminary hard-criteria check.", "assumptions": "Before GC joins, the legitimate purpose is low-pressure outreach preparation, not eligibility or professional assessment.",
+        "impact": "Reduces sensitive third-party processing, discrimination and false clinical/eligibility authority.", "dependency_migration": "P04-02 provenance; P05-02 strict allowlist; P06-02 GC-authored data; P10 scopes; legacy scores retained only as source-labelled evidence or excluded.",
+        "alternatives": "Keep ranking with disclaimer; professional approval later; neutral questions only.", "conclusion": "Accept with modification",
+        "rationale": "Allow minimum-necessary relationship/outreach/logistics context only. Health, mental health, substances, citizenship, race, pregnancy, insurance and eligibility normally wait for authenticated GC entry; no provisional value drives critical decisions.", "affected": "WP04; WP05 P05-02; WP06; WP10; A1/A2", "decision_required": "Resolved as D-DATA-03; exact cross-role fields remain D-DATA-01.",
+    },
+    {
+        "id": "REC-06", "recommendation": "Correct shared-memory private notes and migrate already-written rows.",
+        "evidence": "#124 saves Conversation Guide notes with scope=shared and Ask loads shared memory; local inspected SQLite had zero affected rows; #124 was not deployed; remote database state was not verified.",
+        "current_plan": "New private/shared ledger planned; explicit legacy remediation was missing.", "assumptions": "Source kind identifies guide notes and owner can normally be recovered from subject/person provenance.",
+        "impact": "Prevents IP reflection notes reaching GC/provider/intelligence while preserving audit and avoiding content in logs.", "dependency_migration": "P04-02 person-owned contract; P10-02 inventory, immediate exclusion, idempotent private/quarantine migration; ambiguous owner quarantines.",
+        "alternatives": "Behavior-only fix; delete rows; owner-safe migration/quarantine.", "conclusion": "Accept with modification",
+        "rationale": "Run a metadata-only inventory first; record zero-row evidence if none. If rows exist, deny shared/Ask reads immediately and migrate narrowly without broadening access.", "affected": "WP04 P04-02; WP10 P10-02; A1/A2", "decision_required": "No; actual affected-row count is execution evidence, not an architecture choice.",
+    },
+    {
+        "id": "REC-07", "recommendation": "Preserve Wave 2 work from 5b63e3a rather than reimplementing useful behavior.",
+        "evidence": "Exact three-commit stack on e853821; 535 passed/9 skipped and 36 focused tests; two independent defects reproduced; runtime DDL, caller roles, broad loaders and no RLS remain.",
+        "current_plan": "Wave 2 was previously missing and blocked final mapping.", "assumptions": "The branch remains paused and available for later extraction.",
+        "impact": "Saves tested presentation/transaction semantics without importing restart loss, stale approval, metadata/content conflation or weak access.", "dependency_migration": "P03-05, P09-01/04/06, P11-03/04, P12-02, P13-05; schema re-expressed as migrations.",
+        "alternatives": "Direct merge/cherry-pick; discard; selective adaptation/test port.", "conclusion": "Accept with modification",
+        "rationale": "Treat 5b63e3a as the strongest cumulative evidence source, not an implementation baseline. Reuse tests and semantics only after the named contract changes.", "affected": "WP00; WP03; WP09; WP11; WP12; WP13; A2/B1", "decision_required": "No.",
+    },
+    {
+        "id": "REC-08", "recommendation": "Separate metadata-only document requests from the full content pipeline.",
+        "evidence": "Wave 2 creates an approvable documents row with storage_uri empty; request labels may contain sensitive data; P09 baseline coupled active-case UI to full upload pipeline.",
+        "current_plan": "P09-04 depended on P09-03 and mixed progress/documents; no independent requirement/work-item model.", "assumptions": "Phase-1 readiness coordination can operate synthetically without receiving file bytes.",
+        "impact": "Avoids false artifact approval and permits safe partial delivery while content remains quarantined/disabled.", "dependency_migration": "P09-01 defines both machines; P09-04 owns metadata requirements/work items and phase-1 surfaces without P09-03; P09-06 integrates content versions after P09-03; P09-05 depends P09-06.",
+        "alternatives": "Single documents table; metadata-only workflow first; full pipeline first.", "conclusion": "Accept with modification",
+        "rationale": "A request/readiness marker is not a document. Content state and review begin only after a version exists, and partial merges fail closed.", "affected": "WP09 P09-01/03/04/05/06; P12-02; A2", "decision_required": "D-DOC-01/02 and D-PHI-01 remain open for content.",
+    },
+    {
+        "id": "REC-09", "recommendation": "Move foundational RLS and non-owner runtime before real-user PII.",
+        "evidence": "Runtime uses owner-level startup DDL; app/Wave 2 storage has broad/global loaders; no DB policy enforcement or pool-context proof.",
+        "current_plan": "P13-05 was a B2 prerequisite only.", "assumptions": "Synthetic A1/A2 may validate features before B1, but no real subject data is admitted.",
+        "impact": "Database denies cross-org/resource/owner access if an app guard fails; reduces B1 breach blast radius.", "dependency_migration": "P13-05/06/07 move to B1; FORCE RLS, NOBYPASSRLS runtime, transaction-local verified context and pool reset tests; B2 remains separate evidence approval.",
+        "alternatives": "App-only isolation; separate databases per cohort; RLS at B2.", "conclusion": "Accept",
+        "rationale": "App-only checks are inadequate for real-user PII given current broad readers. No alternative isolation model has equivalent evidence at lower programme cost.", "affected": "WP13 P13-05/06/07; B1/B2", "decision_required": "D-PHI-01/02 remain for approved scope/controls/approvers, not for whether RLS precedes B1.",
+    },
+    {
+        "id": "REC-10", "recommendation": "Make #122 Python CI required, stable and resistant to bypass.",
+        "evidence": "#122 workflow passed; #124 ran only build/contract checks; main lacks Python/PostgreSQL CI; private-repo protection/ruleset API returned plan-level 403.",
+        "current_plan": "P01-01 added tests but did not define stable contexts, workflow hardening or enforcement limitation.", "assumptions": "Repository billing/visibility may change independently of code.",
+        "impact": "Prevents test-path bypass and false governance claims; adds PostgreSQL evidence.", "dependency_migration": "P01-01: no path filters, stable names, pinned action SHAs, supported runtime, constraints, timeouts, PostgreSQL job; D-CI-01 governs repository enforcement/readback.",
+        "alternatives": "Procedural review only; GitHub plan/ruleset upgrade; externally enforced merge queue.", "conclusion": "Defer",
+        "rationale": "Accept the workflow recommendation now, but enforcement choice/evidence is unavailable. Until D-CI-01 resolves, do not call it bypass-resistant or open real-user gates.", "affected": "WP01 P01-01; A0 and every later app PR", "decision_required": "Yes — D-CI-01, owner Luke; options and required readback/negative test are recorded.",
+    },
+    {
+        "id": "REC-11", "recommendation": "Add an explicit Node 0 IP-owner guard and correct non-IP behavior.",
+        "evidence": "#124 ensure endpoint lets any authenticated subject mint a primary-IP case; viewer/provider/staff paths can fall into storage errors/500.",
+        "current_plan": "General workspace authorization existed without a shared participant/API guard acceptance matrix.", "assumptions": "Staff tools are separate from participant Node 0 routes.",
+        "impact": "Prevents privilege creation, role confusion and avoidable errors.", "dependency_migration": "P03-05 subject-derived capabilities; P05-03 shared IP-owner guard and negative role tests.",
+        "alternatives": "Per-route checks; shared router dependency/service policy; redirect all roles.", "conclusion": "Accept with modification",
+        "rationale": "Use one subject-derived capability policy across commands and pages; return explicit deny/role destination without creating a case.", "affected": "WP03 P03-05; WP05 P05-03; A1", "decision_required": "No.",
+    },
+    {
+        "id": "REC-12", "recommendation": "Bound and type Node 0 inputs and malformed request behavior.",
+        "evidence": "#124 hand-parses unbounded names/notes/questions/JSON/forms/collections/PDF content; Wave 2 silently truncates labels/notes.",
+        "current_plan": "Validation was implicit and spread across feature PRs.", "assumptions": "Limits can be product-specific but must reject rather than silently alter user data.",
+        "impact": "Controls denial-of-service, log/storage amplification and ambiguous stored content.", "dependency_migration": "P05-02 typed candidate commands/collections; P05-03 form/PDF/body limits; P06-02 onboarding; P09-04 structured metadata/reviewer note; P12-01 Ask.",
+        "alternatives": "Global proxy limit only; silent slicing; layered strict validation.", "conclusion": "Accept",
+        "rationale": "Use strict enums/max lengths plus body/collection limits and controlled 4xx errors; do not silently truncate.", "affected": "WP05; WP06; WP09; WP12", "decision_required": "No; exact numerical limits are PR acceptance details and D-DOC-02 for files.",
+    },
+    {
+        "id": "REC-13", "recommendation": "Move candidate and invitation invariants from app checks into PostgreSQL migrations.",
+        "evidence": "#124 lacks candidate-case FK, invitation-link uniqueness, one-active-outreach constraint and checks for enums/scores; concurrent writes can violate product rules.",
+        "current_plan": "WP04/WP05 proposed new schema but did not enumerate all reviewed invariants.", "assumptions": "Versioned migrations and expand/contract compatibility precede domain tables.",
+        "impact": "Prevents orphan/duplicate/contradictory state under concurrency.", "dependency_migration": "P04-01 FKs/uniqueness; P05-02 outreach constraints and no score bounds because ranking is removed; P03-02/03 claim/invite uniqueness; P02-03 migrations.",
+        "alternatives": "App locks only; advisory locks; database constraints plus commands.", "conclusion": "Accept",
+        "rationale": "Business invariants that can be represented in PostgreSQL must remain true independently of application races.", "affected": "WP02; WP03; WP04; WP05; A1", "decision_required": "No.",
+    },
+    {
+        "id": "REC-14", "recommendation": "Replace broad public/cloud prefixes with explicit exposure.",
+        "evidence": "#124 exposes /node0/onboarding/ publicly and /api/node0/ by prefix; Wave 2 demonstrates exact phase-1 allowlisting.",
+        "current_plan": "Fail-closed route policy existed but did not assign this finding.", "assumptions": "New routes require explicit security review before cloud/public reachability.",
+        "impact": "Prevents future routes inheriting token/public or cloud exposure accidentally.", "dependency_migration": "P03-02, P05-03, P06-02 exact registries/dependencies; P09-04 exact cluster paths; P13-03 route-negative inventory.",
+        "alternatives": "Prefix allowlist; per-route registry; separate public app.", "conclusion": "Accept",
+        "rationale": "Explicit route identity is the simplest fail-closed control for the current app.", "affected": "WP03; WP05; WP06; WP09; WP13; A1/A2", "decision_required": "No.",
+    },
+    {
+        "id": "REC-15", "recommendation": "Project expiry on GET and add token/PDF cache, referrer and indexing protections.",
+        "evidence": "#124 expired links look active until POST; token-bearing pages/PDFs lack no-store and restrictive referrer policy.",
+        "current_plan": "Token transitions were covered, response exposure was not.", "assumptions": "Tokens remain URL-borne only where unavoidable and never appear in telemetry.",
+        "impact": "Reduces stale-action confusion and token/sensitive-output leakage via browser cache, referrer or indexing.", "dependency_migration": "P03-02/03 GET+command expiry and response headers; P05-03 outreach PDF headers; security tests.",
+        "alternatives": "POST-only check; session exchange; header hardening plus one-time token.", "conclusion": "Accept",
+        "rationale": "Read projection and mutation must agree, and sensitive responses must be non-cacheable with restrictive referrer/noindex policy.", "affected": "WP03; WP05", "decision_required": "No.",
+    },
+    {
+        "id": "REC-16", "recommendation": "Bound candidate/invitation and memory queries and remove N+1 behavior.",
+        "evidence": "#124 looks up invitations per candidate and loads all shared memory before Python filtering; Wave 2 removes one reviewer-inbox N+1 but retains broad loaders.",
+        "current_plan": "Performance was a general risk rather than explicit acceptance criteria.", "assumptions": "Pagination and purpose-scoped limits are compatible with Node 0 and Ask UX.",
+        "impact": "Bounds latency/memory, narrows accidental data access and improves tenant isolation.", "dependency_migration": "P05-02 batched query-shaped hydration/indexes; P10-02 scope/subject limits at persistence; P12-01 bounded context; P09-04 owner-scoped query shapes.",
+        "alternatives": "Cache current readers; batch only; purpose-scoped SQL.", "conclusion": "Accept",
+        "rationale": "Filter/limit at the authoritative storage boundary rather than after loading broad rows.", "affected": "WP05; WP09; WP10; WP12", "decision_required": "No.",
+    },
+    {
+        "id": "REC-17", "recommendation": "Add candidate retention, archive, correction and deletion behavior.",
+        "evidence": "#124 stores sensitive third-party assessments without a lifecycle; current plan has D-DATA-02 but implementation mapping was weak.",
+        "current_plan": "Retention decision and legacy backfill existed.", "assumptions": "Legal/privacy may set the exact period; source/audit may require tombstones rather than raw-content retention.",
+        "impact": "Reduces unnecessary third-party data retention while preserving correction/audit needs.", "dependency_migration": "D-DATA-02; P04-02/03 provenance/tombstones; P05-02 archive/anonymize/delete command/job and evidence.",
+        "alternatives": "Indefinite retention; immediate deletion; shortest justified period with tombstone/audit.", "conclusion": "Accept",
+        "rationale": "Implement the lifecycle in the candidate domain; keep the exact duration as the named bounded privacy decision.", "affected": "WP04; WP05 P05-02; A1", "decision_required": "Yes — D-DATA-02 supplies duration and exception policy before live use.",
+    },
+    {
+        "id": "REC-18", "recommendation": "Move #124's large global CSS addition to route-scoped Node 0 styling.",
+        "evidence": "About 3,030 lines were added to global style.css; participant DS and route-specific recipes exist.",
+        "current_plan": "P05-03 and P11-03 mentioned DS adoption but not the global-style finding.", "assumptions": "Participant and internal/operator design systems remain separate.",
+        "impact": "Limits cross-surface regressions and clarifies style ownership without making aesthetic purity a release gate.", "dependency_migration": "P05-03 node0.css; P11-03 released tokens/recipes; P12-02 visual/a11y verification.",
+        "alternatives": "Keep global block; CSS modules/build; route stylesheet plus shared DS.", "conclusion": "Accept with modification",
+        "rationale": "Port only necessary styles through route scope and released DS contracts; block on interaction/accessibility/security, not cosmetic literal purity.", "affected": "WP05; WP11; WP12", "decision_required": "No.",
+    },
+    {
+        "id": "REC-19", "recommendation": "Retain unaddressed claim semantics and one-time share-link rotation.",
+        "evidence": "#124 gates allow_unaddressed to GC intent, stores hash only, rotates/supersedes, and displays plaintext once; corrected #122 supplies case-invite guards.",
+        "current_plan": "Workspace claim separated conceptually but shared engine/resource-target distinction was incomplete.", "assumptions": "Bearer possession cannot reveal sensitive data or create paid-case membership.",
+        "impact": "Keeps low-friction outreach while bounding replay, forwarding and privilege escalation.", "dependency_migration": "P03-02 workspace claim target; P03-03 recipient-bound case target; shared token/CAS primitives, distinct state machines and consent.",
+        "alternatives": "Addressed links only; unaddressed case invite; unaddressed low-risk workspace claim.", "conclusion": "Accept with modification",
+        "rationale": "Retain token mechanics and low-risk semantics only for a pending free-workspace claim; never layer bearer access onto a paid case.", "affected": "WP03 P03-02/03; WP06", "decision_required": "Resolved by D-AUTH-01.",
+    },
+    {
+        "id": "REC-20", "recommendation": "Standardize organization handling on NATALYX_ORG_ID.",
+        "evidence": "#124 restores a configured organization constant, but the intended product is multi-resource/multi-tenant and Wave 2 reviewers/readers are insufficiently org-scoped.",
+        "current_plan": "Organization scope is part of case/workspace contracts and RLS.", "assumptions": "A fixed organization may remain a synthetic/dev bootstrap default only.",
+        "impact": "Prevents a deployment constant becoming tenant/access authority.", "dependency_migration": "P03-05 and P13-05 derive organization from verified identity/grant/resource context; config default permitted only in synthetic bootstrap.",
+        "alternatives": "Global configured org; identity claim; resource/grant-derived org context.", "conclusion": "Reject",
+        "rationale": "Configuration unification is convenient evidence, not the final authorization model. Organization must be verified from the authenticated/granted resource context.", "affected": "WP03 P03-05; WP13 P13-05", "decision_required": "No.",
+    },
+    {
+        "id": "REC-21", "recommendation": "Land the GC at shared /case/home and remove a duplicate GC Node 0 home.",
+        "evidence": "#122 has paired case lenses; #124 routes GC to case home after bearer redemption even though Node 0 should not yet create a case.",
+        "current_plan": "Free workspace and paid case are separate but landing wording was not explicit.", "assumptions": "The GC may join a free workspace before any promotion and later receive a paid-case invitation.",
+        "impact": "Avoids duplicate participant shells and prevents pre-promotion users from being shown a canonical-case fiction.", "dependency_migration": "P03-02/P06 workspace lens before promotion; P03-03/P09-04 shared case home only after canonical paid-case grant; P12 cutover removes duplicates.",
+        "alternatives": "Always case home; duplicate GC Node 0 home; shared shell with resource-specific projection.", "conclusion": "Accept with modification",
+        "rationale": "Keep one shared participant shell pattern, but route by actual resource: free-workspace GC projection before promotion, case home only after paid-case access exists.", "affected": "WP03; WP06; WP09; WP12", "decision_required": "No.",
+    },
+    {
+        "id": "REC-22", "recommendation": "Keep return_to, token-scoped landing, duplicate-home cleanup, symbol cleanup and refreshed DS assets from #124.",
+        "evidence": "Corrected #122 validates internal return_to; #124 provides one-time token landing and presentation cleanup; canonical participant DS owns released assets/tokens.",
+        "current_plan": "Most items were salvage candidates without precise ownership.", "assumptions": "DS assets are ported from an approved release, not vendored ad hoc.",
+        "impact": "Preserves UX value and resume behavior without weakening redirect, token or repository boundaries.", "dependency_migration": "P03-01 return_to; P03-02 token landing; P11-03 DS release; P05-03/P12-02 selective UI cleanup.",
+        "alternatives": "Copy branch files; discard polish; selective port from approved contracts.", "conclusion": "Accept with modification",
+        "rationale": "Adopt the behavior and cleanup, but keep redirect validation, resource-specific landing and canonical DS release ownership.", "affected": "WP03; WP05; WP11; WP12", "decision_required": "No.",
+    },
+]
 
 
 EXISTING_PRS: list[dict[str, Any]] = [
@@ -1378,12 +1932,12 @@ EXISTING_PRS: list[dict[str, Any]] = [
     {
         "key": "app#122", "repo": "NatalyxPlatform/natalyx-app", "number": 122, "title": "Wave 1 participant case shell surfaces", "url": "https://github.com/NatalyxPlatform/natalyx-app/pull/122", "sha": "e85382150853cf4774948c55b91e330e7e69617e", "inspected": INSPECTED_AT,
         "useful": "Case projection/lens surfaces, safe return_to, invitation TTL/CAS/self-member/one-GC constraints, transactional membership, fail-closed Learn, SQL-limited timeline, responsive/a11y tests and Python CI workflow.",
-        "reusable": "Invitation commits/files and tests; case_journey/case_home presenter and paired-lens/mobile tests; .github/workflows/python-tests.yml; DS vendoring/escaping contract where still applicable.",
+        "reusable": "Invitation behavior/tests; case_journey/case_home presenter and paired-lens/mobile tests; .github/workflows/python-tests.yml after CI hardening; DS escaping contract where still applicable.",
         "tests": "Reported 499-test suite; green unittest/build/contract checks observed at e853821. Preserve concurrency, logged-out invite, paired IP/GC, Learn timeout and render tests.",
         "unsafe": "No Node 0 workspace target, payment/promotion or separate claim model; facts/proposals lack strong authorship/approval authority; generic invitation status setter remains; case lifecycle is not the whole programme state model.",
-        "destinations": ["P01-01", "P02-03", "P03-01", "P03-03", "P04-02", "P09-04", "P10-02", "P11-03", "P12-02"], "extraction": "Reinspected at latest head. It is exactly e853821 (no newer delta); retention strengthened, but final extraction waits for Alan checkpoint.",
-        "review": "Alan's 2026-07-10 review-round comment records fixes from earlier 8df63dd to e853821. No formal GitHub review object; current planning must not imply all architecture is approved.",
-        "disposition": "Retain pending Alan reconciliation; selective port or rebase only after architecture approval", "close_when": "CHECK-ALAN-122-124 is complete; every fix/finding/test has a destination; replacement contracts cover workspace/case/provenance; the relevant replacements have merged or the team explicitly elects to merge a narrowed #122.", "delete_when": "Only after final disposition/closure, all commits/tests are reachable or intentionally discarded, no worktree depends on branch, and Alan/Luke confirm cleanup.",
+        "destinations": ["P01-01", "P02-03", "P03-01", "P03-03", "P03-05", "P04-02", "P09-04", "P10-02", "P11-03", "P12-02"], "extraction": "Complete at e853821: authoritative behavior/tests and selectively portable implementation are classified; superseded architecture and evidence-only claims are named.",
+        "review": "Alan's 2026-07-10 review-round comment and the completed 2026-07-12 reconciliation are captured. No formal GitHub approval is inferred.",
+        "disposition": "Selective-port behavior and tests; supersede as programme architecture", "close_when": "Every retained behavior/test is reachable in approved replacements or deliberately rejected; no team member elects a separately narrowed #122 merge.", "delete_when": "Only after closure, retained commits/tests are reachable or archived, no worktree depends on the branch, and Alan/Luke explicitly confirm cleanup.",
     },
     {
         "key": "app#123", "repo": "NatalyxPlatform/natalyx-app", "number": 123, "title": "Node 0 beta: GC onboarding and hosted handoff", "url": "https://github.com/NatalyxPlatform/natalyx-app/pull/123", "sha": "34078f810b634aa6ddce5954763c03cb46b574d8", "inspected": INSPECTED_AT,
@@ -1396,13 +1950,13 @@ EXISTING_PRS: list[dict[str, Any]] = [
     },
     {
         "key": "app#124", "repo": "NatalyxPlatform/natalyx-app", "number": 124, "title": "Consolidate BYOS Node 0 handoff", "url": "https://github.com/NatalyxPlatform/natalyx-app/pull/124", "sha": "84a5a847fea71213b6257549e5a620f654836cb1", "inspected": INSPECTED_AT,
-        "useful": "Current consolidation of Node 0 questionnaire/guide/surfaces, GC onboarding, participant case shell, invitations, DS assets and large focused test suites.",
+        "useful": "Consolidated Node 0 questionnaire/guide/surfaces, GC onboarding, participant case shell, invitation delegation, DS assets and large focused test suites as extraction evidence.",
         "reusable": "Deterministic guide/resource/tests, selected Node 0/GC/case presentation, source-aware Learn dependency notes, subject to file-level extraction.",
         "tests": "test_node0.py and test_case_home.py contain broad behavior/render coverage; green build/contract-smoke observed, but no main Python/PostgreSQL proof.",
         "unsafe": "Node 0 Free creates a synthetic canonical case; unaddressed link can lead to case membership; IP third-party assertions drive score/invite; notes become shared memory; no commercial event, payment ledger or promotion. It contains older #122 equivalents but not the later hardening commits through e853821; its checks omit the unittest workflow.",
-        "destinations": ["P04-01", "P04-02", "P04-03", "P05-02", "P05-03", "P06-02", "P06-03", "P09-04", "P10-02", "P11-04", "P12-02"], "extraction": "Unextracted; Alan review explicitly incomplete and unresolved.",
-        "review": "Alan's review is explicitly incomplete and unresolved (halfway through per team update). No completion is assumed; CHECK-ALAN-122-124 blocks final disposition and replacement work.",
-        "disposition": "Retain unchanged as evidence; selective port/rewrite after checkpoint", "close_when": "Alan completes and reconciles findings; every valuable commit/file/test has a destination; replacement architecture is approved; extracted replacements cover value; Luke and Alan confirm supersession.", "delete_when": "Only after closure, replacement merges/extraction verification, no protected worktree depends on branch and explicit team cleanup confirmation.",
+        "destinations": ["P03-02", "P03-03", "P04-01", "P04-02", "P04-03", "P05-02", "P05-03", "P06-02", "P06-03", "P09-04", "P10-02", "P11-03", "P11-04", "P12-02"], "extraction": "Complete at 84a5a84: all consolidated-review findings are dispositioned and assigned; no mergeable/cherry-pick unit is approved.",
+        "review": "Alan's complete consolidated comment 4948149089 is independently reconciled. Its extraction-only recommendation is accepted; several salvage semantics are modified by the workspace/access/document contracts.",
+        "disposition": "Fully supersede as a merge unit; preserve selective concepts, copy, assets and tests as evidence", "close_when": "Every retained behavior/test is reachable in approved replacements or explicitly rejected and Luke/Alan confirm supersession.", "delete_when": "Only after closure, replacement reachability/extraction verification, no protected worktree depends on the branch and explicit team cleanup confirmation.",
     },
     {
         "key": "ds#7", "repo": "NatalyxPlatform/natalyx-design-system", "number": 7, "title": "Document Jinja attrs hardening follow-up", "url": "https://github.com/NatalyxPlatform/natalyx-design-system/pull/7", "sha": "cedfcc489b1f60842aed3a9701348c85964cfd96", "inspected": INSPECTED_AT,
@@ -1416,6 +1970,30 @@ EXISTING_PRS: list[dict[str, Any]] = [
 
 for _existing_pr in EXISTING_PRS:
     _existing_pr["inspected"] = PR_INSPECTED_AT
+
+
+WAVE2_BRANCH = {
+    "repo": "NatalyxPlatform/natalyx-app",
+    "wps": ["WP00", "WP01", "WP02", "WP03", "WP09", "WP11", "WP12", "WP13"],
+    "branch": "feat/byos-journey-wave-2",
+    "url": "https://github.com/NatalyxPlatform/natalyx-app/tree/feat/byos-journey-wave-2",
+    "head": "5b63e3a7c3643efcd5f3e74f422d095423b55f59",
+    "base": "e85382150853cf4774948c55b91e330e7e69617e",
+    "ancestry": [
+        "3a549baf — phase-1 cluster pages and initial metadata-only request flow",
+        "e40eebaa — transactional submission, private rows and canonical case anchoring",
+        "5b63e3a7 — role/owner checks, atomic review audit, fail-closed dispatch and N+1 removal",
+    ],
+    "useful": "Projection-driven phase-1 cluster presentation, exact route allowlisting, person-versus-case-side ownership intent, transactional submission/work-item and review/audit patterns, fail-closed item retention, approved Learn status selection and 36 focused tests.",
+    "unsafe": "Runtime ensure_column/index DDL; identity/participation/access conflation; caller-supplied role/lens authority; unguarded/global loaders; no RLS or staff capability; metadata readiness represented as an approvable empty document; restart purges case-anchored work items; stale work item can approve a resubmitted row; paused/done actions are not capability-gated.",
+    "reproductions": [
+        "Second init_db changed a canonical case-anchored reviewer item from present to absent because participant_id='' matched the orphan cleanup.",
+        "After v1 was resolved and v2 resubmitted on the same row, the stale v1 work item approved v2 because review CAS bound only document_id/state, not an immutable submission revision.",
+    ],
+    "tests": "Controlled local run: 535 passed, 9 skipped in 12.471s; focused Wave 2 cluster suite 36/36. No branch check runs, PostgreSQL, browser/accessibility or visual evidence was present.",
+    "destinations": ["P01-01", "P02-03", "P03-01", "P03-03", "P03-05", "P09-01", "P09-04", "P09-06", "P11-03", "P11-04", "P12-02", "P13-05"],
+    "disposition": "Preserve paused at the exact head; selectively port semantics/tests only after adaptation. Do not merge, cherry-pick, continue implementation or use its runtime schema directly.",
+}
 
 
 PROTECTED_WORKTREES: list[dict[str, str]] = [
@@ -1442,61 +2020,152 @@ FIRST_THREE_IMPLEMENTATION_PRS = ["P01-01", "P02-01", "P13-01"]
 
 
 CRITICAL_PATH = [
-    "P00-01", "P01-01", "P02-01", "P02-02", "P02-03", "P07-01", "P08-01",
-    "P07-02", "P08-02", "P07-03", "P07-04", "P09-04", "P08-03", "P08-04",
-    "P13-04", "P13-07",
+    "P00-01", "P01-01", "P02-01", "P02-02", "P02-03", "P03-05", "P04-01", "P04-02",
+    "P07-01", "P08-01", "P07-02", "P08-02", "P07-03", "P03-03", "P07-04", "P09-01",
+    "P09-04", "P09-02", "P09-03", "P09-06", "P09-05", "P13-04", "P13-05", "P13-06", "P13-07",
 ]
 
 
 CRITICAL_JOINS = [
-    "P07-03 additionally waits for P04-02 (workspace/provenance); P07-04 additionally waits for P03-03 (paid-case invitation).",
-    "P09-04 additionally waits for P09-03 and P11-03; P13-04 additionally waits for P06-03, P09-05, P10-04, P12-02 and A1 runner P13-03.",
-    "P13-07 additionally waits for P13-05 RLS/non-owner runtime and P13-06 backup/audit/control evidence before B2.",
+    "P03-02 and P04-01 wait for P03-05 identity/participation/access; P07-03 additionally waits for P04-02; P07-04 additionally waits for P03-03.",
+    "P09-04 metadata/readiness is independent of content storage; P09-06 joins P09-03 content to P09-04 surfaces; P09-05 then builds provider snapshots from actual clean versions.",
+    "P13-04 waits for the complete synthetic A2 surface; P13-05/06/07 then supply RLS, operational controls and human evidence required before B1, while B2 remains a later PHI approval.",
 ]
 
 
 EARLY_PARALLEL_SEQUENCE = [
     ["P00-01"],
-    ["P01-01", "P02-01", "P13-01", RECONCILIATION_CHECKPOINT["id"]],
-    ["P02-02", "P13-02", "P11-01", "P11-03"],
-    ["P02-03", "P02-04", "P03-01", "P04-01"],
+    ["P11-01 (isolated local preparation only)", "P11-03 (isolated local preparation only)"],
+    ["P01-01", "P02-01", "P13-01"],
+    ["P02-02", "P13-02"],
+    ["P02-03", "P02-04", "P03-01"],
+    ["P03-05", "P04-01"],
 ]
 
 
 PARALLEL_LANES = [
     {"lane": "Foundation and live recovery", "lead": "Alan", "items": ["P01-01", "P02-01", "P02-02", "P02-03", "P02-04", "P13-01", "P13-02"], "coordination": "Luke approves ADR and A0; no replacement participant surface required."},
-    {"lane": "Alan reconciliation", "lead": "Alan", "items": ["CHECK-ALAN-122-124", "CLEAN-01"], "coordination": "Runs beside CI/A0; blocks replacement auth/Node0/case surfaces, not evidence work."},
-    {"lane": "Identity and workspace", "lead": "Alan", "items": ["P03-01", "P03-02", "P03-03", "P03-04", "P04-01", "P04-02", "P04-03"], "coordination": "Luke decides role/privacy/authorship contract; begins after checkpoint."},
-    {"lane": "Participant Free and Complete", "lead": "Alan", "items": ["P05-01", "P05-02", "P05-03", "P06-01", "P06-02", "P06-03"], "coordination": "Depends workspace/provenance; Luke accepts complete-the-match and projections."},
-    {"lane": "Commercial and payment", "lead": "Alan", "items": ["P07-01", "P07-02", "P07-03", "P07-04", "P08-01", "P08-02", "P08-03", "P08-04"], "coordination": "Domain/config work can proceed beside participant UI once Luke/finance/legal decisions are explicit."},
-    {"lane": "Documents and provider exchange", "lead": "Alan", "items": ["P09-01", "P09-02", "P09-03", "P09-04", "P09-05"], "coordination": "Infra storage can follow ADR while UI waits on case/provenance and checkpoint."},
-    {"lane": "Intelligence, Learn and DS", "lead": "Alan", "items": ["P10-01", "P10-02", "P10-03", "P10-04", "P11-01", "P11-02", "P11-03", "P11-04", "P12-01"], "coordination": "Learn and DS repositories can progress without blocking A0; app adoption waits on pinned releases."},
-    {"lane": "Cutover and formal gates", "lead": "Joint", "items": ["P12-02", "P12-03", "P13-03", "P13-04", "P13-05", "P13-06", "P13-07"], "coordination": "Alan verifies technical evidence; Luke and external reviewers accept B1/B2."},
+    {"lane": "Completed source reconciliation", "lead": "Luke", "items": ["CHECK-ALAN-122-124", "CLEAN-01"], "coordination": "The review checkpoint is complete; CLEAN-01 remains future closure evidence and authorizes no cleanup."},
+    {"lane": "Identity and workspace", "lead": "Alan", "items": ["P03-01", "P03-02", "P03-03", "P03-04", "P03-05", "P04-01", "P04-02", "P04-03"], "coordination": "P03-05 encodes the reconciled access contract before workspace/case schemas consume it; Luke reviews privacy and role semantics."},
+    {"lane": "Participant Free", "lead": "Luke", "items": ["P05-01", "P05-02", "P05-03"], "coordination": "Waits for WP03/WP04 and the required WP11 contract; Alan reviews technical safety and failure behavior."},
+    {"lane": "Complete and GC onboarding", "lead": "Alan", "items": ["P06-01", "P06-02", "P06-03"], "coordination": "Depends on workspace/provenance and commercial primitives; Luke reviews product and privacy boundaries."},
+    {"lane": "Commercial and payment", "lead": "Luke", "items": ["P07-01", "P07-02", "P07-03", "P07-04", "P08-01", "P08-02", "P08-03", "P08-04"], "coordination": "Luke implements settled founder policy; Alan reviews and retains named technical-mechanism decisions, including D-PAY-01."},
+    {"lane": "Documents and provider exchange", "lead": "Alan", "items": ["P09-01", "P09-02", "P09-03", "P09-04", "P09-05", "P09-06"], "coordination": "Metadata readiness can progress without bytes; content integration waits for the secure pipeline; provider handoff waits for clean content versions."},
+    {"lane": "Intelligence", "lead": "Alan", "items": ["P10-01", "P10-02", "P10-03", "P10-04"], "coordination": "Alan implements the scoped service/app contracts after D-AI-01; Luke reviews truth and privacy boundaries."},
+    {"lane": "Learn, participant DS and cutover", "lead": "Luke", "items": ["P11-01", "P11-02", "P11-03", "P11-04", "P12-01", "P12-02", "P12-03"], "coordination": "P11-01/P11-03 allow isolated uncommitted preparation; app adoption and cutover wait for their named upstream dependencies."},
+    {"lane": "Formal gates", "lead": "Alan", "items": ["P13-03", "P13-04", "P13-05", "P13-06", "P13-07"], "coordination": "Alan is DRI for technical gate evidence; P13-07 is jointly implemented with Luke and qualified external reviewers."},
 ]
 
 
 WORK_PACKAGE_OWNERSHIP = [
-    {"wp": "WP00", "dri": "Luke", "implementer": "Luke", "reviewer": "Alan", "approver": "Luke", "note": "Programme baseline; Alan sign-off precedes mandatory assignments."},
+    {"wp": "WP00", "dri": "Luke", "implementer": "Luke", "reviewer": "Alan", "approver": "Luke", "note": "Ready for Alan review and joint acceptance; no new implementation is authorized by this review package."},
     {"wp": "WP01", "dri": "Alan", "implementer": "Alan", "reviewer": "Luke", "approver": "Luke", "note": "Technical evidence foundation."},
-    {"wp": "WP02", "dri": "Alan", "implementer": "Alan", "reviewer": "Luke + higher-capability", "approver": "Luke", "note": "Alan proposes framework; Luke approves compatibility/risk."},
-    {"wp": "WP03", "dri": "Alan", "implementer": "Alan", "reviewer": "Luke + security", "approver": "Luke", "note": "Luke decides admission/access policy."},
-    {"wp": "WP04", "dri": "Alan", "implementer": "Alan", "reviewer": "Luke + privacy", "approver": "Luke", "note": "Joint domain/provenance design."},
-    {"wp": "WP05", "dri": "Alan", "implementer": "Alan", "reviewer": "Luke", "approver": "Luke", "note": "Luke owns Free boundary and sensitive question/score policy."},
-    {"wp": "WP06", "dri": "Alan", "implementer": "Alan", "reviewer": "Luke + privacy", "approver": "Luke", "note": "Luke owns cross-role projection and Complete contract."},
-    {"wp": "WP07", "dri": "Luke", "implementer": "Alan", "reviewer": "Luke + finance/legal", "approver": "Luke", "note": "Luke decides commercial semantics; Alan implements event/state contract."},
-    {"wp": "WP08", "dri": "Luke", "implementer": "Alan", "reviewer": "payment/security/finance", "approver": "Luke", "note": "Mandatory external review before real money."},
-    {"wp": "WP09", "dri": "Alan", "implementer": "Alan", "reviewer": "Luke + security/privacy/provider", "approver": "Luke", "note": "Luke approves retention and provider purpose."},
-    {"wp": "WP10", "dri": "Alan", "implementer": "Alan", "reviewer": "Luke + AI safety/privacy", "approver": "Luke", "note": "Luke approves truth/scope policy."},
-    {"wp": "WP11", "dri": "Alan", "implementer": "Alan", "reviewer": "Luke + accessibility/content", "approver": "Luke", "note": "Separate repo releases; aesthetic purity is not universal gate."},
-    {"wp": "WP12", "dri": "Alan", "implementer": "Alan", "reviewer": "Luke + accessibility", "approver": "Luke", "note": "Luke owns product acceptance; participant surfaces only."},
-    {"wp": "WP13", "dri": "Joint", "implementer": "Alan", "reviewer": "Luke + external security/privacy/compliance", "approver": "Luke", "note": "Alan verifies technical gates; Luke accepts; B1/B2 need independent review."},
+    {"wp": "WP02", "dri": "Alan", "implementer": "Alan", "reviewer": "Luke", "approver": "Luke", "note": "Alan chooses the migration framework/mechanism; Luke approves compatibility and risk."},
+    {"wp": "WP03", "dri": "Alan", "implementer": "Alan", "reviewer": "Luke", "approver": "Luke", "note": "Alan implements identity/admission controls; Luke reviews founder access constraints."},
+    {"wp": "WP04", "dri": "Alan", "implementer": "Alan", "reviewer": "Luke", "approver": "Luke", "note": "Alan implements the domain/provenance contracts; Luke reviews product/privacy boundaries."},
+    {"wp": "WP05", "dri": "Luke", "implementer": "Luke", "reviewer": "Alan", "approver": "Luke", "note": "Luke owns Free implementation; Alan reviews technical architecture, security and failure behavior."},
+    {"wp": "WP06", "dri": "Alan", "implementer": "Alan", "reviewer": "Luke", "approver": "Luke", "note": "Alan implements Complete/GC onboarding; Luke reviews cross-role projection and product boundaries."},
+    {"wp": "WP07", "dri": "Luke", "implementer": "Luke", "reviewer": "Alan", "approver": "Luke", "note": "Luke implements settled commercial semantics; Alan reviews technical mechanisms and idempotency."},
+    {"wp": "WP08", "dri": "Luke", "implementer": "Luke", "reviewer": "Alan", "approver": "Luke", "note": "Luke implements payment-domain contracts after D-PAY-01; external review remains mandatory before real money."},
+    {"wp": "WP09", "dri": "Alan", "implementer": "Alan", "reviewer": "Luke", "approver": "Luke", "note": "Alan implements document/provider controls; Luke reviews retention, purpose and PHI boundaries."},
+    {"wp": "WP10", "dri": "Alan", "implementer": "Alan", "reviewer": "Luke", "approver": "Luke", "note": "Alan implements intelligence contracts after D-AI-01; Luke reviews truth and privacy policy."},
+    {"wp": "WP11", "dri": "Luke", "implementer": "Luke", "reviewer": "Alan", "approver": "Luke", "note": "Luke implements the separate Learn, intelligence-catalog, participant-DS and app-adoption PRs; Alan reviews technical contracts."},
+    {"wp": "WP12", "dri": "Luke", "implementer": "Luke", "reviewer": "Alan", "approver": "Luke", "note": "Luke implements participant shell/cutover; Alan reviews integration, authorization and failure behavior."},
+    {"wp": "WP13", "dri": "Alan", "implementer": "Alan", "reviewer": "Luke", "approver": "Luke", "note": "Alan owns technical gate evidence; Luke accepts gates and external reviewers retain their required attestations."},
 ]
+
+
+TECHNICAL_DECISION_OWNERS = {
+    "D-CI-01": "Alan - immediate control configuration/evidence",
+    "D-MIG-01": "Alan - immediate framework, sequencing and recovery mechanism",
+    "D-AUTH-02": "Alan - later identity/admission mechanism",
+    "D-PAY-01": "Alan - later processor, security and settlement mechanism",
+    "D-DOC-01": "Alan - later download/recovery mechanism; privacy/legal validation",
+    "D-DOC-02": "Alan - later scanner/quarantine mechanism",
+    "D-PROV-01": "Alan - later provider-packet mechanism; privacy/provider validation",
+    "D-AI-01": "Alan - later model/retrieval/schema/fallback mechanism",
+    "D-OPS-01": "Alan - immediate recovery/rollback/forward-repair mechanism",
+    "D-PHI-01": "Alan - technical evidence; qualified external reviewers - control approval",
+    "D-PHI-02": "Alan - evidence index; qualified external reviewers - attestations",
+}
+
+
+PR_OWNERSHIP_EXCEPTIONS = {
+    "P13-07": {
+        "implementer": "Joint",
+        "reviewer": "Luke + External/TBD",
+        "justification": "Alan assembles technical control evidence; Luke owns founder go/no-go; qualified external reviewers supply required attestations.",
+    }
+}
+
+
+def _technical_decision_owner(pr_id: str) -> str:
+    owners = [
+        f"{decision['id']}: {TECHNICAL_DECISION_OWNERS[decision['id']]}"
+        for decision in DECISIONS
+        if decision["id"] in TECHNICAL_DECISION_OWNERS and pr_id in decision["affected"]
+    ]
+    return "; ".join(owners) if owners else "None; implement the settled founder constraints and approved contracts"
+
+
+def _local_preparation_status(pr: dict[str, Any]) -> str:
+    if pr["id"] == "P00-01":
+        return "Ready for Alan review and joint acceptance; no new implementation"
+    if pr["id"] in {"P11-01", "P11-03"}:
+        return "Eligible for isolated, uncommitted, synthetic/no-invented-content preparation only"
+    if pr["id"] in {"P02-01", "P09-01"}:
+        return "Technical-decision preparation only; implementation waits on named dependencies"
+    if pr["id"] == "P13-07":
+        return "Evidence-structure preparation only; technical and external evidence remains incomplete"
+    return "Not ready; named PR, decision or programme-acceptance prerequisites remain"
+
+
+def _merge_readiness(pr: dict[str, Any]) -> str:
+    if pr["id"] == "P00-01":
+        return "Blocked pending Alan review and joint programme acceptance"
+    conditions: list[str] = []
+    if pr["deps"]:
+        conditions.append("PR dependencies " + ", ".join(pr["deps"]))
+    if pr["blocked_by"]:
+        conditions.append("technical decisions/controls " + ", ".join(pr["blocked_by"]))
+    if pr["gate"] not in {"Pre-A0", "A0"}:
+        conditions.append("Gate A0 active and verified")
+    conditions.append("Alan review" if pr["wp"] in {"WP00", "WP05", "WP07", "WP08", "WP11", "WP12"} else "Luke review/final founder approval")
+    if pr["id"] == "P13-07":
+        conditions.append("qualified external attestations and B1 evidence")
+    return "Blocked pending " + "; ".join(conditions)
+
+
+_ownership_by_wp = {item["wp"]: item for item in WORK_PACKAGE_OWNERSHIP}
+for _pr in PROPOSED_PRS:
+    _wp_owner = _ownership_by_wp[_pr["wp"]]
+    _exception = PR_OWNERSHIP_EXCEPTIONS.get(_pr["id"], {})
+    _pr["wp_dri"] = _wp_owner["dri"]
+    _pr["dri"] = _wp_owner["dri"]
+    _pr["primary_implementer"] = _exception.get("implementer", _wp_owner["implementer"])
+    _pr["implementer"] = _pr["primary_implementer"]
+    _pr["reviewer"] = _exception.get("reviewer", _wp_owner["reviewer"])
+    _pr["approver"] = _wp_owner["approver"]
+    _pr["technical_decision_owner"] = _technical_decision_owner(_pr["id"])
+    _pr["local_preparation_status"] = _local_preparation_status(_pr)
+    _pr["merge_readiness"] = _merge_readiness(_pr)
+    _pr["ownership_exception"] = _exception.get("justification", "None")
+
+    if _pr["id"] == "P00-01":
+        _pr["readiness"] = "Ready for Alan review and joint acceptance"
+    elif _pr["id"] in {"P11-01", "P11-03"}:
+        _pr["readiness"] = "Local preparation only"
+    elif _pr["id"] == "P13-07":
+        _pr["readiness"] = "Evidence preparation only"
+    elif _pr["readiness"] not in {"Ready for Alan decision", "Blocked by decision"}:
+        _pr["readiness"] = "Dependencies/decisions unmet"
 
 
 REVIEW_MODEL = [
     {"checkpoint": "Architecture review", "when": "Before any package PR plan is marked ready", "owner": "Luke", "evidence": "Approved entities/contracts/decision items"},
-    {"checkpoint": "PR-plan approval", "when": "Before implementation branch", "owner": "Luke + proposed implementer", "evidence": "Scope, non-goals, dependencies, tests, rollout/repair"},
-    {"checkpoint": "Alan PR reconciliation", "when": "Before replacement auth/Node0/case surfaces", "owner": "Alan; Luke accepts", "evidence": "CHECK-ALAN-122-124 complete"},
+    {"checkpoint": "Isolated local preparation", "when": "Only where the PR record expressly permits it", "owner": "Named proposed implementer", "evidence": "Separate worktree; uncommitted; synthetic-only; protected work untouched"},
+    {"checkpoint": "PR-plan approval", "when": "Before commit or PR creation", "owner": "Named proposed implementer + reciprocal reviewer", "evidence": "Scope, non-goals, dependencies, tests, rollout/repair"},
+    {"checkpoint": "Alan PR reconciliation", "when": "Completed 2026-07-12 before planning amendments", "owner": "Luke; Alan supplied the completed technical review", "evidence": "Frozen matrix and CHECK-ALAN-122-124 complete"},
     {"checkpoint": "Pre-merge review", "when": "Every PR", "owner": "Named reviewer/approver", "evidence": "CI, objective acceptance, risk review"},
     {"checkpoint": "Cloud verification", "when": "Gate-related PRs", "owner": "Alan", "evidence": "Known revision and redacted live/synthetic artifacts"},
     {"checkpoint": "Gate acceptance", "when": "A0/A1/A2/B1/B2", "owner": "Luke", "evidence": "Gate matrix; external sign-off where required"},
@@ -1508,9 +2177,9 @@ RISK_REGISTER = [
     {"id": "R-02", "class": "Product/privacy risk", "risk": "IP assertions are presented as GC truth or leak across roles.", "owner": "Luke", "mitigation": "Authorship matrix, D-DATA decisions, WP04/WP06 negative tests.", "gate": "A1/A2"},
     {"id": "R-03", "class": "Security risk", "risk": "Forwarded invitation or shared signup code grants sensitive access.", "owner": "Alan", "mitigation": "Separate claim/invite machines, claim-aware Cognito admission, consent/membership transaction.", "gate": "A1/A2"},
     {"id": "R-04", "class": "Financial risk", "risk": "Duplicate charge/case/invoice/refund or unreproducible balance.", "owner": "Luke", "mitigation": "Append-only ledgers, processor inbox, typed promotion event, idempotency/concurrency tests.", "gate": "A2"},
-    {"id": "R-05", "class": "Security/compliance risk", "risk": "Unscanned/public/over-shared documents or provider packet expose sensitive data.", "owner": "Luke", "mitigation": "Quarantine/vault, KMS/IAM, purpose consent, access audit, RLS, formal gates.", "gate": "A2/B2"},
+    {"id": "R-05", "class": "Security/compliance risk", "risk": "Metadata is mistaken for a document or unscanned/public/over-shared content/provider packets expose sensitive data.", "owner": "Luke", "mitigation": "Separate metadata/content state machines, quarantine/vault, KMS/IAM, purpose consent, access audit, RLS before B1 and formal B2.", "gate": "A2/B1/B2"},
     {"id": "R-06", "class": "AI safety risk", "risk": "Private memory or provisional/AI fact becomes shared/provider truth.", "owner": "Luke", "mitigation": "Scoped envelopes, evidence rail, proposal authority, safety evals.", "gate": "A2"},
-    {"id": "R-07", "class": "Delivery risk", "risk": "Useful work is deleted or Alan spends time polishing obsolete architecture.", "owner": "Joint", "mitigation": "Extraction ledger/checkpoint, destination tests, no cleanup before sign-off.", "gate": "Pre-A0"},
+    {"id": "R-07", "class": "Delivery risk", "risk": "Useful #122/#124/Wave 2/worktree evidence is deleted or obsolete architecture is continued.", "owner": "Joint", "mitigation": "Completed matrix/extraction ledger, destination tests and no cleanup before replacement reachability/team confirmation.", "gate": "Pre-A0"},
     {"id": "R-08", "class": "Operational risk", "risk": "Green CI is mistaken for live or PHI readiness.", "owner": "Luke", "mitigation": "Known-revision cloud gates and formal B1/B2 evidence/approvers.", "gate": "A0-B2"},
     {"id": "R-09", "class": "UX/accessibility risk", "risk": "Mobile or assistive users cannot complete the participant journey.", "owner": "Alan", "mitigation": "Release-blocking DS criteria and end-to-end mobile/keyboard tests.", "gate": "A1/A2"},
     {"id": "R-10", "class": "Repository-boundary risk", "risk": "Participant/internal DS, Learn/intelligence/app truth or app/infra ownership is blurred.", "owner": "Luke", "mitigation": "Pinned contracts, separate PRs/repositories, architecture-after-merge statements.", "gate": "All"},
@@ -1518,10 +2187,10 @@ RISK_REGISTER = [
 
 
 RELEASE_STRATEGY = [
-    "Merge only after the consolidated plan is reviewed by Alan and accepted by Luke; proposed ownership is not a compulsory assignment before that sign-off.",
+    "The corrected work-package split is proposed pending Alan's review. Only PRs expressly marked for isolated local preparation may be worked on before joint acceptance, and that work remains uncommitted, synthetic-only and outside protected worktrees; commit, PR creation and merge wait for reciprocal review and the named controls.",
     "Use additive schemas, feature flags and dual-compatible reads/writes; contract only after telemetry/evidence proves the prior revision is unavailable.",
     "Recover and pass A0 first, then validate A1 core participant behavior before adding commercial/document complexity, then A2 before any real user.",
-    "Keep all development synthetic through A2. B1 permits only the explicitly approved PII beta scope. PHI remains blocked until B2's formal human go/no-go.",
+    "Keep all development synthetic through A2. B1 requires forced RLS/non-owner runtime plus the explicitly approved PII beta scope. PHI-capable paths remain disabled until B2's formal human go/no-go.",
     "Every gate release identifies exact app/intelligence/infra revisions, migration heads, artifact pins and rollback/forward-repair response.",
     "Existing PRs/branches are closed or deleted only after extraction, replacement reachability, review reconciliation and explicit team confirmation.",
 ]
@@ -1550,27 +2219,31 @@ PROJECT_FIELDS = [
 PROJECT_CONVENTIONS = {
     "project": "MVP Product Flow Reshape",
     "number": 3,
-    "status": "Benched and closed pending Alan's review of the Drive-only package; do not use for execution until jointly reactivated.",
+    "status": "Benched and closed after plan reconciliation; do not use for execution until the amended Drive package is jointly accepted and the Project is separately reactivated/resynced.",
     "hierarchy": "Draft items cannot be true GitHub sub-issues. Work-package parents are identifiable draft epics; child PR/decision/gate items link by Work package and Dependencies fields and exact IDs. Convert only when real implementation begins.",
-    "readiness": "Readiness is independent from Status. A Todo item may be blocked, awaiting reconciliation, plan-ready or ready to implement.",
-    "assignment": "Alan is a proposed implementer pending his review/sign-off; Project fields describe the recommendation, not an imposed assignment.",
+    "readiness": "Local preparation status is distinct from merge readiness. A PR may permit isolated uncommitted preparation while remaining blocked from commit, PR creation or merge.",
+    "assignment": "PR ownership inherits the proposed work-package split pending Alan's review; named technical-decision ownership does not transfer implementation ownership across work packages.",
     "reviewer_field": "GitHub reserves the literal custom-field name Reviewer, so Programme reviewer holds the requested planning reviewer role without duplicating the built-in Reviewers metadata.",
-    "source_of_truth": "programme_data.py is the package generator source; rendered Markdown is review material; the Project is operational control plane after sync. Changes must update data, regenerate, validate and re-sync together.",
+    "source_of_truth": "programme_data.py is the package generator source and Drive is the canonical review surface. The benched Project becomes an operational control plane only after a separately authorized sync; catalogue changes must not be presented as live Project state.",
 }
 
 
 PROJECT_SYNC_RESULT = {
-    "validated_at": "2026-07-10 21:59 America/New_York",
+    "catalogue_generated_at": "2026-07-12 19:30 America/New_York",
+    "live_snapshot_at": "2026-07-10 21:59 America/New_York",
     "project_id": "PVT_kwDOEAWZDM4BYbai",
-    "items": 106,
-    "draft_items": 95,
+    "items": 110,
+    "draft_items": 99,
     "linked_items": 11,
+    "live_items": 106,
+    "live_draft_items": 95,
+    "live_linked_items": 11,
     "total_fields": 29,
     "custom_fields": 16,
-    "statuses": "All 106 items are Todo",
-    "required_values": "Complete on every item; Proposed PR ID complete on all 50 proposed PR items",
-    "type_counts": "14 WP; 50 proposed PR; 9 existing PR; 2 existing issue; 22 decision; 1 checkpoint; 5 gate; 3 cleanup",
-    "result": "Passed: exact counts, unique stable IDs/URLs, no missing fields or links",
+    "statuses": "Desired catalogue: checkpoint and three resolved decisions Done; implementation PRs Todo. Last live snapshot: all 106 items Todo.",
+    "required_values": "Desired fields complete on 110 items; Proposed PR ID complete on all 52 proposed PR items",
+    "type_counts": "14 WP; 52 proposed PR; 9 existing PR; 2 existing issue; 24 decision; 1 checkpoint; 5 gate; 3 cleanup",
+    "result": "Local desired catalogue validated; remote Project intentionally not resynced because it is benched and the task authorizes only canonical planning sources/generated artifacts.",
 }
 
 

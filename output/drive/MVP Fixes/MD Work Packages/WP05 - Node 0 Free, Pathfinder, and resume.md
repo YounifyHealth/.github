@@ -2,8 +2,8 @@
 title: '\plantitle{Natalyx MVP Fixes}'
 title-meta: "Natalyx MVP Fixes"
 subtitle: "Work Package 05: Node 0 Free, Pathfinder, and resume"
-author: "L. Rhodes (plan owner) - A. Zhao (technical review requested)"
-date: "2026-07-10"
+author: "L. Rhodes (plan owner) - A. Zhao (technical feedback reconciled)"
+date: "2026-07-12"
 ---
 # Work Package 05: Node 0 Free, Pathfinder, and resume
 
@@ -14,7 +14,7 @@ date: "2026-07-10"
 | Work package | WP05 |
 | Plan file | `WP05 - Node 0 Free, Pathfinder, and resume.md` |
 | Proposed PRs | P05-01, P05-02, P05-03 |
-| Inspection snapshot | 2026-07-10 20:12 America/New_York |
+| Inspection snapshot | 2026-07-12 19:30 America/New_York |
 
 ## Purpose and outcome
 
@@ -39,6 +39,7 @@ Classification is explicit: **verified** is observed code/PR/live behavior; **ve
 | --- | --- | --- | --- | --- |
 | E-010 | verified | app / PR #124@84a5a84 | app/routes/node0.py:63-90 | Opening Node 0 calls create_byos_case_for_ip with is_synthetic=True; there is no separate free workspace or authorized promotion. |
 | E-013 | verified | app / PR #124@84a5a84 | app/node0.py:252-482,622-878,975-1001 | Nineteen IP-entered candidate answers about relationship and third-party circumstances/health derive a 0-100 score, readiness/status, ordering, guide route and evidence packet without per-field provenance or verification. |
+| E-028 | verified review | app / PR #124 comment 4948149089 | Consolidated review - findings for the WP00 extraction ledger | Alan's completed review classifies #124 as high-value extraction material rather than a merge unit and identifies transaction, privacy, scoring, access, validation, invariant, exposure, retention, performance, CSS and CI findings. |
 
 ## Architecture and contracts
 
@@ -51,8 +52,8 @@ Classification is explicit: **verified** is observed code/PR/live behavior; **ve
 | Ownership boundary | `app`; repository-specific PRs remain separate. |
 | Entities/state | `entry_session`, `node0_workspace` |
 | Authorization | Authenticated subject/service plus entity membership, role, purpose, consent and expected revision; query parameters, links and UI state are never authority. |
-| API/service | Deterministic route decision response with policy version. Workspace-scoped candidate and guide commands. UI calls workspace-scoped commands only. |
-| Storage | Use workspace candidates/assertions from WP04. |
+| API/service | Deterministic route decision response with policy version. Typed workspace-scoped commands reject malformed/oversize input and return neutral questions to clarify, never eligibility flags. UI calls workspace-scoped commands only. |
+| Storage | Use workspace candidates/assertions from WP04 with FKs, uniqueness and one-active-outreach invariants. |
 | Audit | Use the common transition envelope and append-only source/event identifiers; redact tokens, raw documents, prompts and sensitive payloads. |
 | Failure | Fail closed for authorization, provenance, money, document and PHI boundaries; expose a bounded actionable error and preserve retry/repair evidence. |
 | Observability | Correlation, policy/schema/config version, transition and dependency result metrics without PHI/PII payload logging. |
@@ -202,18 +203,21 @@ Owner: **natalyx-app**. States: `draft`, `active`, `match_ready`, `promotion_pen
 
 ## Explicit PR sequence
 
-| Order | ID | Title | Repository | Dependencies | Gate | Size | Readiness |
+| Order | ID | Title | Repository | Dependencies | Gate | Local preparation | Merge readiness |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | P05-01 | Replace Pathfinder routing with deterministic entry decisions | app | P03-01, P04-01 | A1 | Medium | Dependencies unmet |
-| 2 | P05-02 | Rebuild Node 0 Free candidate and outreach domain | app | P04-02, P05-01 | A1 | Exceptional | Dependencies unmet |
-| 3 | P05-03 | Ship resumable Node 0 Free participant surface | app | P03-01, P05-02, P11-03 | A1 | Large | Dependencies unmet |
+| 1 | P05-01 | Replace Pathfinder routing with deterministic entry decisions | app | P03-01, P04-01 | A1 | Not ready; named PR, decision or programme-acceptance prerequisites remain | Blocked pending PR dependencies P03-01, P04-01; Gate A0 active and verified; Alan review |
+| 2 | P05-02 | Rebuild Node 0 Free candidate and outreach domain | app | P04-02, P05-01 | A1 | Not ready; named PR, decision or programme-acceptance prerequisites remain | Blocked pending PR dependencies P04-02, P05-01; Gate A0 active and verified; Alan review |
+| 3 | P05-03 | Ship resumable Node 0 Free participant surface | app | P03-01, P05-02, P11-03 | A1 | Not ready; named PR, decision or programme-acceptance prerequisites remain | Blocked pending PR dependencies P03-01, P05-02, P11-03; Gate A0 active and verified; Alan review |
 
 ### P05-01 - Replace Pathfinder routing with deterministic entry decisions
 
 | Field | Plan |
 | --- | --- |
 | Repository / base | `app` (`main`) |
-| Gate / size / readiness | A1 / Medium / Dependencies unmet |
+| Gate / size | A1 / Medium |
+| Local preparation status | Not ready; named PR, decision or programme-acceptance prerequisites remain |
+| Merge readiness | Blocked pending PR dependencies P03-01, P04-01; Gate A0 active and verified; Alan review |
+| Technical-decision owner | None; implement the settled founder constraints and approved contracts |
 | Dependencies | P03-01, P04-01 |
 | Blocking decisions/checkpoints | None beyond dependencies and plan approval |
 | Source / salvage | Current pathfinder_destinations.py, PR #119 product-alignment doc |
@@ -290,16 +294,19 @@ Hard dependencies: P03-01, P04-01. Parallel opportunities: P05-03
 - [ ] Route users predictably to Node 0, full IP setup, GC claim, Learn/Ask education, or provider/partner paths using explicit inputs and policy versioning.
 - [ ] Every listed objective test passes locally and at the required gate where applicable.
 - [ ] Every explicit non-goal remains out of the diff and no protected worktree/branch is modified during extraction.
+- [ ] The planning record has matching dependency, local-preparation, merge-readiness, ownership, gate and disposition fields.
 - [ ] Rollout/repair evidence is attached before merge; unresolved decisions remain blocked rather than encoded as guesses.
 
 #### Ownership and review
 
 | Role | Recommendation |
 | --- | --- |
-| DRI | Luke |
-| Implementer | Luke (proposed; pending joint approval) |
+| Work-package DRI | Luke |
+| Primary implementer | Luke (proposed; pending Alan review) |
+| Technical-decision owner | None; implement the settled founder constraints and approved contracts |
 | Reviewer | Alan |
-| Final approver | Joint |
+| Final approver | Luke |
+| PR-level ownership exception | None |
 | Required expertise | Python/FastAPI, PostgreSQL, security-aware product engineering |
 | Higher-capability review | Risk-proportionate; not mandatory by programme default |
 
@@ -308,9 +315,12 @@ Hard dependencies: P03-01, P04-01. Parallel opportunities: P05-03
 | Field | Plan |
 | --- | --- |
 | Repository / base | `app` (`main`) |
-| Gate / size / readiness | A1 / Exceptional / Dependencies unmet |
+| Gate / size | A1 / Exceptional |
+| Local preparation status | Not ready; named PR, decision or programme-acceptance prerequisites remain |
+| Merge readiness | Blocked pending PR dependencies P04-02, P05-01; Gate A0 active and verified; Alan review |
+| Technical-decision owner | None; implement the settled founder constraints and approved contracts |
 | Dependencies | P04-02, P05-01 |
-| Blocking decisions/checkpoints | CHECK-ALAN-122-124 |
+| Blocking decisions/checkpoints | None beyond dependencies and plan approval |
 | Source / salvage | PR #117 direct algorithm/test salvage, PR #124, quiz rewrite worktree |
 
 #### Objective
@@ -319,13 +329,16 @@ Port the useful deterministic candidate, preliminary safety, and outreach behavi
 
 #### Scope
 
-- Unlimited candidates
-- Preliminary hard-criteria check with limitations
+- Unlimited candidates under bounded command/collection sizes
+- Minimum-necessary relationship, outreach and logistics questions only
 - Basic outreach sequencing and shareable intro packet
+- Migration-backed case/workspace/candidate/outreach constraints
+- Batched hydration plus archive/anonymize/delete behavior under D-DATA-02
 
 #### Explicit non-goals
 
-- No weighted ranking
+- No weighted ranking or suitability score
+- No IP-entered health, substance, mental-health, citizenship, race or eligibility data
 - No medical clearance
 - No paid feature
 
@@ -341,8 +354,8 @@ Port the useful deterministic candidate, preliminary safety, and outreach behavi
 
 | Area | Planned change |
 | --- | --- |
-| Schema/model | Use workspace candidates/assertions from WP04. |
-| API/routes | Workspace-scoped candidate and guide commands. |
+| Schema/model | Use workspace candidates/assertions from WP04 with FKs, uniqueness and one-active-outreach invariants. |
+| API/routes | Typed workspace-scoped commands reject malformed/oversize input and return neutral questions to clarify, never eligibility flags. |
 | UI/product surface | No visible participant/operator UI change. |
 | Infrastructure/workflow | No cloud/infrastructure resource or workflow change. |
 | Migration/backfill | No migration or backfill. |
@@ -353,10 +366,14 @@ Port the useful deterministic candidate, preliminary safety, and outreach behavi
 
 Objective tests:
 
-- Deterministic metrics
-- critical safety blocking
+- Allowed/blocked field matrix
+- no ranking/gating
+- strict enum/body/collection limits
 - author attribution
 - candidate isolation
+- concurrent outreach invariant
+- retention/deletion
+- query-count bound
 - free feature contract
 
 Local validation:
@@ -387,16 +404,19 @@ Hard dependencies: P04-02, P05-01. Parallel opportunities: None inside this pack
 - [ ] Port the useful deterministic candidate, preliminary safety, and outreach behavior onto workspace/provenance contracts while preserving the complete-the-match free boundary.
 - [ ] Every listed objective test passes locally and at the required gate where applicable.
 - [ ] Every explicit non-goal remains out of the diff and no protected worktree/branch is modified during extraction.
+- [ ] The planning record has matching dependency, local-preparation, merge-readiness, ownership, gate and disposition fields.
 - [ ] Rollout/repair evidence is attached before merge; unresolved decisions remain blocked rather than encoded as guesses.
 
 #### Ownership and review
 
 | Role | Recommendation |
 | --- | --- |
-| DRI | Luke |
-| Implementer | Luke (proposed; pending joint approval) |
+| Work-package DRI | Luke |
+| Primary implementer | Luke (proposed; pending Alan review) |
+| Technical-decision owner | None; implement the settled founder constraints and approved contracts |
 | Reviewer | Alan |
-| Final approver | Joint |
+| Final approver | Luke |
+| PR-level ownership exception | None |
 | Required expertise | Python/FastAPI, PostgreSQL, security-aware product engineering |
 | Higher-capability review | Mandatory before merge |
 
@@ -405,9 +425,12 @@ Hard dependencies: P04-02, P05-01. Parallel opportunities: None inside this pack
 | Field | Plan |
 | --- | --- |
 | Repository / base | `app` (`main`) |
-| Gate / size / readiness | A1 / Large / Dependencies unmet |
+| Gate / size | A1 / Large |
+| Local preparation status | Not ready; named PR, decision or programme-acceptance prerequisites remain |
+| Merge readiness | Blocked pending PR dependencies P03-01, P05-02, P11-03; Gate A0 active and verified; Alan review |
+| Technical-decision owner | None; implement the settled founder constraints and approved contracts |
 | Dependencies | P03-01, P05-02, P11-03 |
-| Blocking decisions/checkpoints | CHECK-ALAN-122-124 |
+| Blocking decisions/checkpoints | None beyond dependencies and plan approval |
 | Source / salvage | PRs #121/#124 selective UI port, DS PR #8 |
 
 #### Objective
@@ -417,6 +440,10 @@ Provide a coherent mobile-capable Node 0 Free workspace shell for candidate trac
 #### Scope
 
 - Workspace home and candidate flow
+- Shared IP-owner guard across participant and API routes
+- Exact public/cloud exposure registry
+- Expiry-aware token views and no-store/referrer/noindex response policy
+- Route-scoped Node 0 stylesheet
 - Honest preliminary labels/empty/error states
 - Logout/login resume and mobile navigation
 
@@ -450,8 +477,12 @@ Provide a coherent mobile-capable Node 0 Free workspace shell for candidate trac
 Objective tests:
 
 - Clickable Free path
+- GC/viewer/staff/nonowner denial without 500
+- exact route exposure negatives
+- expired-token GET
+- cache/referrer headers
+- malformed/oversize form/PDF input
 - resume
-- authorization
 - no-JS/keyboard
 - 320/375/768px
 - dependency failure
@@ -484,16 +515,19 @@ Hard dependencies: P03-01, P05-02, P11-03. Parallel opportunities: P05-01
 - [ ] Provide a coherent mobile-capable Node 0 Free workspace shell for candidate tracking, outreach, guide use, and resume without paid-case language.
 - [ ] Every listed objective test passes locally and at the required gate where applicable.
 - [ ] Every explicit non-goal remains out of the diff and no protected worktree/branch is modified during extraction.
+- [ ] The planning record has matching dependency, local-preparation, merge-readiness, ownership, gate and disposition fields.
 - [ ] Rollout/repair evidence is attached before merge; unresolved decisions remain blocked rather than encoded as guesses.
 
 #### Ownership and review
 
 | Role | Recommendation |
 | --- | --- |
-| DRI | Luke |
-| Implementer | Luke (proposed; pending joint approval) |
+| Work-package DRI | Luke |
+| Primary implementer | Luke (proposed; pending Alan review) |
+| Technical-decision owner | None; implement the settled founder constraints and approved contracts |
 | Reviewer | Alan |
-| Final approver | Joint |
+| Final approver | Luke |
+| PR-level ownership exception | None |
 | Required expertise | Python/FastAPI, PostgreSQL, security-aware product engineering |
 | Higher-capability review | Risk-proportionate; not mandatory by programme default |
 
@@ -529,13 +563,33 @@ Compatibility window: keep prior readers/writers and rollback image usable throu
 
 ## Risks and decisions
 
-| Type | ID / risk | Owner | Affected PRs / latest point | Treatment |
-| --- | --- | --- | --- | --- |
-| Blocking/product/compliance decision | D-DATA-03 - Does any 0-100 candidate ranking or race-based preference survive, and what may provisional third-party answers gate? | Luke | P05-02, P06-03; Before P05-02 | D-DATA-03 - Remove candidate ranking and race preference; use source-labelled questions-to-clarify. Unverified IP answers cannot gate claim/onboarding/eligibility. |
-| Implementation risk | Paid features leak into Free | Luke or named PR DRI | Package PRs; before associated gate | Mitigate through the explicit tests, rollout and forward-repair plan |
-| Implementation risk | Provisional score is overclaimed | Luke or named PR DRI | Package PRs; before associated gate | Mitigate through the explicit tests, rollout and forward-repair plan |
-| Implementation risk | Route drift | Luke or named PR DRI | Package PRs; before associated gate | Mitigate through the explicit tests, rollout and forward-repair plan |
-| Implementation risk | LLM dependency reintroduced | Luke or named PR DRI | Package PRs; before associated gate | Mitigate through the explicit tests, rollout and forward-repair plan |
+Founder outcomes, Alan's remaining technical ownership and external activation dependencies are recorded separately so a final policy is never mistaken for an active control.
+
+| ID | Status | Classification | Remaining owner | Affected / latest | Programme effect |
+| --- | --- | --- | --- | --- | --- |
+| D-DATA-03 | Resolved by reconciliation | Reconciliation settled | Alan - implementation | P05-02, P06-03; Resolved 2026-07-12 | No longer blocks Node 0 implementation planning. |
+
+### D-DATA-03 - Candidate scoring and sensitive preference policy
+
+| Field | Recorded decision or requirement |
+| --- | --- |
+| Decision state | Final |
+| Founder outcome | No candidate ranking, viability/eligibility flag or race preference survives; provisional pre-join input can generate neutral source-labelled questions only. |
+| Founder constraints | No sensitive third-party scoring or gating; No provisional assertion becomes GC/provider truth |
+| What remains for Alan | Remove legacy ranking/gating and preserve neutral-question behavior |
+| Evidence required | Prohibited-field and no-ranking tests |
+| Approval rule | No further founder decision unless ranking or eligibility behavior is proposed. |
+| External dependencies | None |
+| Affected PRs / latest point | P05-02, P06-03; Resolved 2026-07-12 |
+| Programme effect | No longer blocks Node 0 implementation planning. |
+| Independent recommendation | No ranking, viability/eligibility flag or race preference survives. Pre-join IP input is limited to minimum-necessary relationship/outreach/logistics context and may produce neutral source-labelled questions only; it never gates claim, onboarding, provider use or critical decisions. |
+
+| Implementation risk | Owner | Treatment |
+| --- | --- | --- |
+| Paid features leak into Free | Luke | Mitigate through explicit tests, rollout and forward-repair evidence before the associated gate. |
+| Provisional score is overclaimed | Luke | Mitigate through explicit tests, rollout and forward-repair evidence before the associated gate. |
+| Route drift | Luke | Mitigate through explicit tests, rollout and forward-repair evidence before the associated gate. |
+| LLM dependency reintroduced | Luke | Mitigate through explicit tests, rollout and forward-repair evidence before the associated gate. |
 
 ## Existing-work salvage
 
@@ -544,7 +598,7 @@ Compatibility window: keep prior readers/writers and rollback image usable throu
 | app#117 | 5ac09f0cdd92 | Deterministic candidate questionnaire, scoring/status calculation, conversation-guide resource, routes and extensive Node 0 tests. | P05-02, P05-03 | Selective port and rewrite | Unextracted; algorithm/test review required after Alan checkpoint and Luke field/score decision. |
 | app#119 | a8cd2f428535 | Concise product-leverage framing and boundaries for the MVP flow. | P05-01 | Retain as source or merge separately after plan decision | Catalogued; reconcile terminology into approved programme. |
 | app#121 | 529d377e2337 | Primary Node 0 participant model/UI, PDF/guide presentation and focused surface tests. | P05-03 | Selective UI/test port, then supersede | Unextracted; #124 may contain later copies but equivalence must be proved by file/commit comparison. |
-| app#124 | 84a5a847fea7 | Current consolidation of Node 0 questionnaire/guide/surfaces, GC onboarding, participant case shell, invitations, DS assets and large focused test suites. | P05-02, P05-03 | Retain unchanged as evidence; selective port/rewrite after checkpoint | Unextracted; Alan review explicitly incomplete and unresolved. |
+| app#124 | 84a5a847fea7 | Consolidated Node 0 questionnaire/guide/surfaces, GC onboarding, participant case shell, invitation delegation, DS assets and large focused test suites as extraction evidence. | P05-02, P05-03 | Fully supersede as a merge unit; preserve selective concepts, copy, assets and tests as evidence | Complete at 84a5a84: all consolidated-review findings are dispositioned and assigned; no mergeable/cherry-pick unit is approved. |
 | detached candidate rewrite | 9605d88 | substantial uncommitted Node 0 quiz rewrite | P04-02/P05-02 | Selective port from protected worktree | Preserve; compare with predecessor and #117/#124 before any discard. |
 | detached predecessor candidate model | dc6a2f0 | substantial uncommitted predecessor model | P04-02/P05-02 if unique | Selective port from protected worktree | Preserve until rewrite diff/extraction ledger is complete. |
 
@@ -557,15 +611,15 @@ Package source inventory:
 
 ## Ownership recommendation
 
-Luke leads this work package, with Alan providing technical review. The split is proposed for review and can be amended before implementation begins.
+Luke is the proposed DRI and primary implementer; Alan reviews the technical architecture, security and failure behavior. Reconciliation is complete; replacement work waits for WP03/WP04 contracts, and commit/PR/merge waits for Alan's review and joint package acceptance.
 
-| PR | DRI | Implementer | Reviewer | Final approver | External/high-capability review |
-| --- | --- | --- | --- | --- | --- |
-| P05-01 | Luke | Luke (proposed) | Alan | Joint | As risk warrants |
-| P05-02 | Luke | Luke (proposed) | Alan | Joint | Mandatory |
-| P05-03 | Luke | Luke (proposed) | Alan | Joint | As risk warrants |
+| PR | WP DRI | Primary implementer | Technical-decision owner | Reviewer | Final approver | Exception |
+| --- | --- | --- | --- | --- | --- | --- |
+| P05-01 | Luke | Luke (proposed) | None; implement the settled founder constraints and approved contracts | Alan | Luke | None |
+| P05-02 | Luke | Luke (proposed) | None; implement the settled founder constraints and approved contracts | Alan | Luke | None |
+| P05-03 | Luke | Luke (proposed) | None; implement the settled founder constraints and approved contracts | Alan | Luke | None |
 
-Luke leads implementation and product acceptance for this package; Alan reviews architecture, migration, security and failure behavior. This is a recommendation pending joint review, not a compulsory assignment.
+PR ownership inherits the proposed work-package split pending Alan's review. Named technical-decision ownership remains separate and never transfers implementation ownership across work packages; reciprocal and external review requirements remain intact.
 
 ## Definition of done
 

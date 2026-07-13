@@ -12,12 +12,12 @@ Direct GraphQL inspection found Project 3 open with only GitHub's default Title,
 | --- | --- |
 | Project | MVP Product Flow Reshape |
 | Number | 3 |
-| Status | Reuse GitHub's Todo / In Progress / Done field for execution state. |
+| Status | Benched and closed after plan reconciliation; do not use for execution until the amended Drive package is jointly accepted and the Project is separately reactivated/resynced. |
 | Hierarchy | Draft items cannot be true GitHub sub-issues. Work-package parents are identifiable draft epics; child PR/decision/gate items link by Work package and Dependencies fields and exact IDs. Convert only when real implementation begins. |
-| Readiness | Readiness is independent from Status. A Todo item may be blocked, awaiting reconciliation, plan-ready or ready to implement. |
-| Assignment | Alan is a proposed implementer pending his review/sign-off; Project fields describe the recommendation, not an imposed assignment. |
+| Readiness | Local preparation status is distinct from merge readiness. A PR may permit isolated uncommitted preparation while remaining blocked from commit, PR creation or merge. |
+| Assignment | PR ownership inherits the proposed work-package split pending Alan's review; named technical-decision ownership does not transfer implementation ownership across work packages. |
 | Reviewer Field | GitHub reserves the literal custom-field name Reviewer, so Programme reviewer holds the requested planning reviewer role without duplicating the built-in Reviewers metadata. |
-| Source Of Truth | programme_data.py is the package generator source; rendered Markdown is review material; the Project is operational control plane after sync. Changes must update data, regenerate, validate and re-sync together. |
+| Source Of Truth | programme_data.py is the package generator source and Drive is the canonical review surface. The benched Project becomes an operational control plane only after a separately authorized sync; catalogue changes must not be presented as live Project state. |
 
 ## Fields
 
@@ -47,31 +47,35 @@ GitHub's existing **Status** field is reused; no duplicate status field is creat
 | Item type | Expected count | Naming convention |
 | --- | --- | --- |
 | Work packages | 14 | [WPxx] title |
-| Proposed PRs | 50 | [Pxx-yy] title |
+| Proposed PRs | 52 | [Pxx-yy] title |
 | Existing PRs | 9 | Actual linked PR |
 | Existing issues | 2 | Actual linked issue |
-| Decisions | 22 | [DECISION D-*] title |
+| Decisions | 24 | [DECISION D-*] title |
 | Review checkpoints | 1 | [CHECKPOINT] title |
 | Programme gates | 5 | [GATE Ax] title |
 | Cleanup tasks | 3 | [CLEANUP C-*] title |
 
-## Live post-sync validation
+## Desired catalogue and last live snapshot
 
-| Check | Verified result |
+| Check | Recorded result |
 | --- | --- |
-| Validated At | 2026-07-10 21:59 America/New_York |
+| Catalogue Generated At | 2026-07-12 19:30 America/New_York |
+| Live Snapshot At | 2026-07-10 21:59 America/New_York |
 | Project Id | PVT_kwDOEAWZDM4BYbai |
-| Items | 106 |
-| Draft Items | 95 |
+| Items | 110 |
+| Draft Items | 99 |
 | Linked Items | 11 |
+| Live Items | 106 |
+| Live Draft Items | 95 |
+| Live Linked Items | 11 |
 | Total Fields | 29 |
 | Custom Fields | 16 |
-| Statuses | All 106 items are Todo |
-| Required Values | Complete on every item; Proposed PR ID complete on all 50 proposed PR items |
-| Type Counts | 14 WP; 50 proposed PR; 9 existing PR; 2 existing issue; 22 decision; 1 checkpoint; 5 gate; 3 cleanup |
-| Result | Passed: exact counts, unique stable IDs/URLs, no missing fields or links |
+| Statuses | Desired catalogue: checkpoint and three resolved decisions Done; implementation PRs Todo. Last live snapshot: all 106 items Todo. |
+| Required Values | Desired fields complete on 110 items; Proposed PR ID complete on all 52 proposed PR items |
+| Type Counts | 14 WP; 52 proposed PR; 9 existing PR; 2 existing issue; 24 decision; 1 checkpoint; 5 gate; 3 cleanup |
+| Result | Local desired catalogue validated; remote Project intentionally not resynced because it is benched and the task authorizes only canonical planning sources/generated artifacts. |
 
-The synchronizer read these values back from Project 3 after the final update; it did not infer them from the local catalogue. All items remain planning-only and no proposed PR is marked `Ready to implement`.
+The desired 110-item catalogue is validated locally. The last read-back live snapshot remains 106 items and all Todo; this reconciliation did not apply remote Project changes. All implementation items remain planning-only and no proposed PR is marked `Ready to implement`.
 
 ## Dependency and hierarchy representation
 
@@ -84,9 +88,10 @@ Each proposed PR carries a Work package value and exact Dependencies text. Work-
 | Dimension | Meaning |
 | --- | --- |
 | Status | Todo / In Progress / Done: execution state only. |
-| Readiness | Whether plan/decision/dependency/reconciliation conditions permit implementation. |
+| Local preparation | Whether isolated, uncommitted, synthetic-only work may occur before joint acceptance. |
+| Merge readiness | Whether dependencies, decisions, reciprocal review, A0 and applicable external controls permit merge. |
 | Disposition | How existing/proposed/decision/gate/cleanup material should be treated. |
-| Ownership | DRI/implementer/reviewer/approver recommendation; Alan remains proposed until sign-off. |
+| Ownership | Work-package DRI and primary implementer, separate technical-decision owner, reciprocal reviewer and founder approver; all remain proposed pending Alan's review. |
 
 ## Project sync and maintenance
 
@@ -96,21 +101,21 @@ Dry-run/read current state:
 /Users/lukerhodes/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3 scripts/sync_project.py
 ```
 
-Apply idempotent updates:
+Apply idempotent updates only after separate reactivation/authorization (the script blocks apply while benched):
 
 ```bash
 /Users/lukerhodes/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3 scripts/sync_project.py --apply
 ```
 
-After any canonical change, regenerate Markdown, validate, re-render the PDF, then re-run the idempotent Project sync. Do not hand-edit IDs/titles/dependencies in only one surface.
+After any canonical change, regenerate Markdown, validate and re-render the PDF. Validate the desired catalogue locally; remote sync is a separate authorized action after the benched Project is reactivated.
 
 ## Final Project validation checklist
 
 - [ ] One identifiable item for every WP00-WP13.
-- [ ] One proposed-PR draft item for all 50 PR IDs.
+- [ ] One proposed-PR draft item for all 52 PR IDs.
 - [ ] Actual linked PRs #112/#117/#119/#121/#122/#123/#124 and DS #7/#8.
 - [ ] Actual linked Learn #3 and Intelligence #14 dependency issues.
-- [ ] Alan reconciliation checkpoint present and blocking named replacement work.
+- [ ] Alan reconciliation checkpoint present and complete; normal dependencies/decisions remain.
 - [ ] Every blocking decision and A0/A1/A2/B1/B2 gate present.
-- [ ] Ownership, dependencies, readiness, plan path, source/salvage and disposition populated.
+- [ ] Ownership, technical-decision responsibility, dependencies, local preparation, merge readiness, plan path, source/salvage and disposition populated.
 - [ ] No duplicate titles/IDs and Project/document parity validator passes.

@@ -1,13 +1,13 @@
 # Work package 07 — Commercial configuration, enrollment, and promotion
 
-> Planning-only execution contract. Proposed implementers and owners remain recommendations until Alan reviews/signs off the consolidated plan and Luke accepts it. Project: [MVP Product Flow Reshape](https://github.com/orgs/NatalyxPlatform/projects/3).
+> Planning-only execution contract. The corrected work-package split remains proposed pending Alan's review. Local preparation and merge readiness are separate; the benched Project catalogue is not resynced. Project reference: [MVP Product Flow Reshape](https://github.com/orgs/NatalyxPlatform/projects/3).
 
 | Plan | Value |
 | --- | --- |
 | Work package | WP07 |
 | Plan file | `07-commercial-configuration-enrollment-and-promotion.md` |
 | Proposed PRs | P07-01, P07-02, P07-03, P07-04 |
-| Inspection snapshot | 2026-07-10 20:12 America/New_York |
+| Inspection snapshot | 2026-07-12 19:30 America/New_York |
 
 ## 1. Purpose and outcome
 
@@ -165,12 +165,12 @@ No browser success/return route and no raw processor callback can emit or substi
 
 ## 4. Explicit PR sequence
 
-| Order | ID | Title | Repository | Dependencies | Gate | Size | Readiness |
+| Order | ID | Title | Repository | Dependencies | Gate | Local preparation | Merge readiness |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | P07-01 | Add versioned commercial configuration and terms acceptance | app | P02-03 | A2 | Large | Dependencies unmet |
-| 2 | P07-02 | Implement commitment and enrollment-pending lifecycle | app | P07-01, P08-01 | A2 | Large | Dependencies unmet |
-| 3 | P07-03 | Emit processor-neutral workspace promotion authorization | app | P04-02, P07-02, P08-02 | A2 | Large | Dependencies unmet |
-| 4 | P07-04 | Promote workspace exactly once from authorization event | app | P03-03, P04-02, P07-03 | A2 | Exceptional | Dependencies unmet |
+| 1 | P07-01 | Add versioned commercial configuration and terms acceptance | app | P02-03 | A2 | Not ready; named PR, decision or programme-acceptance prerequisites remain | Blocked pending PR dependencies P02-03; Gate A0 active and verified; Alan review |
+| 2 | P07-02 | Implement commitment and enrollment-pending lifecycle | app | P07-01, P08-01 | A2 | Not ready; named PR, decision or programme-acceptance prerequisites remain | Blocked pending PR dependencies P07-01, P08-01; Gate A0 active and verified; Alan review |
+| 3 | P07-03 | Emit processor-neutral workspace promotion authorization | app | P04-02, P07-02, P08-02 | A2 | Not ready; named PR, decision or programme-acceptance prerequisites remain | Blocked pending PR dependencies P04-02, P07-02, P08-02; Gate A0 active and verified; Alan review |
+| 4 | P07-04 | Promote workspace exactly once from authorization event | app | P03-03, P04-02, P07-03 | A2 | Not ready; named PR, decision or programme-acceptance prerequisites remain | Blocked pending PR dependencies P03-03, P04-02, P07-03; Gate A0 active and verified; Alan review |
 
 ### P07-01 — Add versioned commercial configuration and terms acceptance
 
@@ -178,9 +178,12 @@ No browser success/return route and no raw processor callback can emit or substi
 | --- | --- |
 | Repository / base | `app` (`main`) |
 | Project item | [P07-01](https://github.com/orgs/NatalyxPlatform/projects/3?query=P07-01) |
-| Gate / size / readiness | A2 / Large / Dependencies unmet |
+| Gate / size | A2 / Large |
+| Local preparation status | Not ready; named PR, decision or programme-acceptance prerequisites remain |
+| Merge readiness | Blocked pending PR dependencies P02-03; Gate A0 active and verified; Alan review |
+| Technical-decision owner | None; implement the settled founder constraints and approved contracts |
 | Dependencies | P02-03 |
-| Blocking decisions/checkpoints | D-COM-01, D-COM-02, D-COM-03 |
+| Blocking decisions/checkpoints | None beyond dependencies and plan approval |
 | Source / salvage | Payment/business-model DOCX |
 
 #### Objective
@@ -254,17 +257,19 @@ Hard dependencies: P02-03. Parallel opportunities: P07-03, P07-04
 - [ ] Store activated price books, milestone schedules, Node 0 credit rules, and immutable terms/privacy acceptance versions without scattering literals.
 - [ ] Every listed objective test passes locally and at the required gate where applicable.
 - [ ] Every explicit non-goal remains out of the diff and no protected worktree/branch is modified during extraction.
-- [ ] The Project item has matching dependency, readiness, ownership, gate and disposition fields.
+- [ ] The planning record has matching dependency, local-preparation, merge-readiness, ownership, gate and disposition fields.
 - [ ] Rollout/repair evidence is attached before merge; unresolved decisions remain blocked rather than encoded as guesses.
 
 #### Ownership and review
 
 | Role | Recommendation |
 | --- | --- |
-| DRI | Alan |
-| Implementer | Alan (proposed; pending consolidated-plan sign-off) |
-| Reviewer | Luke |
+| Work-package DRI | Luke |
+| Primary implementer | Luke (proposed; pending Alan review) |
+| Technical-decision owner | None; implement the settled founder constraints and approved contracts |
+| Reviewer | Alan |
 | Final approver | Luke |
+| PR-level ownership exception | None |
 | Required expertise | commercial systems, PostgreSQL |
 | Higher-capability review | Mandatory before merge |
 
@@ -274,9 +279,12 @@ Hard dependencies: P02-03. Parallel opportunities: P07-03, P07-04
 | --- | --- |
 | Repository / base | `app` (`main`) |
 | Project item | [P07-02](https://github.com/orgs/NatalyxPlatform/projects/3?query=P07-02) |
-| Gate / size / readiness | A2 / Large / Dependencies unmet |
+| Gate / size | A2 / Large |
+| Local preparation status | Not ready; named PR, decision or programme-acceptance prerequisites remain |
+| Merge readiness | Blocked pending PR dependencies P07-01, P08-01; Gate A0 active and verified; Alan review |
+| Technical-decision owner | None; implement the settled founder constraints and approved contracts |
 | Dependencies | P07-01, P08-01 |
-| Blocking decisions/checkpoints | D-COM-04 |
+| Blocking decisions/checkpoints | None beyond dependencies and plan approval |
 | Source / salvage | Business-model conversion trigger |
 
 #### Objective
@@ -351,17 +359,19 @@ Hard dependencies: P07-01, P08-01. Parallel opportunities: P07-04
 - [ ] Create a deliberate managed-journey commitment with accepted terms, selected payment path, pinned config, and an enrollment invoice request independent from case state.
 - [ ] Every listed objective test passes locally and at the required gate where applicable.
 - [ ] Every explicit non-goal remains out of the diff and no protected worktree/branch is modified during extraction.
-- [ ] The Project item has matching dependency, readiness, ownership, gate and disposition fields.
+- [ ] The planning record has matching dependency, local-preparation, merge-readiness, ownership, gate and disposition fields.
 - [ ] Rollout/repair evidence is attached before merge; unresolved decisions remain blocked rather than encoded as guesses.
 
 #### Ownership and review
 
 | Role | Recommendation |
 | --- | --- |
-| DRI | Alan |
-| Implementer | Alan (proposed; pending consolidated-plan sign-off) |
-| Reviewer | Luke |
+| Work-package DRI | Luke |
+| Primary implementer | Luke (proposed; pending Alan review) |
+| Technical-decision owner | None; implement the settled founder constraints and approved contracts |
+| Reviewer | Alan |
 | Final approver | Luke |
+| PR-level ownership exception | None |
 | Required expertise | Python/FastAPI, PostgreSQL, security-aware product engineering |
 | Higher-capability review | Mandatory before merge |
 
@@ -371,9 +381,12 @@ Hard dependencies: P07-01, P08-01. Parallel opportunities: P07-04
 | --- | --- |
 | Repository / base | `app` (`main`) |
 | Project item | [P07-03](https://github.com/orgs/NatalyxPlatform/projects/3?query=P07-03) |
-| Gate / size / readiness | A2 / Large / Dependencies unmet |
+| Gate / size | A2 / Large |
+| Local preparation status | Not ready; named PR, decision or programme-acceptance prerequisites remain |
+| Merge readiness | Blocked pending PR dependencies P04-02, P07-02, P08-02; Gate A0 active and verified; Alan review |
+| Technical-decision owner | None; implement the settled founder constraints and approved contracts |
 | Dependencies | P04-02, P07-02, P08-02 |
-| Blocking decisions/checkpoints | D-COM-04, D-DATA-01 |
+| Blocking decisions/checkpoints | None beyond dependencies and plan approval |
 | Source / salvage | Business-model promotion invariants |
 
 #### Objective
@@ -450,17 +463,19 @@ Hard dependencies: P04-02, P07-02, P08-02. Parallel opportunities: P07-01
 - [ ] Validate commitment, terms, commercial version, settled funding and credit evidence, then emit exactly one byos.workspace_promotion_authorized.v1 event; processor callbacks and browser redirects cannot emit it.
 - [ ] Every listed objective test passes locally and at the required gate where applicable.
 - [ ] Every explicit non-goal remains out of the diff and no protected worktree/branch is modified during extraction.
-- [ ] The Project item has matching dependency, readiness, ownership, gate and disposition fields.
+- [ ] The planning record has matching dependency, local-preparation, merge-readiness, ownership, gate and disposition fields.
 - [ ] Rollout/repair evidence is attached before merge; unresolved decisions remain blocked rather than encoded as guesses.
 
 #### Ownership and review
 
 | Role | Recommendation |
 | --- | --- |
-| DRI | Alan |
-| Implementer | Alan (proposed; pending consolidated-plan sign-off) |
-| Reviewer | Luke |
+| Work-package DRI | Luke |
+| Primary implementer | Luke (proposed; pending Alan review) |
+| Technical-decision owner | None; implement the settled founder constraints and approved contracts |
+| Reviewer | Alan |
 | Final approver | Luke |
+| PR-level ownership exception | None |
 | Required expertise | event-driven systems, payments, commercial policy |
 | Higher-capability review | Mandatory before merge |
 
@@ -470,9 +485,12 @@ Hard dependencies: P04-02, P07-02, P08-02. Parallel opportunities: P07-01
 | --- | --- |
 | Repository / base | `app` (`main`) |
 | Project item | [P07-04](https://github.com/orgs/NatalyxPlatform/projects/3?query=P07-04) |
-| Gate / size / readiness | A2 / Exceptional / Dependencies unmet |
+| Gate / size | A2 / Exceptional |
+| Local preparation status | Not ready; named PR, decision or programme-acceptance prerequisites remain |
+| Merge readiness | Blocked pending PR dependencies P03-03, P04-02, P07-03; Gate A0 active and verified; Alan review |
+| Technical-decision owner | None; implement the settled founder constraints and approved contracts |
 | Dependencies | P03-03, P04-02, P07-03 |
-| Blocking decisions/checkpoints | D-COM-04, D-DATA-01, CHECK-ALAN-122-124 |
+| Blocking decisions/checkpoints | None beyond dependencies and plan approval |
 | Source / salvage | byos.workspace_promotion_authorized.v1 contract, PR #124 source linkage concepts |
 
 #### Objective
@@ -548,17 +566,19 @@ Hard dependencies: P03-03, P04-02, P07-03. Parallel opportunities: P07-01, P07-0
 - [ ] Consume byos.workspace_promotion_authorized.v1 to create/find one enrollment_pending paid case, link the source workspace, project allowlisted data, and grant only restricted IP membership.
 - [ ] Every listed objective test passes locally and at the required gate where applicable.
 - [ ] Every explicit non-goal remains out of the diff and no protected worktree/branch is modified during extraction.
-- [ ] The Project item has matching dependency, readiness, ownership, gate and disposition fields.
+- [ ] The planning record has matching dependency, local-preparation, merge-readiness, ownership, gate and disposition fields.
 - [ ] Rollout/repair evidence is attached before merge; unresolved decisions remain blocked rather than encoded as guesses.
 
 #### Ownership and review
 
 | Role | Recommendation |
 | --- | --- |
-| DRI | Alan |
-| Implementer | Alan (proposed; pending consolidated-plan sign-off) |
-| Reviewer | Luke |
+| Work-package DRI | Luke |
+| Primary implementer | Luke (proposed; pending Alan review) |
+| Technical-decision owner | None; implement the settled founder constraints and approved contracts |
+| Reviewer | Alan |
 | Final approver | Luke |
+| PR-level ownership exception | None |
 | Required expertise | event-driven systems, privacy, PostgreSQL |
 | Higher-capability review | Mandatory before merge |
 
@@ -594,18 +614,113 @@ Compatibility window: keep prior readers/writers and rollback image usable throu
 
 ## 7. Risks and decisions
 
-| Type | ID / risk | Owner | Affected PRs / latest point | Project item / treatment |
-| --- | --- | --- | --- | --- |
-| Blocking/product/compliance decision | D-DATA-01 — Which provisional IP assertions may the GC see, which GC answers may the IP see, and which fields survive promotion/provider projection? | Luke | P04-02, P06-02, P06-03, P07-03, P07-04, P09-05, P10-01, P10-02; Before P04-02 | [D-DATA-01](https://github.com/orgs/NatalyxPlatform/projects/3?query=D-DATA-01) — Default deny; expose only explicit purpose-limited projections. Class 1/2 and class 4 never automatically cross roles. |
-| Blocking/product/compliance decision | D-COM-01 — Set the flat one-time price and tax treatment; it must remain fully creditable against the later JMF. | Luke | P06-01, P07-01, P08-01; Before activation of a Complete configuration | [D-COM-01](https://github.com/orgs/NatalyxPlatform/projects/3?query=D-COM-01) — Keep no active production value until explicitly approved; test with synthetic configuration. |
-| Blocking/product/compliance decision | D-COM-02 — Ratify $8,900 JMF, $7,830 pay-in-full, $750 deposit and 20/30/20/20/10 post-deposit milestones as configuration v1 with effective date/currency. | Luke | P07-01, P08-01, P08-03; Before P07-01 activation data | [D-COM-02](https://github.com/orgs/NatalyxPlatform/projects/3?query=D-COM-02) — Use the document anchors but require explicit version activation rather than code literals. |
-| Blocking/product/compliance decision | D-COM-03 — Approve the actual paid-service terms, privacy/consent disclosure and refundable-to-earned wording. | Luke | P07-01, P07-02, P08-03; Before P07-02 user acceptance | [D-COM-03](https://github.com/orgs/NatalyxPlatform/projects/3?query=D-COM-03) — External legal/privacy/finance review before any real acceptance. |
-| Blocking/product/compliance decision | D-COM-04 — Define evidence for enrollment funding confirmed, promotion authorization, and for onboarding/compatibility complete enough to move case active and earn/issue activation billing. | Luke | P07-02, P07-03, P07-04, P08-03, P09-04; Before P07-02 | [D-COM-04](https://github.com/orgs/NatalyxPlatform/projects/3?query=D-COM-04) — Funding confirmation is durable ledger evidence; promotion uses the sole typed authorization event; activation requires an explicit evidence checklist, actor and audit event. |
-| Blocking/product/compliance decision | D-COM-05 — Select financing partner and define when funding is sufficiently authorized/settled; otherwise hide the path. | Luke | P07-02, P08-02; Before financed option is exposed | [D-COM-05](https://github.com/orgs/NatalyxPlatform/projects/3?query=D-COM-05) — Do not block card/ACH MVP; keep optional and disabled. |
-| Implementation risk | Configuration drift | Alan or named PR DRI | Package PRs; before associated gate | Mitigate through the explicit tests, rollout and forward-repair plan |
-| Implementation risk | Duplicate promotion | Alan or named PR DRI | Package PRs; before associated gate | Mitigate through the explicit tests, rollout and forward-repair plan |
-| Implementation risk | Redirect spoofing | Alan or named PR DRI | Package PRs; before associated gate | Mitigate through the explicit tests, rollout and forward-repair plan |
-| Implementation risk | Unresolved policy encoded as default | Alan or named PR DRI | Package PRs; before associated gate | Mitigate through the explicit tests, rollout and forward-repair plan |
+Founder outcomes, Alan's remaining technical ownership and external activation dependencies are recorded separately so a final policy is never mistaken for an active control.
+
+| ID | Status | Classification | Remaining owner | Affected / latest | Programme effect |
+| --- | --- | --- | --- | --- | --- |
+| D-DATA-01 | Founder decision final; implementation evidence pending | Luke decides product/privacy outcome | Alan - implementation | P04-02, P06-02, P06-03, P07-03, P07-04, P09-05, P10-01, P10-02; Before P04-02 | Founder ambiguity is removed across WP04, WP06, WP07, WP09 and WP10; A1 still requires the technical denial evidence. |
+| D-COM-01 | Founder decision final for beta; tax externally dependent | Luke decides commercial outcome | Alan - implementation | P06-01, P07-01, P08-01; Before activation of a Complete configuration | P06-01, P07-01 and P08-01 may proceed synthetically; live activation remains gated. |
+| D-COM-02 | Founder decision final for v1; live activation gated | Luke decides commercial outcome | Alan - implementation | P07-01, P08-01, P08-03; Before P07-01 activation data | Synthetic commercial configuration and ledgers may proceed; real charging remains gated. |
+| D-COM-03 | Externally dependent; founder policy inputs settled | External specialist / later evidence required | External legal/privacy/finance; Luke final business approval | P07-01, P07-02, P08-03; Before P07-02 user acceptance | Synthetic A2 preparation may proceed; live P07-02/P08 charging and B1 customer acceptance remain blocked. |
+| D-COM-04 | Founder decision final; implementation evidence pending | Luke decides commercial/product outcome | Alan - implementation | P07-02, P07-03, P07-04, P08-03, P09-04; Before P07-02 | P07-02 through P09-04 may proceed under the settled semantics. |
+| D-COM-05 | Founder decision final for beta | Luke decides beta scope | None during beta | P07-02, P08-02; Before financed option is exposed | Financing no longer blocks P08-02; the feature is deliberately out of scope. |
+
+### D-DATA-01 - IP-GC field projection allowlist
+
+| Field | Recorded decision or requirement |
+| --- | --- |
+| Decision state | Final |
+| Founder outcome | Use need-to-know sharing. Shared journey status and agreed relationship/outreach/logistics may cross roles; private IP notes, unconfirmed assertions and GC medical, reproductive, insurance, identity or wellbeing answers do not cross automatically. Provider packets require preview, consent and appropriate verification. |
+| Founder constraints | Default-deny field-and-purpose allowlists; Source-labelled corrections; Named-purpose provider projection only |
+| What remains for Alan | Define explicit field/purpose allowlists in code and projection contracts; Implement cross-role and provider negative tests |
+| Evidence required | Cross-role denial matrix; Provider projection allowlist tests; Correction/source-label evidence |
+| Approval rule | Luke approval is required for a broader sharing policy, not for compliant implementation detail. |
+| External dependencies | None |
+| Affected PRs / latest point | P04-02, P06-02, P06-03, P07-03, P07-04, P09-05, P10-01, P10-02; Before P04-02 |
+| Programme effect | Founder ambiguity is removed across WP04, WP06, WP07, WP09 and WP10; A1 still requires the technical denial evidence. |
+| Independent recommendation | Default deny; expose only explicit purpose-limited projections. Class 1/2 and class 4 never automatically cross roles. |
+
+### D-COM-01 - Node 0 Complete price
+
+| Field | Recorded decision or requirement |
+| --- | --- |
+| Decision state | Final beta policy; external tax wording pending |
+| Founder outcome | Node 0 Complete is a voluntary $495 USD one-time upgrade paid by the IP or authorized IP account holder, never the GC, collected before Complete features and fully credited against the later Phase 1/JMF without gating matching or safety support. |
+| Founder constraints | Transparent one-time feature/credit wording; Versioned prospective changes only; No forced payment to identify, approach or reach agreement with a GC |
+| What remains for Alan | Implement configurable price, payer ownership, durable payment/credit ledger and idempotent flows |
+| Evidence required | Synthetic success, failure, retry, duplicate and credit tests; Tax wording before live activation |
+| Approval rule | Luke approves future commercial-policy changes; tax treatment requires specialist review. |
+| External dependencies | Tax treatment and customer-facing wording before live activation |
+| Affected PRs / latest point | P06-01, P07-01, P08-01; Before activation of a Complete configuration |
+| Programme effect | P06-01, P07-01 and P08-01 may proceed synthetically; live activation remains gated. |
+| Independent recommendation | Keep no active production value until explicitly approved; test with synthetic configuration. |
+
+### D-COM-02 - Ratify JMF price book and effective date
+
+| Field | Recorded decision or requirement |
+| --- | --- |
+| Decision state | Final v1 policy; external activation dependencies |
+| Founder outcome | Configuration v1 is $8,900 USD: a $750 deposit followed by $1,630, $2,445, $1,630, $1,630 and $815 milestones. Pay-in-full is $7,830 total, leaving $7,080 after the deposit; the separate $495 Complete credit must not be double-counted. |
+| Founder constraints | Versioned configuration; Prospective changes only; First live beta requires A2 plus approved terms and tax treatment |
+| What remains for Alan | Implement versioned configuration, milestone and reconciliation behavior |
+| Evidence required | Synthetic schedule, pay-in-full and no-double-credit reconciliation tests |
+| Approval rule | Luke approves future price-book versions and first live activation. |
+| External dependencies | Approved terms and tax treatment before live activation |
+| Affected PRs / latest point | P07-01, P08-01, P08-03; Before P07-01 activation data |
+| Programme effect | Synthetic commercial configuration and ledgers may proceed; real charging remains gated. |
+| Independent recommendation | Use the document anchors but require explicit version activation rather than code literals. |
+
+### D-COM-03 - Terms, privacy and refund language versions
+
+| Field | Recorded decision or requirement |
+| --- | --- |
+| Decision state | Externally dependent |
+| Founder outcome | No live acceptance or charge may rely on the contradictory current terms draft. D-COM-06 and D-COM-07 supply the approved business policy for a new versioned terms package. |
+| Founder constraints | Resolve refundable-until-onboarding versus non-refundable contradiction; No retrospective policy changes; Versioned terms/privacy/refund acceptance |
+| What remains for Alan | Implement versioned acceptance and keep real charging disabled until an approved version is active |
+| Evidence required | Approved paid-service terms; Approved privacy/consent disclosure; Approved tax/refund/accounting wording |
+| Approval rule | Luke approves the final business policy and customer-facing version after specialist review. |
+| External dependencies | Legal, privacy, tax and finance review before real-user acceptance or charging |
+| Affected PRs / latest point | P07-01, P07-02, P08-03; Before P07-02 user acceptance |
+| Programme effect | Synthetic A2 preparation may proceed; live P07-02/P08 charging and B1 customer acceptance remain blocked. |
+| Independent recommendation | External legal/privacy/finance review before any real acceptance. |
+
+### D-COM-04 - Enrollment funding and activation evidence
+
+| Field | Recorded decision or requirement |
+| --- | --- |
+| Decision state | Final |
+| Founder outcome | Use two-step commitment: settled $750 plus current accepted terms proves commercial enrollment, but payment alone never promotes. Exactly one enrollment-pending case follows explicit IP promotion and authenticated GC consent. The $1,630 activation tranche is earned only after defined IP/GC onboarding and screening coordination has begun; it never implies medical clearance. |
+| Founder constraints | Redirects/webhooks never promote; Typed promotion event only; Source-labelled facts and explicit evidence checklist |
+| What remains for Alan | Define typed events, activation checklist, idempotency and audit mechanics |
+| Evidence required | Duplicate, replay, partial-failure, promotion and activation evidence tests |
+| Approval rule | Luke approves any change to commercial enrollment or activation semantics. |
+| External dependencies | None |
+| Affected PRs / latest point | P07-02, P07-03, P07-04, P08-03, P09-04; Before P07-02 |
+| Programme effect | P07-02 through P09-04 may proceed under the settled semantics. |
+| Independent recommendation | Funding confirmation is durable ledger evidence; promotion uses the sole typed authorization event; activation requires an explicit evidence checklist, actor and audit event. |
+
+### D-COM-05 - Financing path
+
+| Field | Recorded decision or requirement |
+| --- | --- |
+| Decision state | Final beta scope |
+| Founder outcome | Financing is excluded and hidden from beta; Natalyx does not advertise, recommend or integrate a lender or treat lender status as funding evidence. |
+| Founder constraints | Card and ACH remain unaffected; Reconsider only after demand evidence plus legal/privacy review |
+| What remains for Alan | Keep financing paths disabled and absent from beta UI/configuration |
+| Evidence required | Negative configuration/UI tests proving financing is unavailable |
+| Approval rule | A future financing proposal requires a new founder decision. |
+| External dependencies | None |
+| Affected PRs / latest point | P07-02, P08-02; Before financed option is exposed |
+| Programme effect | Financing no longer blocks P08-02; the feature is deliberately out of scope. |
+| Independent recommendation | Do not block card/ACH MVP; keep optional and disabled. |
+
+| Implementation risk | Owner | Treatment |
+| --- | --- | --- |
+| Configuration drift | Luke | Mitigate through explicit tests, rollout and forward-repair evidence before the associated gate. |
+| Duplicate promotion | Luke | Mitigate through explicit tests, rollout and forward-repair evidence before the associated gate. |
+| Redirect spoofing | Luke | Mitigate through explicit tests, rollout and forward-repair evidence before the associated gate. |
+| Unresolved policy encoded as default | Luke | Mitigate through explicit tests, rollout and forward-repair evidence before the associated gate. |
 
 ## 8. Existing-work salvage
 
@@ -620,16 +735,16 @@ Package source inventory:
 
 ## 9. Ownership recommendation
 
-Luke owns commercial semantics and final contract. Alan proposes/implements the state machine and idempotency. Finance/legal review unresolved policy.
+Luke is the proposed DRI and primary implementer for the settled commercial contract. Alan reviews and retains the named technical-mechanism decisions; finance/legal review remains required where the live policy names it.
 
-| PR | DRI | Implementer | Reviewer | Final approver | External/high-capability review |
-| --- | --- | --- | --- | --- | --- |
-| P07-01 | Alan | Alan (proposed) | Luke | Luke | Mandatory |
-| P07-02 | Alan | Alan (proposed) | Luke | Luke | Mandatory |
-| P07-03 | Alan | Alan (proposed) | Luke | Luke | Mandatory |
-| P07-04 | Alan | Alan (proposed) | Luke | Luke | Mandatory |
+| PR | WP DRI | Primary implementer | Technical-decision owner | Reviewer | Final approver | Exception |
+| --- | --- | --- | --- | --- | --- | --- |
+| P07-01 | Luke | Luke (proposed) | None; implement the settled founder constraints and approved contracts | Alan | Luke | None |
+| P07-02 | Luke | Luke (proposed) | None; implement the settled founder constraints and approved contracts | Alan | Luke | None |
+| P07-03 | Luke | Luke (proposed) | None; implement the settled founder constraints and approved contracts | Alan | Luke | None |
+| P07-04 | Luke | Luke (proposed) | None; implement the settled founder constraints and approved contracts | Alan | Luke | None |
 
-Luke decides product/lifecycle/commercial/privacy/PHI/provider policy and accepts gates. Alan proposes implementation design, decomposition, migrations, code, tests, rollout and repair. This is a recommendation pending Alan's review/sign-off, not a compulsory assignment.
+PR ownership inherits the proposed work-package split pending Alan's review. Named technical-decision ownership remains separate and never transfers implementation ownership across work packages; reciprocal and external review requirements remain intact.
 
 ## 10. Definition of done
 

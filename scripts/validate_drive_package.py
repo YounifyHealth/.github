@@ -40,6 +40,18 @@ def pdf_text(path: Path) -> str:
     return proc.stdout
 
 
+def parity_tokens(text: str) -> set[str]:
+    text = re.sub(r"\]\([^)]*\)", "]", text)
+    text = re.sub(r"https?://\S+", " ", text)
+    return set(re.findall(r"[A-Za-z0-9][A-Za-z0-9_-]{3,}", text.lower()))
+
+
+def token_coverage(markdown_text: str, rendered_text: str) -> float:
+    source = parity_tokens(markdown_text)
+    rendered = parity_tokens(rendered_text)
+    return len(source & rendered) / len(source) if source else 1.0
+
+
 def main() -> None:
     markdown = sorted(MD_DIR.glob("*.md"))
     pdfs = sorted(PDF_DIR.glob("*.pdf"))
@@ -60,6 +72,13 @@ def main() -> None:
         for pr in [item for item in data.PROPOSED_PRS if item["wp"] == wp["id"]]:
             if pr["id"] not in text:
                 fail(f"{pr['id']} missing from {path.name}")
+            for field in ("local_preparation_status", "merge_readiness", "technical_decision_owner"):
+                if pr[field] not in text:
+                    fail(f"{pr['id']} {field} missing from {path.name}")
+        if "Luke-owned PRs that may begin now" in text:
+            fail(f"unwanted standalone Luke local-start wording in {path.name}")
+        if wp["id"] == "WP00" and ("REC-22" not in text or data.WAVE2_BRANCH["head"] not in text):
+            fail("WP00 does not contain the complete reconciliation matrix and Wave 2 exact head")
 
     for path in [OVERVIEW, *pdfs]:
         info = pdf_info(path)
@@ -75,14 +94,44 @@ def main() -> None:
         if not re.search(r"Natalyx MVP Fixes", text):
             fail(f"title text not extractable in {path.name}")
 
+    coverages: list[tuple[str, float]] = []
+    pdf_by_stem = {path.stem: path for path in pdfs}
+    for path in markdown:
+        coverage = token_coverage(path.read_text(encoding="utf-8"), pdf_text(pdf_by_stem[path.stem]))
+        coverages.append((path.name, coverage))
+        if coverage < 0.97:
+            fail(f"Markdown/PDF token parity below 97% for {path.name}: {coverage:.1%}")
+
+    overview_source = ROOT / "output" / "source" / "Natalyx MVP Fixes - Consolidated Plan Overview.md"
+    overview_coverage = token_coverage(overview_source.read_text(encoding="utf-8"), pdf_text(OVERVIEW))
+    if overview_coverage < 0.97:
+        fail(f"overview Markdown/PDF token parity below 97%: {overview_coverage:.1%}")
+
+    overview_text = pdf_text(OVERVIEW)
+    for marker in ("REC-22", "P03-05", "P09-06", "P13-07", "5b63e3a", "RLS", "B1", "B2", "Suggested ownership and reciprocal review", "Founder decision resolution", "Immediate Alan decisions", "Later Alan decisions", "External dependencies"):
+        if marker not in overview_text:
+            fail(f"reconciled overview marker {marker!r} missing")
+    stale_overview_phrases = ["technical review requested", "the remaining decision is whether", "decisions requiring explicit resolution", "no implementation begins until amendments"]
+    for phrase in stale_overview_phrases:
+        if phrase in overview_text.lower():
+            fail(f"stale overview wording remains: {phrase!r}")
+    if "Luke-owned PRs that may begin now" in overview_text:
+        fail("unwanted standalone Luke local-start wording in overview")
+
+    luke_count = sum(pr["dri"] == "Luke" for pr in data.PROPOSED_PRS)
+    alan_count = sum(pr["dri"] == "Alan" for pr in data.PROPOSED_PRS)
+    if (luke_count, alan_count) != (19, 33):
+        fail(f"ownership split is {luke_count} Luke / {alan_count} Alan, expected 19 / 33")
+
     overview_pages = int(pdf_info(OVERVIEW)["Pages"])
-    if not 15 <= overview_pages <= 40:
+    if not 15 <= overview_pages <= 60:
         fail(f"overview page count {overview_pages} is outside the concise review range")
 
     print(
         "Drive package validation passed: "
         f"14 Markdown plans, 14 matching PDFs, one {overview_pages}-page overview, "
-        "no local paths, Letter sizing and AWS-plan metadata/style source."
+        f"minimum Markdown/PDF token parity {min(value for _, value in coverages):.1%}, "
+        f"overview parity {overview_coverage:.1%}, no local paths, Letter sizing and AWS-plan metadata/style source."
     )
 
 

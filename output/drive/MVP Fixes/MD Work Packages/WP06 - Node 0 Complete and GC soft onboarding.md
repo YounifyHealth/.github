@@ -2,8 +2,8 @@
 title: '\plantitle{Natalyx MVP Fixes}'
 title-meta: "Natalyx MVP Fixes"
 subtitle: "Work Package 06: Node 0 Complete and GC soft onboarding"
-author: "L. Rhodes (plan owner) - A. Zhao (technical review requested)"
-date: "2026-07-10"
+author: "L. Rhodes (plan owner) - A. Zhao (technical feedback reconciled)"
+date: "2026-07-12"
 ---
 # Work Package 06: Node 0 Complete and GC soft onboarding
 
@@ -14,7 +14,7 @@ date: "2026-07-10"
 | Work package | WP06 |
 | Plan file | `WP06 - Node 0 Complete and GC soft onboarding.md` |
 | Proposed PRs | P06-01, P06-02, P06-03 |
-| Inspection snapshot | 2026-07-10 20:12 America/New_York |
+| Inspection snapshot | 2026-07-12 19:30 America/New_York |
 
 ## Purpose and outcome
 
@@ -265,7 +265,8 @@ Required replacement contract:
 
 - Exactly one target: workspace_id or case_id; include purpose, role, access_class, recipient_binding_mode and policy version.
 - Email-less possession may only open pending low-risk workspace claim; it cannot reveal sensitive data or grant paid-case membership.
-- Paid-case invitation is addressed, authenticated, consented and atomically redeemed; mismatch requires explicit policy/issuer handling and preferably fresh bound token.
+- Paid-case invitation is addressed, authenticated, consented and atomically redeems invitation plus participation, access grant and audit; mismatch requires explicit policy/issuer handling and preferably a fresh bound token.
+- Workspace-claim issuance commits supersession, hashed claim, candidate/workspace linkage and required audit atomically; external identity steps use an explicit idempotent completion state.
 - Cognito admission and app membership are separate decisions; account creation never equals workspace/case access.
 - Verified identity comes from auth claims, not form-entered email; duplicate claims return the original result.
 - Never put raw token/email/PHI in general participant timeline payloads; revoke/expire/supersede fail closed.
@@ -282,20 +283,23 @@ Required replacement contract:
 
 ## Explicit PR sequence
 
-| Order | ID | Title | Repository | Dependencies | Gate | Size | Readiness |
+| Order | ID | Title | Repository | Dependencies | Gate | Local preparation | Merge readiness |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | P06-01 | Add Node 0 Complete entitlement and versioned feature gates | app | P04-01, P07-01, P08-01 | A2 | Large | Dependencies unmet |
-| 2 | P06-02 | Add GC soft onboarding and attributable confirmation | app | P03-02, P04-02, P06-01 | A2 | Exceptional | Dependencies unmet |
-| 3 | P06-03 | Add readiness report and role-scoped progress surfaces | app | P06-02, P10-02, P11-04 | A2 | Large | Dependencies unmet |
+| 1 | P06-01 | Add Node 0 Complete entitlement and versioned feature gates | app | P04-01, P07-01, P08-01 | A2 | Not ready; named PR, decision or programme-acceptance prerequisites remain | Blocked pending PR dependencies P04-01, P07-01, P08-01; Gate A0 active and verified; Luke review/final founder approval |
+| 2 | P06-02 | Add GC soft onboarding and attributable confirmation | app | P03-02, P04-02, P06-01 | A2 | Not ready; named PR, decision or programme-acceptance prerequisites remain | Blocked pending PR dependencies P03-02, P04-02, P06-01; Gate A0 active and verified; Luke review/final founder approval |
+| 3 | P06-03 | Add readiness report and role-scoped progress surfaces | app | P06-02, P10-02, P11-04 | A2 | Not ready; named PR, decision or programme-acceptance prerequisites remain | Blocked pending PR dependencies P06-02, P10-02, P11-04; Gate A0 active and verified; Luke review/final founder approval |
 
 ### P06-01 - Add Node 0 Complete entitlement and versioned feature gates
 
 | Field | Plan |
 | --- | --- |
 | Repository / base | `app` (`main`) |
-| Gate / size / readiness | A2 / Large / Dependencies unmet |
+| Gate / size | A2 / Large |
+| Local preparation status | Not ready; named PR, decision or programme-acceptance prerequisites remain |
+| Merge readiness | Blocked pending PR dependencies P04-01, P07-01, P08-01; Gate A0 active and verified; Luke review/final founder approval |
+| Technical-decision owner | None; implement the settled founder constraints and approved contracts |
 | Dependencies | P04-01, P07-01, P08-01 |
-| Blocking decisions/checkpoints | D-COM-01 |
+| Blocking decisions/checkpoints | None beyond dependencies and plan approval |
 | Source / salvage | Business-model Node 0 feature table |
 
 #### Objective
@@ -370,16 +374,19 @@ Hard dependencies: P04-01, P07-01, P08-01. Parallel opportunities: P06-03
 - [ ] Model optional Complete access independently from workspace and case, pin the commercial configuration, and expose server-side gates for the approved paid-depth features.
 - [ ] Every listed objective test passes locally and at the required gate where applicable.
 - [ ] Every explicit non-goal remains out of the diff and no protected worktree/branch is modified during extraction.
+- [ ] The planning record has matching dependency, local-preparation, merge-readiness, ownership, gate and disposition fields.
 - [ ] Rollout/repair evidence is attached before merge; unresolved decisions remain blocked rather than encoded as guesses.
 
 #### Ownership and review
 
 | Role | Recommendation |
 | --- | --- |
-| DRI | Alan |
-| Implementer | Alan (proposed; pending consolidated-plan sign-off) |
+| Work-package DRI | Alan |
+| Primary implementer | Alan (proposed; pending Alan review) |
+| Technical-decision owner | None; implement the settled founder constraints and approved contracts |
 | Reviewer | Luke |
 | Final approver | Luke |
+| PR-level ownership exception | None |
 | Required expertise | Python/FastAPI, PostgreSQL, security-aware product engineering |
 | Higher-capability review | Mandatory before merge |
 
@@ -388,9 +395,12 @@ Hard dependencies: P04-01, P07-01, P08-01. Parallel opportunities: P06-03
 | Field | Plan |
 | --- | --- |
 | Repository / base | `app` (`main`) |
-| Gate / size / readiness | A2 / Exceptional / Dependencies unmet |
+| Gate / size | A2 / Exceptional |
+| Local preparation status | Not ready; named PR, decision or programme-acceptance prerequisites remain |
+| Merge readiness | Blocked pending PR dependencies P03-02, P04-02, P06-01; Gate A0 active and verified; Luke review/final founder approval |
+| Technical-decision owner | None; implement the settled founder constraints and approved contracts |
 | Dependencies | P03-02, P04-02, P06-01 |
-| Blocking decisions/checkpoints | D-DATA-01, D-DATA-02, CHECK-ALAN-122-124 |
+| Blocking decisions/checkpoints | None beyond dependencies and plan approval |
 | Source / salvage | PRs #123/#124 UX only, GC authorship audit |
 
 #### Objective
@@ -466,16 +476,19 @@ Hard dependencies: P03-02, P04-02, P06-01. Parallel opportunities: None inside t
 - [ ] Let an authenticated GC claim low-risk workspace access, provide GC-owned answers, confirm/replace selected provisional facts, and preserve private boundaries.
 - [ ] Every listed objective test passes locally and at the required gate where applicable.
 - [ ] Every explicit non-goal remains out of the diff and no protected worktree/branch is modified during extraction.
+- [ ] The planning record has matching dependency, local-preparation, merge-readiness, ownership, gate and disposition fields.
 - [ ] Rollout/repair evidence is attached before merge; unresolved decisions remain blocked rather than encoded as guesses.
 
 #### Ownership and review
 
 | Role | Recommendation |
 | --- | --- |
-| DRI | Alan |
-| Implementer | Alan (proposed; pending consolidated-plan sign-off) |
+| Work-package DRI | Alan |
+| Primary implementer | Alan (proposed; pending Alan review) |
+| Technical-decision owner | None; implement the settled founder constraints and approved contracts |
 | Reviewer | Luke |
 | Final approver | Luke |
+| PR-level ownership exception | None |
 | Required expertise | privacy, accessible forms, authorization |
 | Higher-capability review | Mandatory before merge |
 
@@ -484,9 +497,12 @@ Hard dependencies: P03-02, P04-02, P06-01. Parallel opportunities: None inside t
 | Field | Plan |
 | --- | --- |
 | Repository / base | `app` (`main`) |
-| Gate / size / readiness | A2 / Large / Dependencies unmet |
+| Gate / size | A2 / Large |
+| Local preparation status | Not ready; named PR, decision or programme-acceptance prerequisites remain |
+| Merge readiness | Blocked pending PR dependencies P06-02, P10-02, P11-04; Gate A0 active and verified; Luke review/final founder approval |
+| Technical-decision owner | None; implement the settled founder constraints and approved contracts |
 | Dependencies | P06-02, P10-02, P11-04 |
-| Blocking decisions/checkpoints | D-DATA-01 |
+| Blocking decisions/checkpoints | None beyond dependencies and plan approval |
 | Source / salvage | PR #124 score/report concepts |
 
 #### Objective
@@ -561,16 +577,19 @@ Hard dependencies: P06-02, P10-02, P11-04. Parallel opportunities: P06-01
 - [ ] Produce a preliminary, source-labelled Node 0 readiness report and separate IP/GC progress views without overclaiming clearance or exposing private answers.
 - [ ] Every listed objective test passes locally and at the required gate where applicable.
 - [ ] Every explicit non-goal remains out of the diff and no protected worktree/branch is modified during extraction.
+- [ ] The planning record has matching dependency, local-preparation, merge-readiness, ownership, gate and disposition fields.
 - [ ] Rollout/repair evidence is attached before merge; unresolved decisions remain blocked rather than encoded as guesses.
 
 #### Ownership and review
 
 | Role | Recommendation |
 | --- | --- |
-| DRI | Alan |
-| Implementer | Alan (proposed; pending consolidated-plan sign-off) |
+| Work-package DRI | Alan |
+| Primary implementer | Alan (proposed; pending Alan review) |
+| Technical-decision owner | None; implement the settled founder constraints and approved contracts |
 | Reviewer | Luke |
 | Final approver | Luke |
+| PR-level ownership exception | None |
 | Required expertise | Python/FastAPI, PostgreSQL, security-aware product engineering |
 | Higher-capability review | Mandatory before merge |
 
@@ -606,16 +625,81 @@ Compatibility window: keep prior readers/writers and rollback image usable throu
 
 ## Risks and decisions
 
-| Type | ID / risk | Owner | Affected PRs / latest point | Treatment |
-| --- | --- | --- | --- | --- |
-| Blocking/product/compliance decision | D-DATA-01 - Which provisional IP assertions may the GC see, which GC answers may the IP see, and which fields survive promotion/provider projection? | Luke | P04-02, P06-02, P06-03, P07-03, P07-04, P09-05, P10-01, P10-02; Before P04-02 | D-DATA-01 - Default deny; expose only explicit purpose-limited projections. Class 1/2 and class 4 never automatically cross roles. |
-| Blocking/product/compliance decision | D-DATA-02 - How long to retain unselected candidate assertions and how are GC corrections, conflicting relationship answers, and private IP notes represented? | Luke | P04-02, P04-03, P06-02; Before P04-02 | D-DATA-02 - Append revisions with supersedes/derived-from; never silently erase source; shortest justified retention for unselected candidates. |
-| Blocking/product/compliance decision | D-DATA-03 - Does any 0-100 candidate ranking or race-based preference survive, and what may provisional third-party answers gate? | Luke | P05-02, P06-03; Before P05-02 | D-DATA-03 - Remove candidate ranking and race preference; use source-labelled questions-to-clarify. Unverified IP answers cannot gate claim/onboarding/eligibility. |
-| Blocking/product/compliance decision | D-COM-01 - Set the flat one-time price and tax treatment; it must remain fully creditable against the later JMF. | Luke | P06-01, P07-01, P08-01; Before activation of a Complete configuration | D-COM-01 - Keep no active production value until explicitly approved; test with synthetic configuration. |
-| Implementation risk | Entitlement mistaken for case access | Alan or named PR DRI | Package PRs; before associated gate | Mitigate through the explicit tests, rollout and forward-repair plan |
-| Implementation risk | GC answers exposed to IP | Alan or named PR DRI | Package PRs; before associated gate | Mitigate through the explicit tests, rollout and forward-repair plan |
-| Implementation risk | IP assertions silently converted | Alan or named PR DRI | Package PRs; before associated gate | Mitigate through the explicit tests, rollout and forward-repair plan |
-| Implementation risk | Price hard-coded | Alan or named PR DRI | Package PRs; before associated gate | Mitigate through the explicit tests, rollout and forward-repair plan |
+Founder outcomes, Alan's remaining technical ownership and external activation dependencies are recorded separately so a final policy is never mistaken for an active control.
+
+| ID | Status | Classification | Remaining owner | Affected / latest | Programme effect |
+| --- | --- | --- | --- | --- | --- |
+| D-DATA-01 | Founder decision final; implementation evidence pending | Luke decides product/privacy outcome | Alan - implementation | P04-02, P06-02, P06-03, P07-03, P07-04, P09-05, P10-01, P10-02; Before P04-02 | Founder ambiguity is removed across WP04, WP06, WP07, WP09 and WP10; A1 still requires the technical denial evidence. |
+| D-DATA-02 | Founder default final; external validation before B1 | Luke decides default; external specialist validates | Alan - implementation; privacy/legal - validation | P04-02, P04-03, P06-02; Before P04-02 | Synthetic implementation may proceed; real-user B1 activation remains externally dependent. |
+| D-DATA-03 | Resolved by reconciliation | Reconciliation settled | Alan - implementation | P05-02, P06-03; Resolved 2026-07-12 | No longer blocks Node 0 implementation planning. |
+| D-COM-01 | Founder decision final for beta; tax externally dependent | Luke decides commercial outcome | Alan - implementation | P06-01, P07-01, P08-01; Before activation of a Complete configuration | P06-01, P07-01 and P08-01 may proceed synthetically; live activation remains gated. |
+
+### D-DATA-01 - IP-GC field projection allowlist
+
+| Field | Recorded decision or requirement |
+| --- | --- |
+| Decision state | Final |
+| Founder outcome | Use need-to-know sharing. Shared journey status and agreed relationship/outreach/logistics may cross roles; private IP notes, unconfirmed assertions and GC medical, reproductive, insurance, identity or wellbeing answers do not cross automatically. Provider packets require preview, consent and appropriate verification. |
+| Founder constraints | Default-deny field-and-purpose allowlists; Source-labelled corrections; Named-purpose provider projection only |
+| What remains for Alan | Define explicit field/purpose allowlists in code and projection contracts; Implement cross-role and provider negative tests |
+| Evidence required | Cross-role denial matrix; Provider projection allowlist tests; Correction/source-label evidence |
+| Approval rule | Luke approval is required for a broader sharing policy, not for compliant implementation detail. |
+| External dependencies | None |
+| Affected PRs / latest point | P04-02, P06-02, P06-03, P07-03, P07-04, P09-05, P10-01, P10-02; Before P04-02 |
+| Programme effect | Founder ambiguity is removed across WP04, WP06, WP07, WP09 and WP10; A1 still requires the technical denial evidence. |
+| Independent recommendation | Default deny; expose only explicit purpose-limited projections. Class 1/2 and class 4 never automatically cross roles. |
+
+### D-DATA-02 - Correction, supersession and unselected-candidate retention
+
+| Field | Recorded decision or requirement |
+| --- | --- |
+| Decision state | Final founder default; externally dependent activation |
+| Founder outcome | Retain candidate/workspace material for a 90-day minimum after explicit rejection, withdrawal or last legitimate outreach, honor earlier valid deletion, retain only non-identifying funnel metrics and a minimal audit tombstone, and preserve legal holds. Corrections append source-labelled revisions and private IP notes remain author-only. |
+| Founder constraints | No silent overwrite; Deletion and anonymization are auditable; Legal holds override ordinary deletion |
+| What remains for Alan | Implement lifecycle, deletion, anonymization, correction and legal-hold behavior |
+| Evidence required | Retention/deletion tests; Anonymization and tombstone evidence; Privacy/legal approval before B1 |
+| Approval rule | Luke accepts the live policy after privacy/legal review. |
+| External dependencies | Privacy/legal validation before B1 |
+| Affected PRs / latest point | P04-02, P04-03, P06-02; Before P04-02 |
+| Programme effect | Synthetic implementation may proceed; real-user B1 activation remains externally dependent. |
+| Independent recommendation | Append revisions with supersedes/derived-from; never silently erase source; shortest justified retention for unselected candidates. |
+
+### D-DATA-03 - Candidate scoring and sensitive preference policy
+
+| Field | Recorded decision or requirement |
+| --- | --- |
+| Decision state | Final |
+| Founder outcome | No candidate ranking, viability/eligibility flag or race preference survives; provisional pre-join input can generate neutral source-labelled questions only. |
+| Founder constraints | No sensitive third-party scoring or gating; No provisional assertion becomes GC/provider truth |
+| What remains for Alan | Remove legacy ranking/gating and preserve neutral-question behavior |
+| Evidence required | Prohibited-field and no-ranking tests |
+| Approval rule | No further founder decision unless ranking or eligibility behavior is proposed. |
+| External dependencies | None |
+| Affected PRs / latest point | P05-02, P06-03; Resolved 2026-07-12 |
+| Programme effect | No longer blocks Node 0 implementation planning. |
+| Independent recommendation | No ranking, viability/eligibility flag or race preference survives. Pre-join IP input is limited to minimum-necessary relationship/outreach/logistics context and may produce neutral source-labelled questions only; it never gates claim, onboarding, provider use or critical decisions. |
+
+### D-COM-01 - Node 0 Complete price
+
+| Field | Recorded decision or requirement |
+| --- | --- |
+| Decision state | Final beta policy; external tax wording pending |
+| Founder outcome | Node 0 Complete is a voluntary $495 USD one-time upgrade paid by the IP or authorized IP account holder, never the GC, collected before Complete features and fully credited against the later Phase 1/JMF without gating matching or safety support. |
+| Founder constraints | Transparent one-time feature/credit wording; Versioned prospective changes only; No forced payment to identify, approach or reach agreement with a GC |
+| What remains for Alan | Implement configurable price, payer ownership, durable payment/credit ledger and idempotent flows |
+| Evidence required | Synthetic success, failure, retry, duplicate and credit tests; Tax wording before live activation |
+| Approval rule | Luke approves future commercial-policy changes; tax treatment requires specialist review. |
+| External dependencies | Tax treatment and customer-facing wording before live activation |
+| Affected PRs / latest point | P06-01, P07-01, P08-01; Before activation of a Complete configuration |
+| Programme effect | P06-01, P07-01 and P08-01 may proceed synthetically; live activation remains gated. |
+| Independent recommendation | Keep no active production value until explicitly approved; test with synthetic configuration. |
+
+| Implementation risk | Owner | Treatment |
+| --- | --- | --- |
+| Entitlement mistaken for case access | Alan | Mitigate through explicit tests, rollout and forward-repair evidence before the associated gate. |
+| GC answers exposed to IP | Alan | Mitigate through explicit tests, rollout and forward-repair evidence before the associated gate. |
+| IP assertions silently converted | Alan | Mitigate through explicit tests, rollout and forward-repair evidence before the associated gate. |
+| Price hard-coded | Alan | Mitigate through explicit tests, rollout and forward-repair evidence before the associated gate. |
 
 ## Existing-work salvage
 
@@ -623,7 +707,7 @@ Compatibility window: keep prior readers/writers and rollback image usable throu
 | --- | --- | --- | --- | --- | --- |
 | app#119 | a8cd2f428535 | Concise product-leverage framing and boundaries for the MVP flow. | P06-01 | Retain as source or merge separately after plan decision | Catalogued; reconcile terminology into approved programme. |
 | app#123 | 34078f810b63 | GC onboarding form/copy, hosted auth return, invite handoff and role-specific surface work. | P06-02, P06-03 | Selective UX/test port and rewrite | Unextracted; likely partially copied into #124 but not proven complete. |
-| app#124 | 84a5a847fea7 | Current consolidation of Node 0 questionnaire/guide/surfaces, GC onboarding, participant case shell, invitations, DS assets and large focused test suites. | P06-02, P06-03 | Retain unchanged as evidence; selective port/rewrite after checkpoint | Unextracted; Alan review explicitly incomplete and unresolved. |
+| app#124 | 84a5a847fea7 | Consolidated Node 0 questionnaire/guide/surfaces, GC onboarding, participant case shell, invitation delegation, DS assets and large focused test suites as extraction evidence. | P06-02, P06-03 | Fully supersede as a merge unit; preserve selective concepts, copy, assets and tests as evidence | Complete at 84a5a84: all consolidated-review findings are dispositioned and assigned; no mergeable/cherry-pick unit is approved. |
 | feature/node0-surrogate-onboarding-link | 529d377 | substantial uncommitted onboarding/invitation work | P03-02/P03-03/P06-02 | Selective port from protected worktree | Preserve until file/test extraction is signed off. |
 
 Package source inventory:
@@ -636,13 +720,13 @@ Package source inventory:
 
 Luke decides product visibility and entitlement boundaries; Alan implements. External privacy review is recommended for field-level projections.
 
-| PR | DRI | Implementer | Reviewer | Final approver | External/high-capability review |
-| --- | --- | --- | --- | --- | --- |
-| P06-01 | Alan | Alan (proposed) | Luke | Luke | Mandatory |
-| P06-02 | Alan | Alan (proposed) | Luke | Luke | Mandatory |
-| P06-03 | Alan | Alan (proposed) | Luke | Luke | Mandatory |
+| PR | WP DRI | Primary implementer | Technical-decision owner | Reviewer | Final approver | Exception |
+| --- | --- | --- | --- | --- | --- | --- |
+| P06-01 | Alan | Alan (proposed) | None; implement the settled founder constraints and approved contracts | Luke | Luke | None |
+| P06-02 | Alan | Alan (proposed) | None; implement the settled founder constraints and approved contracts | Luke | Luke | None |
+| P06-03 | Alan | Alan (proposed) | None; implement the settled founder constraints and approved contracts | Luke | Luke | None |
 
-Luke decides product/lifecycle/commercial/privacy/PHI/provider policy and accepts gates. Alan proposes implementation design, decomposition, migrations, code, tests, rollout and repair. This is a recommendation pending Alan's review/sign-off, not a compulsory assignment.
+PR ownership inherits the proposed work-package split pending Alan's review. Named technical-decision ownership remains separate and never transfers implementation ownership across work packages; reciprocal and external review requirements remain intact.
 
 ## Definition of done
 

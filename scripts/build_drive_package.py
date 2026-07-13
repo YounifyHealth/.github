@@ -49,8 +49,8 @@ def yaml_header(title: str, subtitle: str) -> str:
             f"title: '\\plantitle{{{title}}}'",
             f'title-meta: "{title}"',
             f'subtitle: "{subtitle}"',
-            'author: "L. Rhodes (plan owner) - A. Zhao (technical review requested)"',
-            'date: "2026-07-10"',
+            'author: "L. Rhodes (plan owner) - A. Zhao (technical feedback reconciled)"',
+            'date: "2026-07-12"',
             "---",
             "",
         ]
@@ -86,34 +86,8 @@ def replace_local_paths(text: str) -> str:
 
 
 def apply_drive_ownership(text: str, wp_id: str) -> str:
-    if wp_id in LUKE_WPS:
-        text = re.sub(r"^\| DRI \| .* \|$", "| DRI | Luke |", text, flags=re.MULTILINE)
-        text = re.sub(
-            r"^\| Implementer \| .* \|$",
-            "| Implementer | Luke (proposed; pending joint approval) |",
-            text,
-            flags=re.MULTILINE,
-        )
-        text = re.sub(r"^\| Reviewer \| .* \|$", "| Reviewer | Alan |", text, flags=re.MULTILINE)
-        text = re.sub(r"^\| Final approver \| .* \|$", "| Final approver | Joint |", text, flags=re.MULTILINE)
-        text = re.sub(
-            r"^\| (P\d{2}-\d{2}) \| .*? \| .*? \| .*? \| .*? \| (.*?) \|$",
-            r"| \1 | Luke | Luke (proposed) | Alan | Joint | \2 |",
-            text,
-            flags=re.MULTILINE,
-        )
-        text = text.replace("Alan or named PR DRI", "Luke or named PR DRI")
-        text = re.sub(
-            r"(## Ownership recommendation\n\n).*?(\n\n\| PR \|)",
-            r"\1Luke leads this work package, with Alan providing technical review. The split is proposed for review and can be amended before implementation begins.\2",
-            text,
-            flags=re.DOTALL,
-        )
-        text = re.sub(
-            r"Luke decides product/lifecycle/commercial/privacy/PHI/provider policy and accepts gates\. Alan proposes implementation design, decomposition, migrations, code, tests, rollout and repair\. This is a recommendation pending Alan's review/sign-off, not a compulsory assignment\.",
-            "Luke leads implementation and product acceptance for this package; Alan reviews architecture, migration, security and failure behavior. This is a recommendation pending joint review, not a compulsory assignment.",
-            text,
-        )
+    # Ownership now comes directly from programme_data.py. Keep this function as
+    # the sanitization hook, but never rewrite canonical roles in the Drive layer.
     return text
 
 
@@ -251,30 +225,33 @@ def overview_markdown() -> str:
     wp_map = {wp["id"]: wp for wp in data.WORK_PACKAGES}
     pr_by_wp = {wp_id: [pr for pr in data.PROPOSED_PRS if pr["wp"] == wp_id] for wp_id in wp_map}
     ownership = {item["wp"]: item for item in data.WORK_PACKAGE_OWNERSHIP}
+    decisions = {item["id"]: item for item in data.DECISIONS}
 
     summary_rows: list[list[str]] = []
     for wp in data.WORK_PACKAGES:
         wp_id = wp["id"]
-        lead = "Luke" if wp_id in LUKE_WPS else "Alan"
-        reviewer = "Alan" if lead == "Luke" else "Luke"
+        lead = ownership[wp_id]["dri"]
+        reviewer = ownership[wp_id]["reviewer"]
         gates = ", ".join(sorted({pr["gate"] for pr in pr_by_wp[wp_id]}))
         summary_rows.append([wp_id, wp["title"], str(len(pr_by_wp[wp_id])), lead, reviewer, gates])
 
     parts = [
         yaml_header("Natalyx MVP Fixes", "Consolidated plan overview - fourteen coordinated work packages"),
-        "# Purpose and review request",
-        "This is a planning document for cleaning up the current Natalyx MVP delivery surface without losing useful work or compounding the present architecture. It consolidates the programme into fourteen bounded work packages and fifty suggested pull requests. The detailed Markdown and PDF plan for each work package is supplied separately in the `MVP Fixes` Drive folder.",
-        "The GitHub Project is deliberately benched until this plan is reviewed. Nothing in this document authorizes implementation, PR closure, branch cleanup, cloud changes, schema changes, payment activation, real-user use or PHI processing.",
-        "The requested decision is simple: confirm the package boundaries, amend any technical assumptions or PR splits that are wrong, and agree the ownership/review split before implementation begins.",
+        "# Purpose and approved planning update",
+        f"This is the reconciled planning document for cleaning up the current Natalyx MVP delivery surface without losing useful work or compounding the present architecture. It preserves fourteen bounded work packages and now contains {len(data.PROPOSED_PRS)} suggested pull requests. The detailed Markdown and PDF plan for each work package is supplied separately in the `MVP Fixes` Drive folder.",
+        "The GitHub Project is deliberately benched until this plan is reviewed. Only PRs whose local-preparation field expressly permits isolated, uncommitted, synthetic-only preparation may be touched before joint acceptance; nothing authorizes commit, PR creation, merge, branch cleanup, cloud changes, payment activation, real-user use or PHI processing.",
+        "Alan's completed technical feedback, corrected #122 and preserved Wave 2 have been independently reconciled. The founder interview is complete: all 24 decision IDs are classified, founder outcomes are final where recorded, and remaining technical controls and external approvals are explicitly separated from those final policies.",
         "# Current position",
         md_table(
             ["Area", "Current conclusion", "Planning consequence"],
             [
                 ["Live dev", "The inspected endpoint returned ALB 503.", "Treat live recovery and known-revision evidence as Gate A0, separate from green CI."],
-                ["PR 122", "Materially safer invitation/case-shell behavior, but not the final architecture.", "Selectively salvage tests and hardening after Alan's review is captured."],
-                ["PR 124", "Valuable participant work, but it creates a paid-case-shaped record too early and weakens authorship/access boundaries.", "Do not merge unchanged; port behavior into the workspace-first plan."],
+                ["PR 122", "Authoritative baseline for named invitation/resume/lens behavior and tests, but not the final schema/domain architecture.", "Selectively port behavior/tests; supersede runtime DDL and conflated access/provenance models."],
+                ["PR 124", "Alan's complete review confirms high extraction value but a stale/conflicted and unsafe merge unit.", "Fully supersede as a merge unit; port only approved concepts/tests/copy/assets."],
+                ["Wave 2", "Exact three-commit stack at 5b63e3a; 535 tests passed locally, with restart-loss and stale-review defects independently reproduced.", "Preserve paused; adapt phase-1 presentation, transaction patterns and tests under P03/P09/P13."],
+                ["Access / CI", "Identity/participation/access were conflated and RLS absent. GitHub Team is commercially approved but not yet activated or configured.", "P03-05 resolves the access model; P13-05 precedes B1; D-CI-01 keeps A0 and implementation merges blocked until enforcement is active and verified."],
                 ["Node 0", "Free exploration, Complete entitlement, commitment, payment and paid case are currently too entangled.", "Separate their entities and state machines before expanding UI."],
-                ["Commercial", "The business-model document is design authority; no append-only money ledger or promotion authority exists yet.", "Keep prices/terms versioned and processor-neutral; no redirect or raw webhook can promote a case."],
+                ["Commercial", "Founder beta pricing, commitment, credit, refund, loss and grace policies are final; no append-only money ledger or promotion authority exists yet.", "Implement the settled policies as versioned processor-neutral contracts; external terms/tax review still precedes live acceptance or charging."],
                 ["Documents/PHI", "Documents are metadata-only and the provider branch is unreviewed.", "Keep synthetic-only through A2, approved PII at B1, and PHI blocked until formal B2."],
             ],
         ),
@@ -283,11 +260,13 @@ def overview_markdown() -> str:
             [
                 "Node 0 begins as a free workspace; opening it never creates a canonical paid case.",
                 "Workspace, entitlement, commercial commitment, payment, case, invitation/claim, document and journey-stage lifecycles remain separate.",
+                "Identity binds principal to person; participation records the domain relationship; explicit resource grants carry capabilities; application and RLS authorization also consider ownership and purpose.",
                 "Only `byos.workspace_promotion_authorized.v1` authorizes exactly one `enrollment_pending` case; browser redirects and raw processor callbacks never do.",
                 "IP observations remain IP-attributed and provisional. GC confirmation appends a GC-authored revision; it never silently overwrites or upgrades the source.",
+                "Metadata requirements/readiness/work items are not document content. Content versions have a separate upload, quarantine, scan, review, replacement and download lifecycle.",
                 "The app owns durable case truth, authorization and PHI policy. Intelligence returns advisory proposals only. Learn artifacts and design-system releases remain pinned repository contracts.",
                 "PostgreSQL is production authority. Versioned, ordered migrations replace runtime DDL, with locking, checksums, expand/contract compatibility and forward repair.",
-                "Real PII/PHI readiness is established by evidence gates and human acceptance, not by merge or deployment success.",
+                "Forced RLS and a non-owner runtime precede B1 real-user PII. PHI remains disabled until B2 evidence and human acceptance; merge or deployment success accepts neither gate.",
             ]
         ),
         "# Work-package map",
@@ -306,7 +285,7 @@ def overview_markdown() -> str:
         md_table(
             ["Phase", "Work", "Can run in parallel", "Exit condition"],
             [
-                ["Approval", "WP00 plan review and PR 122/124 reconciliation", "No implementation", "Luke and Alan accept or explicitly amend the package boundaries."],
+                ["Planning closeout", "Founder decisions incorporated; WP00 is ready for Alan review and joint acceptance", "Only expressly marked isolated, uncommitted preparation", "Canonical Markdown/PDF package is validated and Drive readback succeeds."],
                 ["Foundation", "WP01, WP02 and A0 portions of WP13", "Learn/DS source work in WP11", "Current tests run on PostgreSQL; migration ADR/runner and known-revision recovery evidence are accepted."],
                 ["Identity and domain", "WP03 and WP04", "Selected WP10 contract work", "Claims/invitations are safe and Node 0 workspace is distinct from paid case."],
                 ["Participant core", "WP05 and WP06", "Commercial configuration in WP07", "Free and Complete flows are resumable, attributable and role-scoped."],
@@ -319,13 +298,19 @@ def overview_markdown() -> str:
             ["Gate", "Purpose", "Owner", "Verifier", "Failure rule"],
             [[gate["id"], gate["title"], gate["owner"], gate["verifier"], gate["failure"]] for gate in data.GATES],
         ),
+        "# Recommendation disposition matrix",
+        "The full assessment record, including evidence, assumptions, impacts, alternatives and migration implications, is in WP00. This is the decision view:",
+        md_table(
+            ["ID", "Recommendation", "Disposition", "Rationale", "Affected work", "Decision"],
+            [[item["id"], item["recommendation"], item["conclusion"], item["rationale"], item["affected"], item["decision_required"]] for item in data.RECONCILIATION_MATRIX],
+        ),
         "# Work-package details",
     ]
 
     for wp in data.WORK_PACKAGES:
         wp_id = wp["id"]
-        lead = "Luke" if wp_id in LUKE_WPS else "Alan"
-        reviewer = "Alan" if lead == "Luke" else "Luke"
+        lead = ownership[wp_id]["dri"]
+        reviewer = ownership[wp_id]["reviewer"]
         parts.extend(
             [
                 f"## {wp_id}: {ascii_dashes(wp['title'])}",
@@ -334,9 +319,7 @@ def overview_markdown() -> str:
                 (
                     f"**Proposed lead/review.** {lead} leads; {reviewer} reviews. "
                     + (
-                        "The split is proposed for joint review and can be amended before implementation begins."
-                        if wp_id in LUKE_WPS
-                        else ascii_dashes(ownership[wp_id]["note"])
+                        ascii_dashes(ownership[wp_id]["note"])
                     )
                 ),
                 "**Key boundaries.**\n\n" + bullets([str(value) for value in wp["architecture"]]),
@@ -352,21 +335,36 @@ def overview_markdown() -> str:
 
     parts.extend(
         [
-            "# Decisions requiring explicit resolution",
+            "# Founder decision resolution and remaining controls",
+            "Founder-final policy is not the same as an active technical control. The status, remaining owner and programme effect below preserve that distinction.",
             md_table(
-                ["Decision", "Topic", "Owner", "Resolve by", "Recommendation"],
-                [[item["id"], item["title"], item["owner"], item["latest"], item["recommendation"]] for item in data.DECISIONS],
+                ["Decision", "Status", "Founder outcome", "Remaining owner", "Resolve by", "Programme effect"],
+                [[item["id"], item["status"], item["founder_decision"], item["remaining_owner"], item["latest"], item["programme_effect"]] for item in data.DECISIONS],
             ),
-            "# Review checklist",
+            "## Immediate Alan decisions",
+            md_table(
+                ["Decision", "Alan owns", "Evidence", "Latest safe point"],
+                [[item_id, "; ".join(decisions[item_id]["alan_remaining"]), "; ".join(decisions[item_id]["evidence_required"]), decisions[item_id]["latest"]] for item_id in data.IMMEDIATE_ALAN_DECISIONS],
+            ),
+            "## Later Alan decisions",
+            md_table(
+                ["Decision", "Alan owns", "Evidence", "Checkpoint"],
+                [[item_id, "; ".join(decisions[item_id]["alan_remaining"]), "; ".join(decisions[item_id]["evidence_required"]), decisions[item_id]["latest"]] for item_id in data.LATER_ALAN_DECISIONS],
+            ),
+            "## External dependencies",
+            md_table(
+                ["Decision", "External dependency", "Activation boundary"],
+                [[item_id, "; ".join(decisions[item_id]["external_dependencies"]), decisions[item_id]["programme_effect"]] for item_id in data.EXTERNAL_DEPENDENT_DECISIONS],
+            ),
+            "# Handoff checklist",
             bullets(
                 [
-                    "Are the fourteen work-package boundaries correct, or should any be split, merged or reordered?",
-                    "Are the fifty suggested PRs small enough and assigned to the correct repositories?",
-                    "Are the workspace/case, invitation, authorship, promotion, payment, document and intelligence contracts technically sound?",
-                    "Is the proposed Luke/Alan lead split workable, with reciprocal review as stated?",
-                    "Are Alan's outstanding PR 122/124 findings fully represented, and what amendments do they require?",
-                    "Do any A0/A1/A2/B1/B2 acceptance criteria or external-review requirements need changing?",
-                    "No implementation begins until amendments are incorporated and the plan is jointly accepted.",
+                    "All 24 decision IDs are present and uniquely classified.",
+                    "D-CI-01, D-MIG-01 and D-OPS-01 remain immediate Alan controls and keep Gate A0 blocked until evidence is accepted.",
+                    "Later Alan decisions are attached to their actual work-package checkpoints rather than forced prematurely.",
+                    "External terms, tax, privacy, security, compliance and PHI dependencies remain explicit activation gates.",
+                    "A0/A1/A2 remain synthetic; B1 is limited to at most five IP/GC pairs and approved nonclinical PII; real document bytes, provider packets and PHI remain prohibited until their later gates.",
+                    f"The {len(data.PROPOSED_PRS)} suggested implementation PRs remain proposals; this planning update creates, merges or deploys none of them.",
                 ]
             ),
         ]

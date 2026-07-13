@@ -1,13 +1,13 @@
 # Work package 01 — CI and PostgreSQL evidence gate
 
-> Planning-only execution contract. Proposed implementers and owners remain recommendations until Alan reviews/signs off the consolidated plan and Luke accepts it. Project: [MVP Product Flow Reshape](https://github.com/orgs/NatalyxPlatform/projects/3).
+> Planning-only execution contract. The corrected work-package split remains proposed pending Alan's review. Local preparation and merge readiness are separate; the benched Project catalogue is not resynced. Project reference: [MVP Product Flow Reshape](https://github.com/orgs/NatalyxPlatform/projects/3).
 
 | Plan | Value |
 | --- | --- |
 | Work package | WP01 |
 | Plan file | `01-ci-and-postgres-evidence-gate.md` |
 | Proposed PRs | P01-01 |
-| Inspection snapshot | 2026-07-10 20:12 America/New_York |
+| Inspection snapshot | 2026-07-12 19:30 America/New_York |
 
 ## 1. Purpose and outcome
 
@@ -15,7 +15,7 @@
 
 **Why this package exists.** It creates a reviewable boundary so the programme can progress without mixing product, data, security, infrastructure and rollout concerns in one oversized change.
 
-**Completed outcome.** A first, deliberately CI-only PR that runs the current tests, exercises the existing schema on PostgreSQL, and publishes diagnosable evidence without introducing the future migration framework.
+**Completed outcome.** A first, deliberately CI-only PR that runs the current tests, exercises the existing schema on PostgreSQL, and publishes diagnosable evidence under stable required-check names without introducing the future migration framework.
 
 **Explicit non-goals.**
 
@@ -33,6 +33,7 @@ Classification is explicit: **verified** is observed code/PR/live behavior; **ve
 | E-005 | verified | app / origin/main@fdf2bb4 | .github/workflows/build.yml:1-42; aws-app-deploy.yml:1-38 | Main builds images and runs a local deploy-contract smoke but has no Python test workflow or PostgreSQL evidence job. |
 | E-006 | verified | app / PR #122@e853821 | PR comment Review round 2 addressed and changed workflow/tests | Updated PR #122 reports 499 tests plus return_to, TTL, CAS, self-invite, lens and Learn fail-closed fixes; green checks were observed. These are salvage candidates, not blanket merge approval. |
 | E-009 | verified | app / origin/main@fdf2bb4 | app/storage/connection.py:14-57,93-123 | The app supports pooled PostgreSQL and SQLite with a SQL compatibility adapter; PostgreSQL is the cloud backend but the current suite is predominantly local. |
+| E-032 | verified limitation | GitHub / 2026-07-12 | private-repository branch-protection/ruleset API | The API returned a plan-level 403 requiring GitHub Pro or public visibility, so a stable workflow can be planned but bypass-resistant required-check enforcement cannot be claimed until D-CI-01 is resolved and read back. |
 
 ## 3. Architecture and contracts
 
@@ -54,9 +55,9 @@ Classification is explicit: **verified** is observed code/PR/live behavior; **ve
 
 ## 4. Explicit PR sequence
 
-| Order | ID | Title | Repository | Dependencies | Gate | Size | Readiness |
+| Order | ID | Title | Repository | Dependencies | Gate | Local preparation | Merge readiness |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | P01-01 | Establish current-test and PostgreSQL CI evidence | app | P00-01 | A0 | Medium | Dependencies unmet |
+| 1 | P01-01 | Establish current-test and PostgreSQL CI evidence | app | P00-01 | A0 | Not ready; named PR, decision or programme-acceptance prerequisites remain | Blocked pending PR dependencies P00-01; technical decisions/controls D-CI-01; Luke review/final founder approval |
 
 ### P01-01 — Establish current-test and PostgreSQL CI evidence
 
@@ -64,9 +65,12 @@ Classification is explicit: **verified** is observed code/PR/live behavior; **ve
 | --- | --- |
 | Repository / base | `app` (`main`) |
 | Project item | [P01-01](https://github.com/orgs/NatalyxPlatform/projects/3?query=P01-01) |
-| Gate / size / readiness | A0 / Medium / Dependencies unmet |
+| Gate / size | A0 / Medium |
+| Local preparation status | Not ready; named PR, decision or programme-acceptance prerequisites remain |
+| Merge readiness | Blocked pending PR dependencies P00-01; technical decisions/controls D-CI-01; Luke review/final founder approval |
+| Technical-decision owner | D-CI-01: Alan - immediate control configuration/evidence |
 | Dependencies | P00-01 |
-| Blocking decisions/checkpoints | None beyond dependencies and plan approval |
+| Blocking decisions/checkpoints | D-CI-01 |
 | Source / salvage | PR #122 unittest workflow and backend-neutral fixes after reconciliation |
 
 #### Objective
@@ -75,7 +79,9 @@ Run the current suite on pull requests/main and prove the existing schema boots 
 
 #### Scope
 
-- Python-version/dependency cache and current test suite
+- Stable, unfiltered unittest and PostgreSQL check names
+- Pinned action SHAs and supported Python runtime
+- Locked/constraint-backed dependencies, timeouts and cancellation
 - Ephemeral PostgreSQL current-schema evidence
 - Sanitized failure artifacts
 
@@ -98,7 +104,7 @@ Run the current suite on pull requests/main and prove the existing schema boots 
 | Schema/model | None; exercise the schema that main owns today. |
 | API/routes | No public API/route contract change. |
 | UI/product surface | No visible participant/operator UI change. |
-| Infrastructure/workflow | Add blocking unit and PostgreSQL evidence jobs. |
+| Infrastructure/workflow | Add stable unittest and PostgreSQL evidence jobs; repository-side required-check enforcement remains D-CI-01 until independently read back. |
 | Migration/backfill | No migration or backfill. |
 | Security/privacy | Preserve existing fail-closed boundaries; validate the PR-specific privacy/security cases. |
 | Architecture/docs/config | Document the contract, version pins and safe partial-merge behavior. |
@@ -108,6 +114,7 @@ Run the current suite on pull requests/main and prove the existing schema boots 
 Objective tests:
 
 - Current Python suite
+- workflow trigger/path-bypass contract
 - init_db twice on PostgreSQL
 - representative create/read/authorization path
 - intentional failure log-redaction check
@@ -140,17 +147,19 @@ Hard dependencies: P00-01. Parallel opportunities: None inside this package beyo
 - [ ] Run the current suite on pull requests/main and prove the existing schema boots and behaves on an ephemeral PostgreSQL service before any migration redesign.
 - [ ] Every listed objective test passes locally and at the required gate where applicable.
 - [ ] Every explicit non-goal remains out of the diff and no protected worktree/branch is modified during extraction.
-- [ ] The Project item has matching dependency, readiness, ownership, gate and disposition fields.
+- [ ] The planning record has matching dependency, local-preparation, merge-readiness, ownership, gate and disposition fields.
 - [ ] Rollout/repair evidence is attached before merge; unresolved decisions remain blocked rather than encoded as guesses.
 
 #### Ownership and review
 
 | Role | Recommendation |
 | --- | --- |
-| DRI | Alan |
-| Implementer | Alan (proposed; pending consolidated-plan sign-off) |
+| Work-package DRI | Alan |
+| Primary implementer | Alan (proposed; pending Alan review) |
+| Technical-decision owner | D-CI-01: Alan - immediate control configuration/evidence |
 | Reviewer | Luke |
 | Final approver | Luke |
+| PR-level ownership exception | None |
 | Required expertise | Python/FastAPI, PostgreSQL, security-aware product engineering |
 | Higher-capability review | Risk-proportionate; not mandatory by programme default |
 
@@ -186,17 +195,39 @@ Compatibility window: keep prior readers/writers and rollback image usable throu
 
 ## 7. Risks and decisions
 
-| Type | ID / risk | Owner | Affected PRs / latest point | Project item / treatment |
-| --- | --- | --- | --- | --- |
-| Implementation risk | CI exposes existing backend drift | Alan or named PR DRI | Package PRs; before associated gate | Mitigate through the explicit tests, rollout and forward-repair plan |
-| Implementation risk | Tests accidentally depend on protected branch code | Alan or named PR DRI | Package PRs; before associated gate | Mitigate through the explicit tests, rollout and forward-repair plan |
-| Implementation risk | Secrets or DB credentials leak in logs | Alan or named PR DRI | Package PRs; before associated gate | Mitigate through the explicit tests, rollout and forward-repair plan |
+Founder outcomes, Alan's remaining technical ownership and external activation dependencies are recorded separately so a final policy is never mistaken for an active control.
+
+| ID | Status | Classification | Remaining owner | Affected / latest | Programme effect |
+| --- | --- | --- | --- | --- | --- |
+| D-CI-01 | Founder final; operationally pending | Luke decides commercial outcome; Alan configures immediately | Alan - immediate | P01-01; Founder decision resolved 2026-07-13; control required before P01-01 merge or any later app implementation PR | P01-01 merge, Gate A0 and dependent implementation PRs remain blocked until the live control is active and verified. |
+
+### D-CI-01 - Required-check enforcement for the private app repository
+
+| Field | Recorded decision or requirement |
+| --- | --- |
+| Decision state | Final founder decision; control pending |
+| Founder outcome | Option A — GitHub Team approved as the private-repository enforcement control. |
+| Founder constraints | Approximately $12 USD/month before tax for three billable users; Commercial decision is final; Expenditure is authorized but not yet incurred; No claim of bypass-resistant enforcement before live configuration and readback |
+| What remains for Alan | Activate GitHub Team when enforcement is required; Configure required unittest and PostgreSQL checks; Restrict routine bypass; Supply ruleset readback and negative-bypass evidence |
+| Evidence required | GitHub Team activation/readback; Mandatory unittest and PostgreSQL checks; Restricted routine bypass; Negative-bypass evidence |
+| Approval rule | Luke accepts the enforcement evidence; the approved purchase itself needs no further founder decision. |
+| External dependencies | GitHub Team activation; expenditure authorized but not yet incurred |
+| Affected PRs / latest point | P01-01; Founder decision resolved 2026-07-13; control required before P01-01 merge or any later app implementation PR |
+| Programme effect | P01-01 merge, Gate A0 and dependent implementation PRs remain blocked until the live control is active and verified. |
+| Independent recommendation | Approved: GitHub Team for three billable users at approximately $12 USD/month before tax. Expenditure is authorized but not yet incurred. Alan owns activation-time ruleset design and evidence; Gate A0 and dependent implementation PRs remain blocked until Team is active, both checks are mandatory, routine bypass is restricted, and negative-bypass evidence is accepted. |
+
+| Implementation risk | Owner | Treatment |
+| --- | --- | --- |
+| CI exposes existing backend drift | Alan | Mitigate through explicit tests, rollout and forward-repair evidence before the associated gate. |
+| Tests accidentally depend on protected branch code | Alan | Mitigate through explicit tests, rollout and forward-repair evidence before the associated gate. |
+| Secrets or DB credentials leak in logs | Alan | Mitigate through explicit tests, rollout and forward-repair evidence before the associated gate. |
 
 ## 8. Existing-work salvage
 
 | Source | Head | Valuable content | Destination | Recommendation | Extraction status/safety |
 | --- | --- | --- | --- | --- | --- |
-| app#122 | e85382150853 | Case projection/lens surfaces, safe return_to, invitation TTL/CAS/self-member/one-GC constraints, transactional membership, fail-closed Learn, SQL-limited timeline, responsive/a11y tests and Python CI workflow. | P01-01 | Retain pending Alan reconciliation; selective port or rebase only after architecture approval | Reinspected at latest head. It is exactly e853821 (no newer delta); retention strengthened, but final extraction waits for Alan checkpoint. |
+| app#122 | e85382150853 | Case projection/lens surfaces, safe return_to, invitation TTL/CAS/self-member/one-GC constraints, transactional membership, fail-closed Learn, SQL-limited timeline, responsive/a11y tests and Python CI workflow. | P01-01 | Selective-port behavior and tests; supersede as programme architecture | Complete at e853821: authoritative behavior/tests and selectively portable implementation are classified; superseded architecture and evidence-only claims are named. |
+| feat/byos-journey-wave-2 | 5b63e3a7c364 | Projection-driven phase-1 cluster presentation, exact route allowlisting, person-versus-case-side ownership intent, transactional submission/work-item and review/audit patterns, fail-closed item retention, approved Learn status selection and 36 focused tests. | P01-01 | Preserve paused at the exact head; selectively port semantics/tests only after adaptation. Do not merge, cherry-pick, continue implementation or use its runtime schema directly. | Paused exact-head evidence; no direct merge |
 
 Package source inventory:
 
@@ -204,13 +235,13 @@ Package source inventory:
 
 ## 9. Ownership recommendation
 
-Alan proposes the workflow and test matrix; Luke approves the evidence threshold. This lane can begin after programme sign-off while the Alan PR-reconciliation checkpoint is still open.
+Alan proposes the workflow and test matrix; Luke approves the evidence threshold. Repository-enforced required-check governance remains bounded by D-CI-01, but the workflow itself can land after programme acceptance.
 
-| PR | DRI | Implementer | Reviewer | Final approver | External/high-capability review |
-| --- | --- | --- | --- | --- | --- |
-| P01-01 | Alan | Alan (proposed) | Luke | Luke | As risk warrants |
+| PR | WP DRI | Primary implementer | Technical-decision owner | Reviewer | Final approver | Exception |
+| --- | --- | --- | --- | --- | --- | --- |
+| P01-01 | Alan | Alan (proposed) | D-CI-01: Alan - immediate control configuration/evidence | Luke | Luke | None |
 
-Luke decides product/lifecycle/commercial/privacy/PHI/provider policy and accepts gates. Alan proposes implementation design, decomposition, migrations, code, tests, rollout and repair. This is a recommendation pending Alan's review/sign-off, not a compulsory assignment.
+PR ownership inherits the proposed work-package split pending Alan's review. Named technical-decision ownership remains separate and never transfers implementation ownership across work packages; reciprocal and external review requirements remain intact.
 
 ## 10. Definition of done
 

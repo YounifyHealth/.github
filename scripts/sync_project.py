@@ -266,7 +266,7 @@ def build_items() -> list[dict[str, Any]]:
                 f"**Child PRs:** {text_list(children)}",
                 f"**Blocking decisions/checkpoints:** {text_list(decision_ids)}",
                 f"**Plan:** `{plan_path(wp_filename(wp['id']))}`",
-                "**Sign-off:** Alan's implementation/review ownership remains proposed until he reviews this consolidated programme; Luke is final product/architecture approver.",
+                "**Sign-off:** Alan's technical feedback is reconciled; implementation/review ownership remains proposed until the amended package is jointly accepted. Luke is final product/architecture approver.",
             ]
         )
         records.append(
@@ -274,6 +274,7 @@ def build_items() -> list[dict[str, Any]]:
                 f"[{wp['id']}] {wp['title']}",
                 body,
                 {
+                    "Status": "Done" if wp["id"] == "WP00" else "Todo",
                     "Item type": "Work package",
                     "Work package": wp["id"],
                     "Target repository": "Multiple / external",
@@ -304,7 +305,7 @@ def build_items() -> list[dict[str, Any]]:
                 f"**Gate / size:** {pr['gate']} / {pr['size']}",
                 "**Acceptance / test plan**\n" + bullets(pr["tests"]),
                 f"**Plan:** `{plan_path(wp_filename(pr['wp']))}`",
-                "**Ownership note:** Proposed only until Alan reviews/signs off the consolidated programme. No implementation is authorized by this draft item.",
+                "**Ownership note:** Proposed only until the amended programme is jointly accepted. No implementation is authorized by this draft item.",
             ]
         )
         records.append(
@@ -312,6 +313,7 @@ def build_items() -> list[dict[str, Any]]:
                 f"[{pr['id']}] {pr['title']}",
                 body,
                 {
+                    "Status": "Todo",
                     "Item type": "Proposed PR",
                     "Work package": pr["wp"],
                     "Target repository": repo_option(pr["repo"]),
@@ -370,10 +372,10 @@ def build_items() -> list[dict[str, Any]]:
                     "Dependencies": "Extraction destinations: " + text_list(existing["destinations"]),
                     "Programme gate": "Pre-A0",
                     "Size": "N/A",
-                    "Blocking decision": "CHECK-ALAN-122-124" if existing["number"] in {122, 124} and repo_name == "natalyx-app" else "None",
+                    "Blocking decision": "None",
                     "Source / salvage PR": f"{existing['url']} @ {existing['sha']}",
                     "Plan document path": plan_path("existing-pr-extraction-ledger.md"),
-                    "Readiness": "Awaiting reconciliation" if existing["number"] in {122, 124} and repo_name == "natalyx-app" else "Retained for salvage",
+                    "Readiness": "Retained for salvage",
                     "Disposition": disposition,
                 },
                 content_url=existing["url"],
@@ -429,6 +431,7 @@ def build_items() -> list[dict[str, Any]]:
                 f"**Affected PRs:** {text_list(decision['affected'])}",
                 f"**Resolve by:** {decision['latest']}",
                 f"**Owner / proposer:** {decision['owner']} / {decision['proposer']}",
+                f"**Status:** {decision.get('status', 'Open')}",
                 f"**Decision register:** `{plan_path('consolidated-plan.md')}`",
             ]
         )
@@ -437,6 +440,7 @@ def build_items() -> list[dict[str, Any]]:
                 f"[DECISION {decision['id']}] {decision['title']}",
                 body,
                 {
+                    "Status": "Done" if decision.get("status", "Open").startswith("Resolved") else "Todo",
                     "Item type": "Decision",
                     "Work package": wp_value,
                     "Target repository": repo_value,
@@ -450,8 +454,8 @@ def build_items() -> list[dict[str, Any]]:
                     "Blocking decision": decision["id"],
                     "Source / salvage PR": "Decision register; affected PRs: " + text_list(decision["affected"]),
                     "Plan document path": plan_path("consolidated-plan.md"),
-                    "Readiness": "Blocked by decision",
-                    "Disposition": "Decision needed",
+                    "Readiness": "Complete" if decision.get("status", "Open").startswith("Resolved") else "Blocked by decision",
+                    "Disposition": "Direct reuse" if decision.get("status", "Open").startswith("Resolved") else "Decision needed",
                 },
             )
         )
@@ -480,13 +484,14 @@ def build_items() -> list[dict[str, Any]]:
                 "Implementer": "N/A",
                 "Programme reviewer": "Joint",
                 "Final approver": owner(checkpoint["approver"]),
-                "Dependencies": "PRs app#122 and app#124",
+                "Status": "Done",
+                "Dependencies": "PRs app#122/app#124 and preserved Wave 2@5b63e3a",
                 "Programme gate": "Pre-A0",
                 "Size": "N/A",
-                "Blocking decision": checkpoint["id"],
-                "Source / salvage PR": "app#122, app#124",
+                "Blocking decision": "None",
+                "Source / salvage PR": "app#122, app#124, feat/byos-journey-wave-2@5b63e3a",
                 "Plan document path": plan_path("existing-pr-extraction-ledger.md"),
-                "Readiness": "Awaiting reconciliation",
+                "Readiness": "Complete",
                 "Disposition": "Checkpoint",
             },
         )
@@ -566,8 +571,9 @@ def build_items() -> list[dict[str, Any]]:
     duplicates = [title for title, count in Counter(titles).items() if count > 1]
     if duplicates:
         raise RuntimeError(f"Duplicate draft titles: {duplicates}")
-    if len(records) != 106:
-        raise RuntimeError(f"Expected 106 Project records, built {len(records)}")
+    expected_records = int(data.PROJECT_SYNC_RESULT["items"])
+    if len(records) != expected_records:
+        raise RuntimeError(f"Expected {expected_records} desired Project records, built {len(records)}")
     return records
 
 
@@ -613,8 +619,8 @@ def update_project_metadata(project_id: str) -> None:
             "Planning control plane for the Natalyx MVP Product Flow Reshape.",
             "",
             "Canonical package: `.github` branch `plan/mvp-product-flow-reshape`.",
-            "No implementation is authorized until Alan reviews the consolidated plan and Luke accepts it.",
-            "Readiness is separate from Status; all new items begin in Todo.",
+            "Alan's technical feedback is reconciled; no implementation is authorized until the amended Drive package is jointly accepted and the Project is explicitly reactivated.",
+            "Readiness is separate from Status; the reconciled checkpoint/resolved decisions are Done while implementation remains Todo.",
         ]
     )
     run_gh_graphql(
@@ -622,7 +628,7 @@ def update_project_metadata(project_id: str) -> None:
         {
             "input": {
                 "projectId": project_id,
-                "shortDescription": "Planning-only control plane for the MVP Product Flow Reshape; implementation awaits Alan review and Luke approval.",
+                "shortDescription": "Benched planning catalogue for the reconciled MVP Product Flow Reshape; implementation awaits joint package acceptance and explicit reactivation.",
                 "readme": readme,
             }
         },
@@ -840,28 +846,33 @@ def sync(apply: bool) -> dict[str, Any]:
     }
     incomplete_items: list[str] = []
     type_counts: Counter[str] = Counter()
+    status_counts: Counter[str] = Counter()
+    expected_status_by_title = {record["title"]: record["fields"].get("Status", "Todo") for record in records}
     for item in final_items:
         values = item_field_values(item)
         title = item["content"]["title"]
         missing_values = sorted(name for name in required_for_all if not values.get(name))
         if values.get("Item type") == "Proposed PR" and not values.get("Proposed PR ID"):
             missing_values.append("Proposed PR ID")
-        if values.get("Status") != "Todo":
-            missing_values.append("Status=Todo")
+        expected_status = expected_status_by_title[title]
+        if values.get("Status") != expected_status:
+            missing_values.append(f"Status={expected_status}")
         if missing_values:
             incomplete_items.append(f"{title}: {', '.join(sorted(set(missing_values)))}")
         if values.get("Item type"):
             type_counts[values["Item type"]] += 1
+        if values.get("Status"):
+            status_counts[values["Status"]] += 1
     expected_types = Counter(
         {
-            "Work package": 14,
-            "Proposed PR": 50,
-            "Existing PR": 9,
-            "Existing issue": 2,
-            "Decision": 22,
+            "Work package": len(data.WORK_PACKAGES),
+            "Proposed PR": len(data.PROPOSED_PRS),
+            "Existing PR": len(data.EXISTING_PRS),
+            "Existing issue": len(data.RELATED_ISSUES),
+            "Decision": len(data.DECISIONS),
             "Review checkpoint": 1,
-            "Programme gate": 5,
-            "Cleanup task": 3,
+            "Programme gate": len(data.GATES),
+            "Cleanup task": len(data.CLEANUP_TASKS),
         }
     )
     if incomplete_items or type_counts != expected_types:
@@ -877,7 +888,7 @@ def sync(apply: bool) -> dict[str, Any]:
             "custom_fields_after": len([name for name in final_fields if name in {spec['name'] for spec in data.PROJECT_FIELDS}]),
             "validated_unique_items": len(records),
             "validated_item_types": dict(sorted(type_counts.items())),
-            "all_statuses": "Todo",
+            "validated_statuses": dict(sorted(status_counts.items())),
             "required_field_values": "complete",
             "validation": "passed",
         }
@@ -891,7 +902,7 @@ def main() -> None:
     args = parser.parse_args()
     if args.apply and getattr(data, "PROJECT_BENCHED", False):
         raise SystemExit(
-            "Project 3 is benched pending Drive-plan approval. Do not apply the active sync until the programme is jointly reactivated."
+            "Project 3 is benched after plan reconciliation. Do not apply the desired catalogue until the amended Drive package is jointly accepted and the Project is explicitly reactivated."
         )
     print(json.dumps(sync(args.apply), indent=2, sort_keys=True))
 
