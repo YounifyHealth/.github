@@ -7,10 +7,10 @@ set -euo pipefail
 
 # Approved repositories for the PR-alert rollout.
 REPOS=(
-  "natalyx-developer-context-skills"
-  "natalyx-app"
-  "natalyx-intelligence"
-  "natalyx-infra"
+  "younify-engineering"
+  "younify-core"
+  "younify-intelligence"
+  "younify-infra"
   "natalyx-learn-resources"
 )
 
@@ -93,7 +93,7 @@ fi
 
 if [[ "$dry_run" == true ]]; then
   for repo in "${REPOS[@]}"; do
-    echo "Would set PR alert secrets for NatalyxPlatform/$repo"
+    echo "Would set PR alert secrets for YounifyHealth/$repo"
     for secret_name in "${secret_names[@]}"; do
       echo "  $secret_name"
     done
@@ -122,12 +122,12 @@ set_secret() {
   local value="$3"
 
   gh secret set "$secret_name" \
-    --repo "NatalyxPlatform/$repo" \
+    --repo "YounifyHealth/$repo" \
     --body "$value"
 }
 
 for repo in "${REPOS[@]}"; do
-  echo "Setting PR alert secrets for NatalyxPlatform/$repo"
+  echo "Setting PR alert secrets for YounifyHealth/$repo"
 
   if [[ "$only_recipients" == true ]]; then
     set_secret "$repo" "PR_ALERT_TO" "$recipients"
@@ -138,7 +138,7 @@ for repo in "${REPOS[@]}"; do
 
     # Use standard input so the password is not placed in a command argument.
     printf '%s' "$app_password" | gh secret set "PR_ALERT_SMTP_PASSWORD" \
-      --repo "NatalyxPlatform/$repo"
+      --repo "YounifyHealth/$repo"
 
     set_secret "$repo" "PR_ALERT_FROM" "$MAIL_FROM"
     set_secret "$repo" "PR_ALERT_TO" "$recipients"
